@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.bean.MessageTarget;
 import com.hl.rollingbaby.network.MessageService;
 
 public class SwingActivity extends BaseActivity implements ServiceConnection {
@@ -73,16 +72,11 @@ public class SwingActivity extends BaseActivity implements ServiceConnection {
     public void onServiceConnected(ComponentName name, IBinder service) {
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
-//        messageBinder.startConnect(((MessageTarget) this).getHandler());
-        if (messageBinder != null) {
             Toast.makeText(this,
                     messageBinder.getTemperature() + "\n"
                     + messageBinder.getSoundMode() + "\n"
                     + messageBinder.getPlayState(),
                     Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(this, "is null",Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override

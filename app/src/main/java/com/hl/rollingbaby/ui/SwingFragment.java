@@ -10,9 +10,6 @@ import android.widget.ImageView;
 import com.hl.rollingbaby.R;
 import com.skyfishjy.library.RippleBackground;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class SwingFragment extends Fragment {
 
     public SwingFragment() {
@@ -30,7 +27,6 @@ public class SwingFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 rippleBackground.startRippleAnimation();
-//                rippleBackground.stopRippleAnimation();
             }
         });
 

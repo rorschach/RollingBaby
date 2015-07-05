@@ -3,7 +3,6 @@ package com.hl.rollingbaby.ui;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -139,10 +138,10 @@ public class StatusFragment extends Fragment {
         cardView_music.setCard(card_music);
         cardView_swing.setCard(card_swing);
 
-//        list = mListener.getStateFromSharedPreference();
+        list = mListener.getStateFromSP();
 //        temperatureText.setText(list.get(0));
 //        humidityText.setText(list.get(1));
-//        palyText.setText(list.get(2));
+//        palyText.setText(list.get(1) + "/" + list.get(2));
 //        swingText.setText(list.get(3));
     }
 
@@ -158,9 +157,9 @@ public class StatusFragment extends Fragment {
     }
 
     public interface OnStatusFragmentInteractionListener {
-        // TODO: Update argument type and name
+
         public void geMessageFromServer(String readMessage);
 
-        public ArrayList<String> getStateFromSharedPreference();
+        public ArrayList<String> getStateFromSP();
     }
 }

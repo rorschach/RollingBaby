@@ -20,6 +20,8 @@ import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.ui.HomeActivity;
 import com.hl.rollingbaby.ui.SettingsActivity;
 
+import java.util.ArrayList;
+
 public class MessageService extends Service {
 
     private static final String TAG = MessageService.class.getSimpleName();
@@ -39,6 +41,13 @@ public class MessageService extends Service {
 
     private SharedPreferences dataPreferences;
     private SharedPreferences.Editor dataEditor;
+
+    private int temperature = 25;
+    private int playState = 0;
+    private String soundMode = Constants.CLOSE;
+    private ArrayList<String> status = new ArrayList<>();
+
+
 
     public static final String EOL = "\n";
 
@@ -158,12 +167,16 @@ public class MessageService extends Service {
             }
         }
 
-        public void getSharedPreferencesStatus() {
-            if (dataPreferences != null && dataEditor != null) {
-                Log.d(TAG, "dataPreferences & dataEditor is not null");
-            } else {
-                Log.d(TAG, "dataPreferences | dataEditor is null");
-            }
+        public ArrayList<String> getStatusFromSharedPreference() {
+            getTemperature();
+            getSoundMode();
+            getPlayState();
+            status.add(temperature + "");
+            status.add(soundMode);
+            status.add(playState + "");
+            Log.d(TAG, status.size() + " : status.size()");
+
+            return status;
         }
 
         private void setStatusToSharedPreferences() {
@@ -175,7 +188,6 @@ public class MessageService extends Service {
         }
 
         public int getTemperature() {
-            int temperature = 25;
             if (dataPreferences != null) {
                 temperature = dataPreferences.getInt(
                         Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
@@ -193,7 +205,6 @@ public class MessageService extends Service {
         }
 
         public int getPlayState() {
-            int playState = 1;
             if (dataPreferences != null) {
                 playState =  dataPreferences.getInt(
                         Constants.PLAY_STATE, Constants.SOUND_PAUSE);
@@ -211,7 +222,6 @@ public class MessageService extends Service {
         }
 
         public String getSoundMode() {
-            String soundMode = Constants.CLOSE;
             if (dataPreferences != null) {
                 soundMode =  dataPreferences.getString(
                         Constants.CURRENT_SOUND_MODE, Constants.CLOSE);

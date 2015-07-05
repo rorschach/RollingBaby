@@ -91,14 +91,12 @@ public class SoundFragment extends Fragment {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                isPlaying = !isPlaying;
                 playState = Math.abs(playState - 1);
                 if (playState == 1) {
                     waveView.setPlayStation(true);
                 } else {
                     waveView.setPlayStation(false);
                 }
-//                waveView.setPlayStation(playState == 1);
                 Log.d(TAG, "Play state after click: " + playState);
                 setPlayButton();
                 mListener.savePlayState(playState);
@@ -131,17 +129,8 @@ public class SoundFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnSoundFragmentInteractionListener {
+
         public int getPlayState();
 
         public void savePlayState(int playState);

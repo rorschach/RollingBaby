@@ -1,20 +1,15 @@
 package com.hl.rollingbaby.ui;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.bean.Constants;
-import com.hl.rollingbaby.bean.MessageTarget;
 import com.hl.rollingbaby.network.MessageService;
 
 public class SoundActivity extends BaseActivity implements
@@ -73,7 +68,6 @@ public class SoundActivity extends BaseActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-//        isInActivity = false;
     }
 
     @Override

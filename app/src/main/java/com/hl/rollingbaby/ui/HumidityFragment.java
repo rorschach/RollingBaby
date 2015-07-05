@@ -8,9 +8,6 @@ import android.view.ViewGroup;
 
 import com.hl.rollingbaby.R;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class HumidityFragment extends Fragment {
 
     public HumidityFragment() {

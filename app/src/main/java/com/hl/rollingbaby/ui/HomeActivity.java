@@ -1,16 +1,13 @@
 package com.hl.rollingbaby.ui;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.util.Log;
@@ -104,10 +101,6 @@ public class HomeActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-//        dataPreferences = getSharedPreferences(
-//                Constants.FILE_NAME, Context.MODE_PRIVATE);
-//        dataEditor = dataPreferences.edit();
-
         mSwipeRefreshWidget = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_widget);
         mSwipeRefreshWidget.setColorScheme(R.color.red, R.color.yellow,
                 R.color.blue, R.color.green);
@@ -116,20 +109,8 @@ public class HomeActivity extends BaseActivity implements
         isInActivity = true;
         Log.d(TAG, String.valueOf(isInActivity));
 
-//        setStatus();
-
         init();
     }
-
-//    private void setStatus() {
-//        SharedPreferences.Editor dataEditor = getSharedPreferences(
-//                Constants.FILE_NAME, Context.MODE_PRIVATE).edit();
-//        dataEditor.putInt(Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
-//        dataEditor.putInt(Constants.CURRENT_HUMIDITY_VALUE, Constants.DEFAULT_HUMIDITY);
-//        dataEditor.putString(Constants.CURRENT_SOUND_MODE, Constants.CLOSE);
-//        dataEditor.putString(Constants.CURRENT_SWING_MODE, Constants.CLOSE);
-//        dataEditor.commit();
-//    }
 
     public void init(){
         initViews();
@@ -177,6 +158,7 @@ public class HomeActivity extends BaseActivity implements
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
         messageBinder.startConnect(((MessageTarget) this).getHandler());
+        list = messageBinder.getStatusFromSharedPreference();
     }
 
     @Override
@@ -215,21 +197,9 @@ public class HomeActivity extends BaseActivity implements
     }
 
     @Override
-    public ArrayList<String> getStateFromSharedPreference() {
-        SharedPreferences dataPreferences = getSharedPreferences(
-                Constants.FILE_NAME, Context.MODE_PRIVATE);
-        int temperatureValue = dataPreferences.getInt(
-                Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
-        int humidityValue = dataPreferences.getInt(
-                Constants.CURRENT_HUMIDITY_VALUE, Constants.DEFAULT_HUMIDITY);
-        String soundMode = dataPreferences.getString(Constants.CURRENT_SOUND_MODE, Constants.CLOSE);
-        String swingMode = dataPreferences.getString(Constants.CURRENT_SWING_MODE, Constants.CLOSE);
-
-        list.add(temperatureValue + "");
-        list.add(humidityValue + "");
-        list.add(soundMode);
-        list.add(swingMode);
-
+    public ArrayList<String> getStateFromSP() {
+//        list = messageBinder.getStatusFromSharedPreference();
+        Log.d(TAG, list.size() + " : list.size()");
         return list;
     }
 
@@ -243,7 +213,6 @@ public class HomeActivity extends BaseActivity implements
 //        if (messageBinder.getConnectState()) {
 //            sendMessage(Constants.COMMAND_REFRESH);
 //        } else {
-                    messageBinder.getSharedPreferencesStatus();
             hideRefreshProgress();
 //        }
     }

@@ -7,6 +7,9 @@ public interface Constants {
 
     public static final String FILE_NAME = "data";
 
+    public static final String GET = "GET";
+    public static final String SET = "SET";
+
     /*
      *message type
      */
@@ -14,7 +17,10 @@ public interface Constants {
     public static final int MESSAGE_SEND = 0x400 + 2;
     public static final int CONNECT_SUCCESS = 0x400 + 4;
     public static final int CONNECT_FAILED = 0x400 + 8;
+    public static final int UPDATE_UI = 0x400 + 16;
 
+    public static final String UPDATE_UI_BROADCAST =
+            "com.hl.rollingbaby.broadcast.UPDATE_UI_BROADCAST";
 
     /*
      *constants in SharedPreference file
@@ -64,8 +70,9 @@ public interface Constants {
     public static final String SOUND_CLOSE = "C";
     public static final String SOUND_MUSIC = "M";
     public static final String SOUND_STORY = "S";
-    public static final int SOUND_PLAY = 0;
-    public static final int SOUND_PAUSE = 1;
+
+    public static final int SOUND_PAUSE = 0;
+    public static final int SOUND_PLAY = 1;
     public static final int SOUND_NEXT = 2;
     public static final int SOUND_PERVIOUS = 3;
 

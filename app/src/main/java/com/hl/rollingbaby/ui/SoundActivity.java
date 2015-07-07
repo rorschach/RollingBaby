@@ -90,8 +90,8 @@ public class SoundActivity extends BaseActivity implements
     public void onServiceConnected(ComponentName name, IBinder service) {
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
-        playState = messageBinder.getPlayState();
-        soundMode = messageBinder.getSoundMode();
+//        playState = messageBinder.getPlayState();
+//        soundMode = messageBinder.getSoundMode();
     }
 
     @Override
@@ -106,7 +106,7 @@ public class SoundActivity extends BaseActivity implements
 
     @Override
     public void savePlayState(int playState) {
-       messageBinder.savePlayState(playState);
+//       messageBinder.savePlayState(playState);
     }
 
     @Override
@@ -116,6 +116,6 @@ public class SoundActivity extends BaseActivity implements
 
     @Override
     public void saveSoundMode(String soundMode) {
-        messageBinder.saveSoundMode(soundMode);
+//        messageBinder.saveSoundMode(soundMode);
     }
 }

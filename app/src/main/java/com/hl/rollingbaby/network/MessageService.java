@@ -39,15 +39,6 @@ public class MessageService extends Service {
     private MessageBinder messageBinder = new MessageBinder();
     private Context context;
 
-    private SharedPreferences dataPreferences;
-    private SharedPreferences.Editor dataEditor;
-
-    private int temperature = 25;
-    private int playState = 0;
-    private String soundMode = Constants.CLOSE;
-    private ArrayList<String> status = new ArrayList<>();
-
-
 
     public static final String EOL = "\n";
 
@@ -58,10 +49,6 @@ public class MessageService extends Service {
     public void onCreate() {
         super.onCreate();
         context = MessageService.this;
-        dataPreferences = getSharedPreferences(
-                Constants.FILE_NAME, Context.MODE_PRIVATE);
-        dataEditor = dataPreferences.edit();
-
         Log.d(TAG, "MessageService is OnCreate");
     }
 
@@ -112,6 +99,7 @@ public class MessageService extends Service {
             messageManager.setConnectState(true);
             messageManager.start();
             Log.d(TAG, "MessageBinder is ConnectToServer");
+            Log.d(TAG, SERVER_HOST + ":" + SERVER_PORT);
         }
 
         public void stopConnect() {
@@ -166,77 +154,5 @@ public class MessageService extends Service {
                 manager.notify(requestCode, mBuilder.build());
             }
         }
-
-        public ArrayList<String> getStatusFromSharedPreference() {
-            getTemperature();
-            getSoundMode();
-            getPlayState();
-            status.add(temperature + "");
-            status.add(soundMode);
-            status.add(playState + "");
-            Log.d(TAG, status.size() + " : status.size()");
-
-            return status;
-        }
-
-        private void setStatusToSharedPreferences() {
-            dataEditor.putInt(Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
-            dataEditor.putInt(Constants.CURRENT_HUMIDITY_VALUE, Constants.DEFAULT_HUMIDITY);
-            dataEditor.putString(Constants.CURRENT_SOUND_MODE, Constants.CLOSE);
-            dataEditor.putString(Constants.CURRENT_SWING_MODE, Constants.CLOSE);
-            dataEditor.commit();
-        }
-
-        public int getTemperature() {
-            if (dataPreferences != null) {
-                temperature = dataPreferences.getInt(
-                        Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
-                return temperature;
-            }
-            Log.d(TAG, temperature + "");
-            return temperature;
-        }
-
-        public void saveTemperature(int temperature) {
-            if (dataEditor != null) {
-                dataEditor.putInt(Constants.CURRENT_TEMPERATURE_VALUE, temperature)
-                        .commit();
-            }
-        }
-
-        public int getPlayState() {
-            if (dataPreferences != null) {
-                playState =  dataPreferences.getInt(
-                        Constants.PLAY_STATE, Constants.SOUND_PAUSE);
-                return playState;
-            }
-            Log.d(TAG, playState + "");
-            return playState;
-        }
-
-        public void savePlayState(int playState) {
-            if (dataEditor != null) {
-                dataEditor.putInt(Constants.PLAY_STATE, playState)
-                        .commit();
-            }
-        }
-
-        public String getSoundMode() {
-            if (dataPreferences != null) {
-                soundMode =  dataPreferences.getString(
-                        Constants.CURRENT_SOUND_MODE, Constants.CLOSE);
-                return soundMode;
-            }
-            Log.d(TAG, soundMode);
-            return soundMode;
-        }
-
-        public void saveSoundMode(String soundMode) {
-            if (dataEditor != null) {
-                dataEditor.putString(Constants.CURRENT_SOUND_MODE, soundMode)
-                        .commit();
-            }
-        }
-
     }
 }

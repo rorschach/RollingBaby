@@ -74,7 +74,7 @@ public class TemperatureActivity extends BaseActivity implements
     public void onServiceConnected(ComponentName name, IBinder service) {
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
-        temperature = messageBinder.getTemperature();
+//        temperature = messageBinder.getTemperature();
         Log.d(TAG, temperature + " : onServiceConnected");
     }
 
@@ -107,6 +107,6 @@ public class TemperatureActivity extends BaseActivity implements
 
     @Override
     public void saveTemperature(int temperature) {
-        messageBinder.saveTemperature(temperature);
+//        messageBinder.saveTemperature(temperature);
     }
 }

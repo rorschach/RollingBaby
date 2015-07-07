@@ -72,11 +72,6 @@ public class SwingActivity extends BaseActivity implements ServiceConnection {
     public void onServiceConnected(ComponentName name, IBinder service) {
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
-            Toast.makeText(this,
-                    messageBinder.getTemperature() + "\n"
-                    + messageBinder.getSoundMode() + "\n"
-                    + messageBinder.getPlayState(),
-                    Toast.LENGTH_SHORT).show();
     }
 
     @Override

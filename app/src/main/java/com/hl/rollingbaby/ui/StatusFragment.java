@@ -11,7 +11,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.hl.rollingbaby.R;
+import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.network.MessageManager;
+import com.hl.rollingbaby.network.StatusService;
 
 import java.util.ArrayList;
 
@@ -138,11 +140,14 @@ public class StatusFragment extends Fragment {
         cardView_music.setCard(card_music);
         cardView_swing.setCard(card_swing);
 
-        list = mListener.getStateFromSP();
+//        list = mListener.getStateFromSP();
 //        temperatureText.setText(list.get(0));
 //        humidityText.setText(list.get(1));
 //        palyText.setText(list.get(1) + "/" + list.get(2));
 //        swingText.setText(list.get(3));
+
+        StatusService.startActionProcessTemperature(
+                getActivity(), Constants.GET, 25);
     }
 
     @Override

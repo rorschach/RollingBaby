@@ -1,13 +1,15 @@
 package com.hl.rollingbaby.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +22,7 @@ import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.bean.MessageTarget;
 import com.hl.rollingbaby.network.MessageManager;
 import com.hl.rollingbaby.network.MessageService;
+import com.hl.rollingbaby.network.StatusService;
 
 import java.util.ArrayList;
 
@@ -38,8 +41,8 @@ public class HomeActivity extends BaseActivity implements
     private MessageService.MessageBinder messageBinder;
     private MessageService messageService;
 
-//    private SharedPreferences dataPreferences;
-//    private SharedPreferences.Editor dataEditor;
+    private UpdateUIReceiver receiver;
+
 
     private StatusFragment statusFragment = new StatusFragment();
 
@@ -122,10 +125,6 @@ public class HomeActivity extends BaseActivity implements
     }
 
     public void getData() {
-//        int temperature = dataPreferences.getInt(Constants.TEMPERATURE, 25);
-//        int humidity = dataPreferences.getInt(Constants.HUMIDITY, 30);
-//        String sound = dataPreferences.getString(Constants.SOUND, "");
-//        String swing = dataPreferences.getString(Constants.SWING, "");
     }
 
     public void showContent() {
@@ -135,6 +134,8 @@ public class HomeActivity extends BaseActivity implements
     protected void onPause() {
         super.onPause();
         isInActivity = false;
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.unregisterReceiver(receiver);
     }
 
     @Override
@@ -143,6 +144,18 @@ public class HomeActivity extends BaseActivity implements
         Intent intent = new Intent(this, MessageService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
         isInActivity = true;
+
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter(Constants.UPDATE_UI_BROADCAST);
+
+        receiver = new UpdateUIReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                super.onReceive(context, intent);
+            }
+        };
+
+        broadcastManager.registerReceiver(receiver, intentFilter);
     }
 
     @Override
@@ -158,7 +171,7 @@ public class HomeActivity extends BaseActivity implements
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
         messageBinder.startConnect(((MessageTarget) this).getHandler());
-        list = messageBinder.getStatusFromSharedPreference();
+//        list = messageBinder.getStatusFromSharedPreference();
     }
 
     @Override
@@ -190,7 +203,7 @@ public class HomeActivity extends BaseActivity implements
 
         try {
             String state[] = readMessage.split(":");
-            //TODO
+            //TODO:process status and display it in UI
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -213,6 +226,9 @@ public class HomeActivity extends BaseActivity implements
 //        if (messageBinder.getConnectState()) {
 //            sendMessage(Constants.COMMAND_REFRESH);
 //        } else {
+//            StatusService.startActionProcessTemperature(this, Constants.GET, 0);
+//            StatusService.startActionProcessSound(this, Constants.GET, 0, "");
+            StatusService.startActionGetTemperature(this);
             hideRefreshProgress();
 //        }
     }
@@ -231,6 +247,26 @@ public class HomeActivity extends BaseActivity implements
 
     public void disableSwipe() {
         mSwipeRefreshWidget.setEnabled(false);
+    }
+
+    public class UpdateUIReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(context, intent.getAction(), Toast.LENGTH_SHORT).show();
+            String action = intent.getAction();
+
+            if (Constants.UPDATE_UI_BROADCAST.equals(action)) {
+                //TODO:update UI
+//                final String type = intent.getStringExtra(StatusService.EXTRA_PROCESS_TYPE);
+//                final int playState = intent.getIntExtra(EXTRA_PLAY_STATE, 1);
+//                final String soundMode = intent.getStringExtra(EXTRA_SOUND_MODE);
+
+                Toast.makeText(context, action, Toast.LENGTH_SHORT).show();
+            }
+
+            Toast.makeText(context, action, Toast.LENGTH_SHORT).show();
+
+        }
     }
 
 

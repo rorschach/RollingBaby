@@ -19,8 +19,6 @@ public interface Constants {
     public static final int CONNECT_FAILED = 0x400 + 8;
     public static final int UPDATE_UI = 0x400 + 16;
 
-    public static final String UPDATE_UI_BROADCAST =
-            "com.hl.rollingbaby.broadcast.UPDATE_UI_BROADCAST";
 
     /*
      *constants in SharedPreference file

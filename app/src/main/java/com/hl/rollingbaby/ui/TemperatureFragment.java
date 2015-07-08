@@ -82,10 +82,7 @@ public class TemperatureFragment extends Fragment {
         mArcWidth.setProgress(mSeekArc.getArcWidth());
         mProgressWidth.setProgress(mSeekArc.getProgressWidth());
 
-        int temperature = mListener.getTemperature();
-        Log.d(TAG, temperature + "");
-        mSeekArc.setProgress(temperature);
-        mSeekArcProgress.setText(temperature + "");
+//        setTemperature();
 
         mSeekArc.setOnSeekArcChangeListener(new OnSeekArcChangeListener() {
 
@@ -207,6 +204,11 @@ public class TemperatureFragment extends Fragment {
         });
 
         return view;
+    }
+
+    public void setTemperature(int temperature) {
+        mSeekArc.setProgress(temperature);
+        mSeekArcProgress.setText(temperature + "");
     }
 
     @Override

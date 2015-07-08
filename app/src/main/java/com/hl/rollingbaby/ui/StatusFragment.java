@@ -25,14 +25,19 @@ public class StatusFragment extends Fragment {
 
     private static final String TAG = "StateFragment";
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_Temperature = "Temperature";
+    private static final String ARG_SoundMode = "SoundMode";
+    private static final String ARG_PlayState = "PlayState";
+    private static final String ARG_SwingMode = "SwingMode";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int mTemperature;
+    private String mSoundMode;
+    private int mPlayState;
+    private String mSwingMode;
 
     private OnStatusFragmentInteractionListener mListener;
+
 
     private MessageManager messageManager;
 
@@ -48,15 +53,21 @@ public class StatusFragment extends Fragment {
 
     private TextView temperatureText;
     private TextView humidityText;
-    private TextView palyText;
+    private TextView soundText;
     private TextView swingText;
     private ArrayList<String> list = new ArrayList<>();
 
-    public static StatusFragment newInstance(String param1, String param2) {
-        StatusFragment fragment = new StatusFragment();
+    public static StatusFragment newInstance(
+            int temperature, String soundMode,int playState, String swingMdoe) {
+        StatusFragment fragment = null;
+        if (fragment == null) {
+            fragment = new StatusFragment();
+        }
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_Temperature, temperature);
+        args.putString(ARG_SoundMode, soundMode);
+        args.putInt(ARG_PlayState, playState);
+        args.putString(ARG_SwingMode, swingMdoe);
         fragment.setArguments(args);
         return fragment;
     }
@@ -76,9 +87,12 @@ public class StatusFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StatusService.startActionGetStatus(getActivity());
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mTemperature = getArguments().getInt(ARG_Temperature);
+            mSoundMode = getArguments().getString(ARG_SoundMode);
+            mPlayState = getArguments().getInt(ARG_PlayState);
+            mSwingMode = getArguments().getString(ARG_SwingMode);
         }
     }
 
@@ -94,30 +108,31 @@ public class StatusFragment extends Fragment {
 
     private void initViews(View view) {
         card_temperature = new Card(getActivity());
-        card_humidity = new Card(getActivity());
+//        card_humidity = new Card(getActivity());
         card_music = new Card(getActivity());
         card_swing = new Card(getActivity());
 
         cardView_temperature = (CardViewNative) view.findViewById(R.id.carddemo);
-        cardView_humidity = (CardViewNative) view.findViewById(R.id.carddemo1);
+//        cardView_humidity = (CardViewNative) view.findViewById(R.id.carddemo1);
         cardView_music = (CardViewNative) view.findViewById(R.id.carddemo2);
         cardView_swing = (CardViewNative) view.findViewById(R.id.carddemo3);
 
-                card_temperature.setOnClickListener(new Card.OnCardClickListener() {
-                    @Override
-                    public void onClick(Card card, View view) {
-                        Intent intent = new Intent(getActivity(), TemperatureActivity.class);
-                        startActivity(intent);
-                    }
-                });
-
-        card_humidity.setOnClickListener(new Card.OnCardClickListener() {
+        card_temperature.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
-                Intent intent = new Intent(getActivity(), HumidityActivity.class);
+                Intent intent = new Intent(getActivity(), TemperatureActivity.class);
+                intent.putExtra("TEMPERATURE",temperatureText.getText());
                 startActivity(intent);
             }
         });
+
+//        card_humidity.setOnClickListener(new Card.OnCardClickListener() {
+//            @Override
+//            public void onClick(Card card, View view) {
+//                Intent intent = new Intent(getActivity(), HumidityActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
         card_music.setOnClickListener(new Card.OnCardClickListener() {
             @Override
@@ -136,24 +151,41 @@ public class StatusFragment extends Fragment {
         });
 
         cardView_temperature.setCard(card_temperature);
-        cardView_humidity.setCard(card_humidity);
+//        cardView_humidity.setCard(card_humidity);
         cardView_music.setCard(card_music);
         cardView_swing.setCard(card_swing);
 
-//        list = mListener.getStateFromSP();
-//        temperatureText.setText(list.get(0));
-//        humidityText.setText(list.get(1));
-//        palyText.setText(list.get(1) + "/" + list.get(2));
-//        swingText.setText(list.get(3));
+        temperatureText = (TextView) view.findViewById(R.id.temperature_state);
+//        humidityText = (TextView) view.findViewById(R.id.humidity_state);
+        soundText = (TextView) view.findViewById(R.id.sound_state);
+        swingText = (TextView) view.findViewById(R.id.swing_state);
+        setCardStatus();
+    }
 
-        StatusService.startActionProcessTemperature(
-                getActivity(), Constants.GET, 25);
+    public void getCardStatus(int temperature,String soundMode,
+                              int playState, String swingMode) {
+        mTemperature = temperature;
+        mSoundMode = soundMode;
+        mPlayState = playState;
+        mSwingMode = swingMode;
+        setCardStatus();
+    }
+
+    public void setCardStatus() {
+        temperatureText.setText(mTemperature + "");
+        soundText.setText(mSoundMode + " / " + mPlayState);
+        swingText.setText(mSwingMode);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     public void setMessageManager(MessageManager obj) {
@@ -165,6 +197,6 @@ public class StatusFragment extends Fragment {
 
         public void geMessageFromServer(String readMessage);
 
-        public ArrayList<String> getStateFromSP();
+        public ArrayList<String> getStateFromShradPerfrences();
     }
 }

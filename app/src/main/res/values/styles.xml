@@ -5,19 +5,10 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.Application" parent="@style/Theme.AppCompat.Light.DarkActionBar" />
 
-    <style name="Theme.Settings" parent="@style/Theme.Application">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-
-        <item name="toolbarStyle">@style/Widget.Toolbar</item>
-    </style>
-
-    <style name="Widget.Toolbar" parent="@style/Widget.AppCompat.Toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="android:navigationIcon">?attr/homeAsUpIndicator</item>
-        <item name="navigationIcon">?attr/homeAsUpIndicator</item>
-    </style>
+    <declare-styleable name="CircleView">
+        <attr name="cv_color" format="color" />
+        <attr name="cv_radius" format="integer" />
+    </declare-styleable>
 
 </resources>

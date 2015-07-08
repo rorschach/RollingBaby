@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.session.MediaSessionManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.hl.rollingbaby.bean.Constants;
@@ -20,60 +21,69 @@ public class StatusService extends IntentService {
 
     private static final String ACTION_PROCESS_TEMPERATURE =
             "com.hl.rollingbaby.network.action.PROCESS_TEMPERATURE";
+
     private static final String ACTION_PROCESS_SOUND =
             "com.hl.rollingbaby.network.action.PROCESS_SOUND";
 
-    private static final String ACTION_SEND_BROADCAST =
-            "com.hl.rollingbaby.network.action.SEND_BROADCAST";
+    private static final String ACTION_PROCESS_SWING =
+            "com.hl.rollingbaby.network.action.PROCESS_SWING";
+
+    public static final String ACTION_UPDATE_UI =
+            "com.hl.rollingbaby.network.action.UPDATE_UI";
 
     /*----------------------------------------------------------------*/
 
-    private static final String EXTRA_PROCESS_TYPE =
-            "com.hl.rollingbaby.network.extra.PROCESS_TYPE";
-
-    private static final String EXTRA_TEMPERATURE_VALUE =
+    public static final String EXTRA_TEMPERATURE_VALUE =
             "com.hl.rollingbaby.network.extra.TEMPERATURE_VALUE";
 
-    private static final String EXTRA_PLAY_STATE =
+    public static final String EXTRA_PLAY_STATE =
             "com.hl.rollingbaby.network.extra.PLAY_STATE";
-    private static final String EXTRA_SOUND_MODE =
+
+    public static final String EXTRA_SOUND_MODE =
             "com.hl.rollingbaby.network.extra.SOUND_MODE";
 
-
+    public static final String EXTRA_SWING_MODE =
+            "com.hl.rollingbaby.network.extra.SWING_MODE";
 
     private SharedPreferences dataPreferences;
     private SharedPreferences.Editor dataEditor;
 
-    private int mTemperature = 25;
+    private int mTemperature;
 
-    private String soundState;
-    private String mSoundMode = Constants.CLOSE;
-    private int mPlayState = 0;
+    private String mSoundMode;
+    private int mPlayState;
 
-    private ArrayList<String> mStatusList = new ArrayList<>();
+    private String mSwingMode;
 
-    public static void startActionGetTemperature(Context context) {
+
+    public static void startActionGetStatus(Context context) {
         Intent intent = new Intent(context, StatusService.class);
         intent.setAction(ACTION_GET_STATUS);
         context.startService(intent);
     }
 
     public static void startActionProcessTemperature(
-            Context context, String type, int temperature) {
+            Context context, int temperature) {
         Intent intent = new Intent(context, StatusService.class);
         intent.setAction(ACTION_PROCESS_TEMPERATURE);
-        intent.putExtra(EXTRA_PROCESS_TYPE, type);
         intent.putExtra(EXTRA_PLAY_STATE, temperature);
         context.startService(intent);
     }
 
     public static void startActionProcessSound(
-            Context context, String type, int playState, String soundMode) {
+            Context context, int playState, String soundMode) {
         Intent intent = new Intent(context, StatusService.class);
         intent.setAction(ACTION_PROCESS_SOUND);
-        intent.putExtra(EXTRA_PROCESS_TYPE, type);
         intent.putExtra(EXTRA_PLAY_STATE, playState);
         intent.putExtra(EXTRA_SOUND_MODE, soundMode);
+        context.startService(intent);
+    }
+
+    public static void startActionProcessSwing(
+            Context context, String swingMode) {
+        Intent intent = new Intent(context, StatusService.class);
+        intent.setAction(ACTION_PROCESS_SWING);
+        intent.putExtra(EXTRA_SWING_MODE, swingMode);
         context.startService(intent);
     }
 
@@ -90,17 +100,22 @@ public class StatusService extends IntentService {
 
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_PROCESS_TEMPERATURE.equals(action)) {
-                final String type = intent.getStringExtra(EXTRA_PROCESS_TYPE);
+
+            if (ACTION_GET_STATUS.equals(action)) {
+                handleActionGetStatus();
+
+            } else if (ACTION_PROCESS_TEMPERATURE.equals(action)) {
                 final int temperature = intent.getIntExtra(EXTRA_TEMPERATURE_VALUE, 25);
-                handleActionProcessTemperature(type, temperature);
+                handleActionProcessTemperature(temperature);
+
             } else if (ACTION_PROCESS_SOUND.equals(action)) {
-                final String type = intent.getStringExtra(EXTRA_PROCESS_TYPE);
                 final int playState = intent.getIntExtra(EXTRA_PLAY_STATE, 1);
                 final String soundMode = intent.getStringExtra(EXTRA_SOUND_MODE);
-                handleActionProcessSound(type, playState, soundMode);
-            }else if (ACTION_GET_STATUS.equals(action)) {
-                handleActionGetStatus();
+                handleActionProcessSound(playState, soundMode);
+
+            }else if (ACTION_PROCESS_SWING.equals(action)) {
+                final String swingMode = intent.getStringExtra(EXTRA_SWING_MODE);
+                handleActionProcessSwing(swingMode);
             }
         }
     }
@@ -110,64 +125,60 @@ public class StatusService extends IntentService {
         mTemperature = dataPreferences.getInt(
                 Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
 
+//        mHumidity = dataPreferences.getInt(
+//                Constants.CURRENT_HUMIDITY_VALUE, Constants.DEFAULT_HUMIDITY);
+
         mPlayState = dataPreferences.getInt(
                 Constants.PLAY_STATE, Constants.SOUND_PAUSE);
 
         mSoundMode = dataPreferences.getString(
                 Constants.CURRENT_SOUND_MODE, Constants.CLOSE);
 
-        Intent intent = new Intent(Constants.UPDATE_UI_BROADCAST);
-        intent.setAction(Constants.UPDATE_UI_BROADCAST);
+        mSwingMode = dataPreferences.getString(
+                Constants.CURRENT_SWING_MODE, Constants.CLOSE);
+
+
+        Intent intent = new Intent();
+        intent.setAction(ACTION_UPDATE_UI);
         intent.putExtra(EXTRA_TEMPERATURE_VALUE, mTemperature);
         intent.putExtra(EXTRA_PLAY_STATE, mPlayState);
         intent.putExtra(EXTRA_SOUND_MODE, mSoundMode);
-        sendBroadcast(intent);
-        Log.d(TAG, mTemperature + ":" + mPlayState + ":" + mSoundMode);
-
+        intent.putExtra(EXTRA_SWING_MODE, mSwingMode);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    private void handleActionProcessTemperature(String type, int temperatureValue) {
-        if (type.equals(Constants.GET)) {
-            mTemperature = dataPreferences.getInt(
-                    Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
+    private void handleActionProcessTemperature(int temperatureValue) {
 
-        }else if (type.equals(Constants.SET)) {
-            dataEditor.putInt(Constants.CURRENT_TEMPERATURE_VALUE, temperatureValue)
-                    .commit();
-            mTemperature = dataPreferences.getInt(
-                    Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
-        }
-        Log.d(TAG, type + ":" + mTemperature);
+        //TODO:send message to server then save it in SharedPreferences file
+
+        dataEditor.putInt(Constants.CURRENT_TEMPERATURE_VALUE, temperatureValue)
+                .commit();
+//        mTemperature = dataPreferences.getInt(
+//                Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
     }
 
-    private void handleActionProcessSound(String type, int playState, String soundMode) {
-        if (type.equals(Constants.GET)) {
+    private void handleActionProcessSound(int playState, String soundMode) {
 
-            mPlayState = dataPreferences.getInt(
-                    Constants.PLAY_STATE, Constants.SOUND_PAUSE);
+        //TODO:send message to server then save it in SharedPreferences file
 
-            mSoundMode = dataPreferences.getString(
-                    Constants.CURRENT_SOUND_MODE, Constants.CLOSE);
+        dataEditor.putInt(Constants.PLAY_STATE, playState)
+                .commit();
+        dataEditor.putString(Constants.CURRENT_SOUND_MODE, soundMode)
+                .commit();
+//        mPlayState = dataPreferences.getInt(
+//                Constants.PLAY_STATE, Constants.SOUND_PAUSE);
+//        mSoundMode = dataPreferences.getString(
+//                Constants.CURRENT_SOUND_MODE, Constants.CLOSE);
+    }
 
-        }else if (type.equals(Constants.SET)) {
+    private void handleActionProcessSwing(String swingMode) {
 
-            //TODO:send message to server then save it in SharedPreferences file
+        //TODO:send message to server then save it in SharedPreferences file
 
-            dataEditor.putInt(Constants.PLAY_STATE, playState)
-                    .commit();
-
-            dataEditor.putString(Constants.CURRENT_SOUND_MODE, soundMode)
-                    .commit();
-
-            mPlayState = dataPreferences.getInt(
-                    Constants.PLAY_STATE, Constants.SOUND_PAUSE);
-
-            mSoundMode = dataPreferences.getString(
-                    Constants.CURRENT_SOUND_MODE, Constants.CLOSE);
-        }
-
-        soundState = mSoundMode + "/" + mPlayState;
-        Log.d(TAG,type + ":" + soundState);
+        dataEditor.putString(Constants.CURRENT_SWING_MODE, swingMode)
+                .commit();
+//        mSwingMode = dataPreferences.getString(
+//                Constants.CURRENT_SWING_MODE, Constants.CLOSE);
     }
 
 

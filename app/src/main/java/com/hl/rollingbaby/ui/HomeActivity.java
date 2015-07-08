@@ -1,5 +1,6 @@
 package com.hl.rollingbaby.ui;
 
+import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -43,8 +44,7 @@ public class HomeActivity extends BaseActivity implements
 
     private UpdateUIReceiver receiver;
 
-
-    private StatusFragment statusFragment = new StatusFragment();
+    private StatusFragment statusFragment;
 
     private Handler handler = new Handler(this);
 
@@ -111,14 +111,18 @@ public class HomeActivity extends BaseActivity implements
 
         isInActivity = true;
         Log.d(TAG, String.valueOf(isInActivity));
+//        statusFragment = (StatusFragment) getFragmentManager().
+//                findFragmentById(R.id.status_fragment);
+//
+//        statusFragment = StatusFragment.newInstance(25, "MUSIC", 1, "SLEEP");
 
-        init();
-    }
+        if (savedInstanceState == null) {
+            statusFragment = StatusFragment.newInstance(25, "MUSIC", 1, "SLEEP");
+            statusFragment.setArguments(getIntent().getExtras());
+            getFragmentManager().beginTransaction().add(
+                    R.id.root_container, statusFragment).commit();
+        }
 
-    public void init(){
-        initViews();
-        getData();
-        showContent();
     }
 
     public void initViews() {
@@ -133,9 +137,12 @@ public class HomeActivity extends BaseActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        isInActivity = false;
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+
+        LocalBroadcastManager broadcastManager =
+                LocalBroadcastManager.getInstance(this);
         broadcastManager.unregisterReceiver(receiver);
+
+        isInActivity = false;
     }
 
     @Override
@@ -143,19 +150,38 @@ public class HomeActivity extends BaseActivity implements
         super.onResume();
         Intent intent = new Intent(this, MessageService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
-        isInActivity = true;
 
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        IntentFilter intentFilter = new IntentFilter(Constants.UPDATE_UI_BROADCAST);
-
-        receiver = new UpdateUIReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                super.onReceive(context, intent);
-            }
-        };
-
+        LocalBroadcastManager broadcastManager =
+                LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter(StatusService.ACTION_UPDATE_UI);
+        receiver = new UpdateUIReceiver();
         broadcastManager.registerReceiver(receiver, intentFilter);
+
+        isInActivity = true;
+    }
+
+    public class UpdateUIReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d("UpdateUIReceiver", "onReceive");
+            if (StatusService.ACTION_UPDATE_UI.equals(action)) {
+
+                final int temperature =
+                        intent.getIntExtra(StatusService.EXTRA_TEMPERATURE_VALUE,36);
+
+                final String soundMode =
+                        intent.getStringExtra(StatusService.EXTRA_SOUND_MODE);
+                final int playState =
+                        intent.getIntExtra(StatusService.EXTRA_PLAY_STATE, 0);
+
+                final String swingMode =
+                        intent.getStringExtra(StatusService.EXTRA_SWING_MODE);
+
+                statusFragment.getCardStatus(temperature, soundMode, playState, swingMode);
+            }
+
+        }
     }
 
     @Override
@@ -210,7 +236,7 @@ public class HomeActivity extends BaseActivity implements
     }
 
     @Override
-    public ArrayList<String> getStateFromSP() {
+    public ArrayList<String> getStateFromShradPerfrences() {
 //        list = messageBinder.getStatusFromSharedPreference();
         Log.d(TAG, list.size() + " : list.size()");
         return list;
@@ -228,7 +254,7 @@ public class HomeActivity extends BaseActivity implements
 //        } else {
 //            StatusService.startActionProcessTemperature(this, Constants.GET, 0);
 //            StatusService.startActionProcessSound(this, Constants.GET, 0, "");
-            StatusService.startActionGetTemperature(this);
+            StatusService.startActionGetStatus(this);
             hideRefreshProgress();
 //        }
     }
@@ -249,25 +275,7 @@ public class HomeActivity extends BaseActivity implements
         mSwipeRefreshWidget.setEnabled(false);
     }
 
-    public class UpdateUIReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, intent.getAction(), Toast.LENGTH_SHORT).show();
-            String action = intent.getAction();
 
-            if (Constants.UPDATE_UI_BROADCAST.equals(action)) {
-                //TODO:update UI
-//                final String type = intent.getStringExtra(StatusService.EXTRA_PROCESS_TYPE);
-//                final int playState = intent.getIntExtra(EXTRA_PLAY_STATE, 1);
-//                final String soundMode = intent.getStringExtra(EXTRA_SOUND_MODE);
-
-                Toast.makeText(context, action, Toast.LENGTH_SHORT).show();
-            }
-
-            Toast.makeText(context, action, Toast.LENGTH_SHORT).show();
-
-        }
-    }
 
 
 }

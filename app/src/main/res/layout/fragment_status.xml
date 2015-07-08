@@ -23,7 +23,6 @@
 
         <TextView
             android:id="@+id/temperature_state"
-            android:text="32"
             android:layout_marginLeft="120dp"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -32,31 +31,31 @@
 
     </it.gmariotti.cardslib.library.view.CardViewNative>
 
-    <it.gmariotti.cardslib.library.view.CardViewNative
-        android:id="@+id/carddemo1"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginBottom="3dp"
-        android:layout_width="match_parent"
-        android:layout_height="48dp" >
+    <!--<it.gmariotti.cardslib.library.view.CardViewNative-->
+        <!--android:id="@+id/carddemo1"-->
+        <!--android:layout_marginLeft="24dp"-->
+        <!--android:layout_marginRight="24dp"-->
+        <!--android:layout_marginBottom="3dp"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="48dp" >-->
 
-        <ImageView
-            android:id="@+id/icon1"
-            android:src="@drawable/humidity"
-            android:layout_marginLeft="32dp"
-            android:layout_width="24dp"
-            android:layout_height="match_parent" />
+        <!--<ImageView-->
+            <!--android:id="@+id/icon1"-->
+            <!--android:src="@drawable/humidity"-->
+            <!--android:layout_marginLeft="32dp"-->
+            <!--android:layout_width="24dp"-->
+            <!--android:layout_height="match_parent" />-->
 
-        <TextView
-            android:id="@+id/humidity_state"
-            android:text="50"
-            android:layout_marginLeft="120dp"
-            android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
+        <!--<TextView-->
+            <!--android:id="@+id/humidity_state"-->
+            <!--android:text="50"-->
+            <!--android:layout_marginLeft="120dp"-->
+            <!--android:gravity="center"-->
+            <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent" />-->
 
-    </it.gmariotti.cardslib.library.view.CardViewNative>
+    <!--</it.gmariotti.cardslib.library.view.CardViewNative>-->
 
     <it.gmariotti.cardslib.library.view.CardViewNative
         android:id="@+id/carddemo2"
@@ -74,8 +73,7 @@
             android:layout_height="match_parent" />
 
         <TextView
-            android:id="@+id/play_state"
-            android:text="isPlaying"
+            android:id="@+id/sound_state"
             android:layout_marginLeft="120dp"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -101,7 +99,6 @@
 
         <TextView
             android:id="@+id/swing_state"
-            android:text="isSwing"
             android:layout_marginLeft="120dp"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceMedium"

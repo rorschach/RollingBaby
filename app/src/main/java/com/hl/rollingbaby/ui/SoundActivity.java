@@ -21,11 +21,14 @@ public class SoundActivity extends BaseActivity implements
     private static final String TAG = "SoundActivity";
     private int playState;
     private String soundMode;
+    private SoundFragment soundFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sound);
+        soundFragment = (SoundFragment) getFragmentManager()
+                .findFragmentById(R.id.sound_fragment);
         init();
     }
 

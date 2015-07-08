@@ -5,15 +5,17 @@
 
     <uses-sdk android:minSdkVersion="14" />
 
-    <!--<uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
-    <!--<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />-->
-    <!--<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />-->
-    <!--<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />-->
-    <!--<uses-permission android:name="android.permission.INTERNET" />-->
-    <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
-    <!--<uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
-    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
-    <!--<uses-permission android:name="android.permission.VIBRATE" />-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
 
     <application
         android:allowBackup="true"
@@ -33,6 +35,11 @@
         <service
             android:name=".network.MessageService"
             android:enabled="true"
+            android:exported="false" >
+        </service>
+
+        <service
+            android:name=".network.StatusService"
             android:exported="false" >
         </service>
 
@@ -77,14 +84,13 @@
                 android:value="com.hl.rollingbaby.ui.HomeActivity" />
         </activity>
 
-        <service
-            android:name=".network.StatusService"
-            android:exported="false" >
-        </service>
-        <service
-            android:name=".network.StatusService"
-            android:exported="false" >
-        </service>
+        <!--<receiver android:name=".ui.HomeActivity$UpdateUIReceiver" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.hl.rollingbaby.intent.UPDATE_UI_BROADCAST" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
+
+
     </application>
 
 </manifest>

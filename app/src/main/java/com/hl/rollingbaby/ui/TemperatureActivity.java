@@ -14,18 +14,23 @@ import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.network.MessageService;
 
 public class TemperatureActivity extends BaseActivity implements
-        TemperatureFragment.OnTemperatureFragmentInteractionListener,
-        ServiceConnection {
+        TemperatureFragment.OnTemperatureFragmentInteractionListener{
 
     private static final String TAG = "TemperatureActivity";
     private MessageService.MessageBinder messageBinder;
     private MessageService messageService;
-    private int temperature = 1;
+    private int temperature;
+    private TemperatureFragment temperatureFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temperature);
+        temperatureFragment = (TemperatureFragment) getFragmentManager()
+                .findFragmentById(R.id.temperature_fragment);
+        Intent intent = getIntent();
+        temperature = Integer.valueOf(intent.getStringExtra("TEMPERATURE"));
+        temperatureFragment.setTemperature(temperature);
         init();
     }
 
@@ -57,31 +62,15 @@ public class TemperatureActivity extends BaseActivity implements
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-        Intent intent = new Intent(this, MessageService.class);
-        bindService(intent, this, BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
-        if (messageService != null) {
-            unbindService(this);
-        }
     }
 
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        messageBinder = (MessageService.MessageBinder) service;
-        messageService = messageBinder.getService();
-//        temperature = messageBinder.getTemperature();
-        Log.d(TAG, temperature + " : onServiceConnected");
-    }
 
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        Toast.makeText(this, "Service disconnected", Toast.LENGTH_LONG).show();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

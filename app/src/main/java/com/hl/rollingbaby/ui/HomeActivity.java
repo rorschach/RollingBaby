@@ -248,14 +248,15 @@ public class HomeActivity extends BaseActivity implements
     @Override
     public void onRefresh() {
 
-//        if (messageBinder.getConnectState()) {
-//            // TODO:get data from server and update UI
-//            sendMessage(Constants.COMMAND_REFRESH);
-//
-//        } else {
-//            // TODO:get data from SharedPreferences and update UI
-//            StatusService.startActionGetStatus(this);
-//        }
+        if (messageBinder.getConnectState()) {
+            // TODO:get data from server and update UI
+            messageBinder.sendMessage(Constants.COMMAND_REFRESH + "\n");
+
+        } else {
+            // TODO:get data from SharedPreferences and update UI
+            StatusService.startActionGetStatus(this);
+        }
+        Toast.makeText(this, "refresh done", Toast.LENGTH_SHORT).show();
         hideRefreshProgress();
     }
 

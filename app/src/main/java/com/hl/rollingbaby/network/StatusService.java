@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.hl.rollingbaby.bean.Constants;
 
-public class StatusService extends IntentService implements ServiceConnection{
+public class StatusService extends IntentService {
 
     private static final String TAG = "StatusService";
 
@@ -49,8 +49,6 @@ public class StatusService extends IntentService implements ServiceConnection{
     public static final String EXTRA_SWING_MODE =
             "com.hl.rollingbaby.network.extra.SWING_MODE";
 
-    private MessageService.MessageBinder messageBinder;
-    private MessageService messageService;
 
     private SharedPreferences dataPreferences;
     private SharedPreferences.Editor dataEditor;
@@ -99,37 +97,6 @@ public class StatusService extends IntentService implements ServiceConnection{
         super(TAG);
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Intent connectIntent = new Intent(this, MessageService.class);
-        bindService(connectIntent, this, BIND_AUTO_CREATE);
-        Log.d(TAG, "onCreate");
-    }
-
-    @Override
-    public void onStart(Intent intent, int startId) {
-        super.onStart(intent, startId);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (messageService != null) {
-            unbindService(this);
-        }
-    }
-
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        messageBinder = (MessageService.MessageBinder) service;
-        messageService = messageBinder.getService();
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        Toast.makeText(this, "Service disconnected", Toast.LENGTH_LONG).show();
-    }
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -193,7 +160,7 @@ public class StatusService extends IntentService implements ServiceConnection{
     private void handleActionProcessTemperature(int temperatureValue) {
 
         //TODO:send message to server then save it in SharedPreferences file
-        sendMessageToServer(Constants.TEMPERATURE_TAG + temperatureValue);
+//        sendMessageToServer(Constants.TEMPERATURE_TAG + temperatureValue);
 
         dataEditor.putInt(Constants.CURRENT_TEMPERATURE_VALUE, temperatureValue)
                 .commit();
@@ -206,7 +173,7 @@ public class StatusService extends IntentService implements ServiceConnection{
     private void handleActionProcessSound(int playState, String soundMode) {
 
         //TODO:send message to server then save it in SharedPreferences file
-        sendMessageToServer(Constants.SOUND_TAG + soundMode + playState);
+//        sendMessageToServer(Constants.SOUND_TAG + soundMode + playState);
 
         dataEditor.putInt(Constants.PLAY_STATE, playState)
                 .commit();
@@ -223,7 +190,7 @@ public class StatusService extends IntentService implements ServiceConnection{
     private void handleActionProcessSwing(String swingMode) {
 
         //TODO:send message to server then save it in SharedPreferences file
-        sendMessageToServer(Constants.SWING_TAG + swingMode);
+//        sendMessageToServer(Constants.SWING_TAG + swingMode);
 
         dataEditor.putString(Constants.CURRENT_SWING_MODE, swingMode)
                 .commit();
@@ -233,18 +200,18 @@ public class StatusService extends IntentService implements ServiceConnection{
         //TODO:update UI to notice user
     }
 
-    private void sendMessageToServer(String message) {
-        messageBinder.sendMessage(message);
-    }
-
-    private void test() {
-        Log.d(TAG, "test");
-        if (messageBinder != null) {
-            messageBinder.buildNotification(
-                    MessageService.NOTIFICATION_TEST,
-                    "TEST", "TEST");
-        }
-    }
+//    private void sendMessageToServer(String message) {
+//        messageBinder.sendMessage(message);
+//    }
+//
+//    private void test() {
+//        Log.d(TAG, "test");
+//        if (messageBinder != null) {
+//            messageBinder.buildNotification(
+//                    MessageService.NOTIFICATION_TEST,
+//                    "TEST", "TEST");
+//        }
+//    }
 
 
 }

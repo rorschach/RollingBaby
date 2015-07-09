@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
@@ -30,11 +31,12 @@ public class SoundFragment extends Fragment {
 
     private OnSoundFragmentInteractionListener mListener;
 
-    public static SoundFragment newInstance(int playState, String soundMode) {
+    public static SoundFragment newInstance(String soundMode, int playState) {
         SoundFragment fragment = new SoundFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_SOUND_MODE, playState);
-        args.putString(ARG_PLAY_STATE, soundMode);
+
+        args.putString(ARG_SOUND_MODE, soundMode);
+        args.putInt(ARG_PLAY_STATE, playState);
         fragment.setArguments(args);
         return fragment;
     }
@@ -46,8 +48,10 @@ public class SoundFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mPlayState = getArguments().getInt(ARG_SOUND_MODE);
-            mSoundMode = getArguments().getString(ARG_PLAY_STATE);
+            mSoundMode = getArguments().getString(ARG_SOUND_MODE);
+            mPlayState = getArguments().getInt(ARG_PLAY_STATE);
+
+            Log.d(TAG, mSoundMode + ":" + mPlayState);
         }
     }
 
@@ -81,9 +85,6 @@ public class SoundFragment extends Fragment {
             }
         });
 
-//        mPlayState = mListener.getPlayState();
-//        mSoundMode = mListener.getSoundMode();
-
 
         setPlayButton();
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -104,10 +105,13 @@ public class SoundFragment extends Fragment {
 
     private void setPlayButton() {
         if (mPlayState == 1) {
+            waveView.setPlayStation(true);
             playButton.setImageResource(R.drawable.pause);
         }else {
+            waveView.setPlayStation(false);
             playButton.setImageResource(R.drawable.play);
         }
+        Toast.makeText(getActivity(), mSoundMode, Toast.LENGTH_SHORT).show();
     }
 
     @Override

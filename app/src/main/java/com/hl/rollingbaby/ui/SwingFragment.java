@@ -3,6 +3,7 @@ package com.hl.rollingbaby.ui;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import com.hl.rollingbaby.bean.Constants;
 import com.skyfishjy.library.RippleBackground;
 
 public class SwingFragment extends Fragment {
+
+    private static final String TAG = "SwingFragment";
 
     private OnSwingFragmentInteractionListener mListener;
 
@@ -25,6 +28,7 @@ public class SwingFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(ARG_SWING_MODE, swingMode);
         fragment.setArguments(args);
+        Log.d(TAG, swingMode);
         return fragment;
     }
 

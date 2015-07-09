@@ -1,20 +1,29 @@
 package com.hl.rollingbaby.ui;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
+import com.hl.rollingbaby.bean.MessageTarget;
+import com.hl.rollingbaby.network.MessageService;
 import com.hl.rollingbaby.network.StatusService;
 
-public class TemperatureActivity extends BaseActivity implements
+public class TemperatureActivity extends BaseActivity implements ServiceConnection,
         TemperatureFragment.OnTemperatureFragmentInteractionListener{
 
     private static final String TAG = "TemperatureActivity";
+
+    private MessageService.MessageBinder messageBinder;
+    private MessageService messageService;
 
     private int mTemperature;
     private String mHeatingState;
@@ -62,16 +71,18 @@ public class TemperatureActivity extends BaseActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        Intent intent = new Intent(this, MessageService.class);
+        bindService(intent, this, BIND_AUTO_CREATE);
         Log.d(TAG, "onResume");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy");
+        if (messageService != null) {
+            unbindService(this);
+        }
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -84,12 +95,25 @@ public class TemperatureActivity extends BaseActivity implements
         int id = item.getItemId();
         if (id == R.id.action_sync) {
 
-            StatusService.startActionProcessTemperature(this, mTemperature);
+//            StatusService.startActionProcessTemperature(this, mTemperature);
+            messageBinder.sendMessage(mTemperature + mHeatingState + "\n");
 
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        messageBinder = (MessageService.MessageBinder) service;
+        messageService = messageBinder.getService();
+//        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        Toast.makeText(this, "Service disconnected", Toast.LENGTH_LONG).show();
     }
 
     @Override

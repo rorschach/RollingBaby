@@ -16,7 +16,7 @@ import java.net.Socket;
  */
 public class MessageManager extends Thread {
     private volatile boolean isConnecting;
-    private static final String TAG = "MyNetThread";
+    private static final String TAG = "MessageManager";
     private Handler handler;
     private String mAddress;
     private int mPort;

@@ -139,6 +139,9 @@ public class StatusFragment extends Fragment {
             @Override
             public void onClick(Card card, View view) {
                 Intent intent = new Intent(getActivity(), SoundActivity.class);
+                intent.putExtra(Constants.CURRENT_SOUND_MODE,
+                        Constants.MUSIC);
+                intent.putExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
                 startActivity(intent);
             }
         });
@@ -147,6 +150,7 @@ public class StatusFragment extends Fragment {
             @Override
             public void onClick(Card card, View view) {
                 Intent intent = new Intent(getActivity(), SwingActivity.class);
+                intent.putExtra(Constants.CURRENT_SWING_MODE, Constants.SLEEP);
                 startActivity(intent);
             }
         });

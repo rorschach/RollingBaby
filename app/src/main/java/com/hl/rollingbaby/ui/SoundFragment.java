@@ -11,32 +11,30 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 
 import com.hl.rollingbaby.R;
+import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.views.WaveView;
 
 public class SoundFragment extends Fragment {
 
-    private static final String TAG = "MusicFragment";
+    private static final String TAG = "SoundFragment";
 
     private SeekBar seekBar;
     private WaveView waveView;
     private ImageButton playButton;
 
-    private int playState = 0;
-    private String soundMode = "";
+    private int mPlayState;
+    private String mSoundMode;
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
+    private static final String ARG_SOUND_MODE = Constants.CURRENT_SOUND_MODE;
+    private static final String ARG_PLAY_STATE = Constants.PLAY_STATE;
 
     private OnSoundFragmentInteractionListener mListener;
 
-    public static SoundFragment newInstance(String param1, String param2) {
+    public static SoundFragment newInstance(int playState, String soundMode) {
         SoundFragment fragment = new SoundFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_SOUND_MODE, playState);
+        args.putString(ARG_PLAY_STATE, soundMode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -48,8 +46,8 @@ public class SoundFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mPlayState = getArguments().getInt(ARG_SOUND_MODE);
+            mSoundMode = getArguments().getString(ARG_PLAY_STATE);
         }
     }
 
@@ -83,29 +81,29 @@ public class SoundFragment extends Fragment {
             }
         });
 
-        playState = mListener.getPlayState();
-        soundMode = mListener.getSoundMode();
+//        mPlayState = mListener.getPlayState();
+//        mSoundMode = mListener.getSoundMode();
 
 
         setPlayButton();
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playState = Math.abs(playState - 1);
-                if (playState == 1) {
+                mPlayState = Math.abs(mPlayState - 1);
+                if (mPlayState == 1) {
                     waveView.setPlayStation(true);
                 } else {
                     waveView.setPlayStation(false);
                 }
-                Log.d(TAG, "Play state after click: " + playState);
+                Log.d(TAG, "Play state after click: " + mPlayState);
                 setPlayButton();
-                mListener.savePlayState(playState);
+                mListener.savePlayState(mPlayState);
             }
         });
     }
 
     private void setPlayButton() {
-        if (playState == 1) {
+        if (mPlayState == 1) {
             playButton.setImageResource(R.drawable.pause);
         }else {
             playButton.setImageResource(R.drawable.play);

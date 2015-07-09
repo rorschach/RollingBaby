@@ -10,25 +10,30 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
+import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.network.MessageService;
+import com.hl.rollingbaby.network.StatusService;
 
 public class SoundActivity extends BaseActivity implements
-        SoundFragment.OnSoundFragmentInteractionListener, ServiceConnection {
-
-    private MessageService.MessageBinder messageBinder;
-    private MessageService messageService;
+        SoundFragment.OnSoundFragmentInteractionListener{
 
     private static final String TAG = "SoundActivity";
-    private int playState;
-    private String soundMode;
+    private int mPlayState;
+    private String mSoundMode;
     private SoundFragment soundFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sound);
-        soundFragment = (SoundFragment) getFragmentManager()
-                .findFragmentById(R.id.sound_fragment);
+
+        if (savedInstanceState == null) {
+            soundFragment = SoundFragment.newInstance(
+                    Constants.SOUND_STOP, Constants.SOUND_MUSIC);
+            soundFragment.setArguments(getIntent().getExtras());
+            getFragmentManager().beginTransaction().add(
+                    R.id.sound_container, soundFragment).commit();
+        }
         init();
     }
 
@@ -55,56 +60,24 @@ public class SoundActivity extends BaseActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_music, menu);
+        getMenuInflater().inflate(R.menu.menu_common, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_sync) {
+
+            StatusService.startActionProcessSound(this, mPlayState, mSoundMode);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Intent intent = new Intent(this, MessageService.class);
-        bindService(intent, this, BIND_AUTO_CREATE);
-//        isInActivity = true;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (messageService != null) {
-            unbindService(this);
-        }
-    }
-
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        messageBinder = (MessageService.MessageBinder) service;
-        messageService = messageBinder.getService();
-//        playState = messageBinder.getPlayState();
-//        soundMode = messageBinder.getSoundMode();
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        Toast.makeText(this, "Service disconnected", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
     public int getPlayState() {
-        return playState;
+        return mPlayState;
     }
 
     @Override
@@ -114,7 +87,7 @@ public class SoundActivity extends BaseActivity implements
 
     @Override
     public String getSoundMode() {
-        return soundMode;
+        return mSoundMode;
     }
 
     @Override

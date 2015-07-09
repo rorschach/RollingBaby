@@ -1,43 +1,44 @@
 package com.hl.rollingbaby.ui;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.network.MessageService;
+import com.hl.rollingbaby.bean.Constants;
+import com.hl.rollingbaby.network.StatusService;
 
 public class TemperatureActivity extends BaseActivity implements
         TemperatureFragment.OnTemperatureFragmentInteractionListener{
 
     private static final String TAG = "TemperatureActivity";
-    private MessageService.MessageBinder messageBinder;
-    private MessageService messageService;
-    private int temperature;
+
+    private int mTemperature;
+    private String mHeatingState;
+
     private TemperatureFragment temperatureFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temperature);
-        temperatureFragment = (TemperatureFragment) getFragmentManager()
-                .findFragmentById(R.id.temperature_fragment);
-        Intent intent = getIntent();
-        temperature = Integer.valueOf(intent.getStringExtra("TEMPERATURE"));
-        temperatureFragment.setTemperature(temperature);
-        init();
-    }
 
-    private void init() {
-        initViews();
-        getData();
-        showContent();
+        Intent intent = getIntent();
+        mTemperature = intent.getIntExtra(
+                Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
+        mHeatingState = intent.getStringExtra(Constants.HEATING_STATE);
+        Log.d(TAG, mTemperature + ":" + mHeatingState + ":" + 0);
+
+        if (savedInstanceState == null) {
+            temperatureFragment = TemperatureFragment.newInstance(
+                    mTemperature, mHeatingState);
+            temperatureFragment.setArguments(getIntent().getExtras());
+            getFragmentManager().beginTransaction().add(
+                    R.id.temperature_container, temperatureFragment).commit();
+        }
     }
 
     @Override
@@ -74,14 +75,17 @@ public class TemperatureActivity extends BaseActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_temperature, menu);
+        getMenuInflater().inflate(R.menu.menu_common, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_sync) {
+
+            StatusService.startActionProcessTemperature(this, mTemperature);
+
             return true;
         }
 
@@ -90,12 +94,12 @@ public class TemperatureActivity extends BaseActivity implements
 
     @Override
     public int getTemperature() {
-        Log.d(TAG, temperature + " : getTemperature");
-        return temperature;
+        Log.d(TAG, mTemperature + " : getTemperature");
+        return mTemperature;
     }
 
     @Override
     public void saveTemperature(int temperature) {
-//        messageBinder.saveTemperature(temperature);
     }
+
 }

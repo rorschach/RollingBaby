@@ -1,6 +1,5 @@
 package com.hl.rollingbaby.ui;
 
-import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -21,23 +20,19 @@ import android.widget.Toast;
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.bean.MessageTarget;
-import com.hl.rollingbaby.network.MessageManager;
 import com.hl.rollingbaby.network.MessageService;
 import com.hl.rollingbaby.network.StatusService;
-
-import java.util.ArrayList;
 
 
 public class HomeActivity extends BaseActivity implements
         MessageTarget, Handler.Callback, ServiceConnection,
-        SwipeRefreshLayout.OnRefreshListener ,
+        SwipeRefreshLayout.OnRefreshListener,
         StatusFragment.OnStatusFragmentInteractionListener{
 
     private SwipeRefreshLayout mSwipeRefreshWidget;
 
     private static final String TAG = "HomeActivity";
     private boolean isInActivity = false;
-    private ArrayList<String> list = new ArrayList<>();
 
     private MessageService.MessageBinder messageBinder;
     private MessageService messageService;
@@ -93,8 +88,8 @@ public class HomeActivity extends BaseActivity implements
 
             case Constants.MESSAGE_SEND:
                 Object obj = msg.obj;
-                statusFragment.setMessageManager((MessageManager) obj);
-//                messageBinder.SendMessage(obj + "");
+//                statusFragment.setMessageManager((MessageManager) obj);
+//                messageBinder.sendMessage(obj + "");
         }
         return true;
     }
@@ -104,20 +99,22 @@ public class HomeActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        mSwipeRefreshWidget = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_widget);
+        mSwipeRefreshWidget =
+                (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_widget);
         mSwipeRefreshWidget.setColorScheme(R.color.red, R.color.yellow,
                 R.color.blue, R.color.green);
         mSwipeRefreshWidget.setOnRefreshListener(this);
 
         isInActivity = true;
         Log.d(TAG, String.valueOf(isInActivity));
-//        statusFragment = (StatusFragment) getFragmentManager().
-//                findFragmentById(R.id.status_fragment);
-//
-//        statusFragment = StatusFragment.newInstance(25, "MUSIC", 1, "SLEEP");
 
         if (savedInstanceState == null) {
-            statusFragment = StatusFragment.newInstance(25, "MUSIC", 1, "SLEEP");
+            statusFragment = StatusFragment.newInstance(
+                    Constants.DEFAULT_TEMPERATURE,
+                    Constants.CLOSE,
+                    Constants.SOUND_MUSIC,
+                    Constants.SOUND_STOP,
+                    Constants.SWING_SLLEP);
             statusFragment.setArguments(getIntent().getExtras());
             getFragmentManager().beginTransaction().add(
                     R.id.root_container, statusFragment).commit();
@@ -153,7 +150,7 @@ public class HomeActivity extends BaseActivity implements
 
         LocalBroadcastManager broadcastManager =
                 LocalBroadcastManager.getInstance(this);
-        IntentFilter intentFilter = new IntentFilter(StatusService.ACTION_UPDATE_UI);
+        IntentFilter intentFilter = new IntentFilter(StatusService.ACTION_UPDATE_MAIN_UI);
         receiver = new UpdateUIReceiver();
         broadcastManager.registerReceiver(receiver, intentFilter);
 
@@ -165,10 +162,12 @@ public class HomeActivity extends BaseActivity implements
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             Log.d("UpdateUIReceiver", "onReceive");
-            if (StatusService.ACTION_UPDATE_UI.equals(action)) {
+            if (StatusService.ACTION_UPDATE_MAIN_UI.equals(action)) {
 
                 final int temperature =
                         intent.getIntExtra(StatusService.EXTRA_TEMPERATURE_VALUE,36);
+                final String heatingState =
+                        intent.getStringExtra(StatusService.EXTRA_HEATING_STATE);
 
                 final String soundMode =
                         intent.getStringExtra(StatusService.EXTRA_SOUND_MODE);
@@ -178,10 +177,14 @@ public class HomeActivity extends BaseActivity implements
                 final String swingMode =
                         intent.getStringExtra(StatusService.EXTRA_SWING_MODE);
 
-                statusFragment.getCardStatus(temperature, soundMode, playState, swingMode);
+                setCard(temperature, heatingState, soundMode, playState, swingMode);
             }
-
         }
+    }
+
+    public void setCard(int temperature, String heatingState, String soundMode, int playState, String swingMode) {
+        statusFragment.getCardStatus(
+                temperature, heatingState, soundMode, playState, swingMode);
     }
 
     @Override
@@ -197,7 +200,6 @@ public class HomeActivity extends BaseActivity implements
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
         messageBinder.startConnect(((MessageTarget) this).getHandler());
-//        list = messageBinder.getStatusFromSharedPreference();
     }
 
     @Override
@@ -230,16 +232,13 @@ public class HomeActivity extends BaseActivity implements
         try {
             String state[] = readMessage.split(":");
             //TODO:process status and display it in UI
+            String temperature = state[0];//like TO25,get the '25'
+            String sound = state[1];//like SOM1,get the 'M' and '1'
+            String swing = state[2];//like SWS, get the 'S'
+            //setCard(25, Music, Stop, Sleep);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public ArrayList<String> getStateFromShradPerfrences() {
-//        list = messageBinder.getStatusFromSharedPreference();
-        Log.d(TAG, list.size() + " : list.size()");
-        return list;
     }
 
     public void sendMessage(String message) {
@@ -248,15 +247,16 @@ public class HomeActivity extends BaseActivity implements
 
     @Override
     public void onRefresh() {
-        // TODO:Write your logic here
+
 //        if (messageBinder.getConnectState()) {
+//            // TODO:get data from server and update UI
 //            sendMessage(Constants.COMMAND_REFRESH);
+//
 //        } else {
-//            StatusService.startActionProcessTemperature(this, Constants.GET, 0);
-//            StatusService.startActionProcessSound(this, Constants.GET, 0, "");
-            StatusService.startActionGetStatus(this);
-            hideRefreshProgress();
+//            // TODO:get data from SharedPreferences and update UI
+//            StatusService.startActionGetStatus(this);
 //        }
+        hideRefreshProgress();
     }
 
     public void showRefreshProgress() {
@@ -274,8 +274,6 @@ public class HomeActivity extends BaseActivity implements
     public void disableSwipe() {
         mSwipeRefreshWidget.setEnabled(false);
     }
-
-
 
 
 }

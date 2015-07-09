@@ -24,13 +24,14 @@ import java.util.ArrayList;
 
 public class MessageService extends Service {
 
-    private static final String TAG = MessageService.class.getSimpleName();
+    private static final String TAG = "MessageService";
     public static final String CONVERSATION_ID = "conversation_id";
 
     public static final int NOTIFICATION_CONNECT_FAILED = 0;
     public static final int NOTIFICATION_CONNECT_SUCCESS = 1;
     public static final int NOTIFICATION_SEND_MESSAGE = 2;
     public static final int NOTIFICATION_READ_MESSAGE = 3;
+    public static final int NOTIFICATION_TEST = 4;
 
     public static String SERVER_HOST;
     public static int SERVER_PORT;
@@ -38,9 +39,6 @@ public class MessageService extends Service {
     private MessageManager messageManager;
     private MessageBinder messageBinder = new MessageBinder();
     private Context context;
-
-
-    public static final String EOL = "\n";
 
     public MessageService() {
     }
@@ -72,8 +70,6 @@ public class MessageService extends Service {
         messageManager.setConnectState(false);
     }
 
-
-
     public void getData() {
         try {
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -81,7 +77,7 @@ public class MessageService extends Service {
             String ip[] = ipPref.split(":");
             SERVER_HOST = ip[0];
             SERVER_PORT = Integer.valueOf(ip[1]);
-            Log.d(TAG, SERVER_HOST + ":" + SERVER_PORT);
+//            Log.d(TAG, SERVER_HOST + ":" + SERVER_PORT);
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
@@ -99,7 +95,6 @@ public class MessageService extends Service {
             messageManager.setConnectState(true);
             messageManager.start();
             Log.d(TAG, "MessageBinder is ConnectToServer");
-            Log.d(TAG, SERVER_HOST + ":" + SERVER_PORT);
         }
 
         public void stopConnect() {
@@ -109,7 +104,6 @@ public class MessageService extends Service {
 
         public void restartConnect(Handler handler) {
             stopConnect();
-            //delay
             startConnect(handler);
         }
 

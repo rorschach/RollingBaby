@@ -22,6 +22,7 @@
             seekarc:rotation="180"
             seekarc:startAngle="30"
             seekarc:sweepAngle="300"
+            seekarc:max="55"
             seekarc:touchInside="true" />
 
         <TextView
@@ -33,8 +34,8 @@
             android:textSize="40sp" />
     </FrameLayout>
 
-    <include
-        android:id="@+id/controls"
-        layout="@layout/controls" />
+    <!--<include-->
+        <!--android:id="@+id/controls"-->
+        <!--layout="@layout/controls" />-->
 
 </LinearLayout>

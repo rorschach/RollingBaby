@@ -15,34 +15,32 @@ import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.network.MessageManager;
 import com.hl.rollingbaby.network.StatusService;
 
-import java.util.ArrayList;
-
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.view.CardViewNative;
 
 
 public class StatusFragment extends Fragment {
 
-    private static final String TAG = "StateFragment";
+    private static final String TAG = "StatusFragment";
 
-    private static final String ARG_Temperature = "Temperature";
-    private static final String ARG_SoundMode = "SoundMode";
-    private static final String ARG_PlayState = "PlayState";
-    private static final String ARG_SwingMode = "SwingMode";
+    private static final String ARG_TEMPERATURE = Constants.CURRENT_TEMPERATURE_VALUE;
+    private static final String ARG_HEATING_STATE = Constants.HEATING_STATE;
+    private static final String ARG_SOUND_MODE = Constants.CURRENT_SOUND_MODE;
+    private static final String ARG_PLAY_STATE = Constants.PLAY_STATE;
+    private static final String ARG_SWING_MODE = Constants.CURRENT_SWING_MODE;
 
-    // TODO: Rename and change types of parameters
     private int mTemperature;
+    private String mHeatingState;
     private String mSoundMode;
     private int mPlayState;
     private String mSwingMode;
 
     private OnStatusFragmentInteractionListener mListener;
 
-
     private MessageManager messageManager;
 
     private Card card_temperature;
-    private Card card_humidity;
+//    private Card card_humidity;
     private Card card_music;
     private Card card_swing;
 
@@ -52,28 +50,28 @@ public class StatusFragment extends Fragment {
     private CardViewNative cardView_swing;
 
     private TextView temperatureText;
-    private TextView humidityText;
+//    private TextView humidityText;
     private TextView soundText;
     private TextView swingText;
-    private ArrayList<String> list = new ArrayList<>();
+//    private ArrayList<String> list = new ArrayList<>();
 
     public static StatusFragment newInstance(
-            int temperature, String soundMode,int playState, String swingMdoe) {
-        StatusFragment fragment = null;
-        if (fragment == null) {
-            fragment = new StatusFragment();
-        }
+            int temperature, String heatingState,
+            String soundMode, int playState, String swingMode) {
+        StatusFragment fragment  = new StatusFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_Temperature, temperature);
-        args.putString(ARG_SoundMode, soundMode);
-        args.putInt(ARG_PlayState, playState);
-        args.putString(ARG_SwingMode, swingMdoe);
+        args.putInt(ARG_TEMPERATURE, temperature);
+        args.putString(ARG_HEATING_STATE, heatingState);
+        args.putString(ARG_SOUND_MODE, soundMode);
+        args.putInt(ARG_PLAY_STATE, playState);
+        args.putString(ARG_SWING_MODE, swingMode);
         fragment.setArguments(args);
         return fragment;
     }
 
     public StatusFragment() {
     }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -89,10 +87,11 @@ public class StatusFragment extends Fragment {
         super.onCreate(savedInstanceState);
         StatusService.startActionGetStatus(getActivity());
         if (getArguments() != null) {
-            mTemperature = getArguments().getInt(ARG_Temperature);
-            mSoundMode = getArguments().getString(ARG_SoundMode);
-            mPlayState = getArguments().getInt(ARG_PlayState);
-            mSwingMode = getArguments().getString(ARG_SwingMode);
+            mTemperature = getArguments().getInt(ARG_TEMPERATURE);
+            mHeatingState = getArguments().getString(ARG_HEATING_STATE);
+            mSoundMode = getArguments().getString(ARG_SOUND_MODE);
+            mPlayState = getArguments().getInt(ARG_PLAY_STATE);
+            mSwingMode = getArguments().getString(ARG_SWING_MODE);
         }
     }
 
@@ -121,7 +120,9 @@ public class StatusFragment extends Fragment {
             @Override
             public void onClick(Card card, View view) {
                 Intent intent = new Intent(getActivity(), TemperatureActivity.class);
-                intent.putExtra("TEMPERATURE",temperatureText.getText());
+                intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE,
+                        mTemperature);//notice here!
+                intent.putExtra(Constants.HEATING_STATE, Constants.CLOSE);
                 startActivity(intent);
             }
         });
@@ -162,9 +163,10 @@ public class StatusFragment extends Fragment {
         setCardStatus();
     }
 
-    public void getCardStatus(int temperature,String soundMode,
+    public void getCardStatus(int temperature,String heatingState, String soundMode,
                               int playState, String swingMode) {
         mTemperature = temperature;
+        mHeatingState = heatingState;
         mSoundMode = soundMode;
         mPlayState = playState;
         mSwingMode = swingMode;
@@ -172,7 +174,7 @@ public class StatusFragment extends Fragment {
     }
 
     public void setCardStatus() {
-        temperatureText.setText(mTemperature + "");
+        temperatureText.setText(mTemperature + " / " + mHeatingState);
         soundText.setText(mSoundMode + " / " + mPlayState);
         swingText.setText(mSwingMode);
     }
@@ -197,6 +199,5 @@ public class StatusFragment extends Fragment {
 
         public void geMessageFromServer(String readMessage);
 
-        public ArrayList<String> getStateFromShradPerfrences();
     }
 }

@@ -2,6 +2,7 @@
     <string name="app_name">RollingBaby</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="action_sync">Sync</string>
 
     <string name="title_activity_temperature">Temperature</string>
     <string name="title_activity_swing">Swing</string>

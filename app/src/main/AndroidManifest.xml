@@ -23,6 +23,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
+            android:launchMode="singleInstance"
             android:name=".ui.HomeActivity"
             android:label="@string/app_name" >
             <intent-filter>
@@ -44,6 +45,7 @@
         </service>
 
         <activity
+            android:launchMode="singleInstance"
             android:name=".ui.SoundActivity"
             android:label="@string/title_activity_music"
             android:parentActivityName=".ui.HomeActivity" >
@@ -52,6 +54,7 @@
                 android:value="com.hl.rollingbaby.ui.HomeActivity" />
         </activity>
         <activity
+            android:launchMode="singleInstance"
             android:name=".ui.TemperatureActivity"
             android:label="@string/title_activity_temperature"
             android:parentActivityName=".ui.HomeActivity" >
@@ -60,6 +63,7 @@
                 android:value="com.hl.rollingbaby.ui.HomeActivity" />
         </activity>
         <activity
+            android:launchMode="singleInstance"
             android:name=".ui.SwingActivity"
             android:label="@string/title_activity_swing"
             android:parentActivityName=".ui.HomeActivity" >
@@ -68,6 +72,7 @@
                 android:value="com.hl.rollingbaby.ui.HomeActivity" />
         </activity>
         <activity
+            android:launchMode="singleInstance"
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".ui.HomeActivity" >
@@ -76,6 +81,7 @@
                 android:value="com.hl.rollingbaby.ui.HomeActivity" />
         </activity>
         <activity
+            android:launchMode="singleInstance"
             android:name=".ui.HumidityActivity"
             android:label="@string/title_activity_humidity"
             android:parentActivityName=".ui.HomeActivity" >
@@ -83,12 +89,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.hl.rollingbaby.ui.HomeActivity" />
         </activity>
-
-        <!--<receiver android:name=".ui.HomeActivity$UpdateUIReceiver" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="com.hl.rollingbaby.intent.UPDATE_UI_BROADCAST" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
 
 
     </application>

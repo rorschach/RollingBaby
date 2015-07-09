@@ -11,8 +11,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
+import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.views.SeekArc;
 import com.hl.rollingbaby.views.SeekArc.OnSeekArcChangeListener;
 
@@ -21,30 +23,31 @@ public class TemperatureFragment extends Fragment {
     private static final String TAG = "TemperatureFragment";
 
     private SeekArc mSeekArc;
-    private SeekBar mRotation;
-    private SeekBar mStartAngle;
-    private SeekBar mSweepAngle;
-    private SeekBar mArcWidth;
-    private SeekBar mProgressWidth;
-    private CheckBox mRoundedEdges;
-    private CheckBox mTouchInside;
-    private CheckBox mClockwise;
+//    private SeekBar mRotation;
+//    private SeekBar mStartAngle;
+//    private SeekBar mSweepAngle;
+//    private SeekBar mArcWidth;
+//    private SeekBar mProgressWidth;
+//    private CheckBox mRoundedEdges;
+//    private CheckBox mTouchInside;
+//    private CheckBox mClockwise;
     private TextView mSeekArcProgress;
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_TEMPERATURE = Constants.CURRENT_TEMPERATURE_VALUE;
+    private static final String ARG_HEATING_STATE = Constants.HEATING_STATE;
 
-    private String mParam1;
-    private String mParam2;
+    private int mTemperature;
+    private String mHeatingState;
 
     private OnTemperatureFragmentInteractionListener mListener;
 
-    public static TemperatureFragment newInstance(String param1, String param2) {
+    public static TemperatureFragment newInstance(int temperature, String heatingState) {
         TemperatureFragment fragment = new TemperatureFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_TEMPERATURE, temperature);
+        args.putString(ARG_HEATING_STATE, heatingState);
         fragment.setArguments(args);
+        Log.d(TAG, temperature + ":" + heatingState + ":" + 1);
         return fragment;
     }
 
@@ -55,8 +58,9 @@ public class TemperatureFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mTemperature = getArguments().getInt(ARG_TEMPERATURE);
+            mHeatingState = getArguments().getString(ARG_HEATING_STATE);
+            Log.d(TAG, mTemperature + ":" + mHeatingState + ":" + 2);
         }
     }
 
@@ -67,22 +71,22 @@ public class TemperatureFragment extends Fragment {
 
         mSeekArc = (SeekArc) view.findViewById(R.id.seekArc);
         mSeekArcProgress = (TextView) view.findViewById(R.id.seekArcProgress);
-        mRotation = (SeekBar) view.findViewById(R.id.rotation);
-        mStartAngle = (SeekBar) view.findViewById(R.id.startAngle);
-        mSweepAngle  = (SeekBar) view.findViewById(R.id.sweepAngle);
-        mArcWidth = (SeekBar) view.findViewById(R.id.arcWidth);
-        mProgressWidth = (SeekBar) view.findViewById(R.id.progressWidth);
-        mRoundedEdges = (CheckBox) view.findViewById(R.id.roundedEdges);
-        mTouchInside = (CheckBox) view.findViewById(R.id.touchInside);
-        mClockwise = (CheckBox) view.findViewById(R.id.clockwise);
+//        mRotation = (SeekBar) view.findViewById(R.id.rotation);
+//        mStartAngle = (SeekBar) view.findViewById(R.id.startAngle);
+//        mSweepAngle  = (SeekBar) view.findViewById(R.id.sweepAngle);
+//        mArcWidth = (SeekBar) view.findViewById(R.id.arcWidth);
+//        mProgressWidth = (SeekBar) view.findViewById(R.id.progressWidth);
+//        mRoundedEdges = (CheckBox) view.findViewById(R.id.roundedEdges);
+//        mTouchInside = (CheckBox) view.findViewById(R.id.touchInside);
+//        mClockwise = (CheckBox) view.findViewById(R.id.clockwise);
+//
+//        mRotation.setProgress(mSeekArc.getArcRotation());
+//        mStartAngle.setProgress(mSeekArc.getStartAngle());
+//        mSweepAngle.setProgress(mSeekArc.getSweepAngle());
+//        mArcWidth.setProgress(mSeekArc.getArcWidth());
+//        mProgressWidth.setProgress(mSeekArc.getProgressWidth());
 
-        mRotation.setProgress(mSeekArc.getArcRotation());
-        mStartAngle.setProgress(mSeekArc.getStartAngle());
-        mSweepAngle.setProgress(mSeekArc.getSweepAngle());
-        mArcWidth.setProgress(mSeekArc.getArcWidth());
-        mProgressWidth.setProgress(mSeekArc.getProgressWidth());
-
-//        setTemperature();
+        setTemperature(mTemperature, mHeatingState);
 
         mSeekArc.setOnSeekArcChangeListener(new OnSeekArcChangeListener() {
 
@@ -100,115 +104,115 @@ public class TemperatureFragment extends Fragment {
             }
         });
 
-        mRotation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onStopTrackingTouch(SeekBar arg0) {
-
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar arg0) {
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
-                mSeekArc.setArcRotation(progress);
-                mSeekArc.invalidate();
-            }
-        });
-
-        mStartAngle.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onStopTrackingTouch(SeekBar arg0) {
-
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar arg0) {
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
-                mSeekArc.setStartAngle(progress);
-                mSeekArc.invalidate();
-            }
-        });
-
-        mSweepAngle.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onStopTrackingTouch(SeekBar arg0) {
-
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar arg0) {
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
-                mSeekArc.setSweepAngle(progress);
-                mSeekArc.invalidate();
-            }
-        });
-
-        mArcWidth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onStopTrackingTouch(SeekBar arg0) {
-
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar arg0) {
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
-                mSeekArc.setArcWidth(progress);
-                mSeekArc.invalidate();
-            }
-        });
-
-        mProgressWidth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onStopTrackingTouch(SeekBar arg0) {
-
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar arg0) {
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
-                mSeekArc.setProgressWidth(progress);
-                mSeekArc.invalidate();
-            }
-        });
-
-        mRoundedEdges.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
-                mSeekArc.setRoundedEdges(isChecked);
-                mSeekArc.invalidate();
-            }
-        });
-
-        mTouchInside.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
-                mSeekArc.setTouchInSide(isChecked);
-            }
-        });
-
-        mClockwise.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
-                mSeekArc.setClockwise(isChecked);
-                mSeekArc.invalidate();
-            }
-        });
+//        mRotation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onStopTrackingTouch(SeekBar arg0) {
+//
+//            }
+//            @Override
+//            public void onStartTrackingTouch(SeekBar arg0) {
+//            }
+//
+//            @Override
+//            public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
+//                mSeekArc.setArcRotation(progress);
+//                mSeekArc.invalidate();
+//            }
+//        });
+//
+//        mStartAngle.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onStopTrackingTouch(SeekBar arg0) {
+//
+//            }
+//            @Override
+//            public void onStartTrackingTouch(SeekBar arg0) {
+//            }
+//
+//            @Override
+//            public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
+//                mSeekArc.setStartAngle(progress);
+//                mSeekArc.invalidate();
+//            }
+//        });
+//
+//        mSweepAngle.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onStopTrackingTouch(SeekBar arg0) {
+//
+//            }
+//            @Override
+//            public void onStartTrackingTouch(SeekBar arg0) {
+//            }
+//
+//            @Override
+//            public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
+//                mSeekArc.setSweepAngle(progress);
+//                mSeekArc.invalidate();
+//            }
+//        });
+//
+//        mArcWidth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onStopTrackingTouch(SeekBar arg0) {
+//
+//            }
+//            @Override
+//            public void onStartTrackingTouch(SeekBar arg0) {
+//            }
+//
+//            @Override
+//            public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
+//                mSeekArc.setArcWidth(progress);
+//                mSeekArc.invalidate();
+//            }
+//        });
+//
+//        mProgressWidth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onStopTrackingTouch(SeekBar arg0) {
+//
+//            }
+//            @Override
+//            public void onStartTrackingTouch(SeekBar arg0) {
+//            }
+//
+//            @Override
+//            public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
+//                mSeekArc.setProgressWidth(progress);
+//                mSeekArc.invalidate();
+//            }
+//        });
+//
+//        mRoundedEdges.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+//                mSeekArc.setRoundedEdges(isChecked);
+//                mSeekArc.invalidate();
+//            }
+//        });
+//
+//        mTouchInside.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+//                mSeekArc.setTouchInSide(isChecked);
+//            }
+//        });
+//
+//        mClockwise.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+//                mSeekArc.setClockwise(isChecked);
+//                mSeekArc.invalidate();
+//            }
+//        });
 
         return view;
     }
 
-    public void setTemperature(int temperature) {
+    public void setTemperature(int temperature, String heatingState) {
         mSeekArc.setProgress(temperature);
-        mSeekArcProgress.setText(temperature + "");
+        mSeekArcProgress.setText(temperature + "/" + heatingState);
     }
 
     @Override
@@ -227,6 +231,12 @@ public class TemperatureFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
+    public void test() {
+       Log.d(TAG, "test");
+    }
+
+
 
     public interface OnTemperatureFragmentInteractionListener {
         public int getTemperature();

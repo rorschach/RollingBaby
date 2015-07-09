@@ -1,5 +1,6 @@
 package com.hl.rollingbaby.ui;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,11 +9,34 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.hl.rollingbaby.R;
+import com.hl.rollingbaby.bean.Constants;
 import com.skyfishjy.library.RippleBackground;
 
 public class SwingFragment extends Fragment {
 
+    private OnSwingFragmentInteractionListener mListener;
+
+    private String mSwingMode;
+
+    private static final String ARG_SWING_MODE = Constants.CURRENT_SWING_MODE;
+
+    public static SwingFragment newInstance(String swingMode) {
+        SwingFragment fragment = new SwingFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_SWING_MODE, swingMode);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public SwingFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mSwingMode = getArguments().getString(ARG_SWING_MODE);
+        }
     }
 
     @Override
@@ -32,4 +56,29 @@ public class SwingFragment extends Fragment {
 
         return view;
     }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnSwingFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public interface OnSwingFragmentInteractionListener {
+
+        public String getSwingMode();
+
+        public void saveSwingMode(String soundMode);
+    }
+
 }

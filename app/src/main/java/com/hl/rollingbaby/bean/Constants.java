@@ -70,7 +70,7 @@ public interface Constants {
     public static final int SOUND_PERVIOUS = 3;
 
     public static final String SWING_TAG = "SW";
-    public static final String SWING_SLLEP = "S";
+    public static final String SWING_SLEEP = "S";
 //    public static final String SWING_ENTERTAINMENT = "E";
     public static final String SWING_CLOSE = "C";
 

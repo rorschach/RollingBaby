@@ -86,6 +86,7 @@ public class StatusFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StatusService.startActionGetStatus(getActivity());
+
         if (getArguments() != null) {
             mTemperature = getArguments().getInt(ARG_TEMPERATURE);
             mHeatingState = getArguments().getString(ARG_HEATING_STATE);
@@ -122,8 +123,9 @@ public class StatusFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), TemperatureActivity.class);
                 intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE,
                         mTemperature);//notice here!
-                intent.putExtra(Constants.HEATING_STATE, Constants.CLOSE);
+                intent.putExtra(Constants.HEATING_STATE, mHeatingState);
                 startActivity(intent);
+                Log.d(TAG, mTemperature + ":" + mHeatingState);
             }
         });
 
@@ -140,9 +142,10 @@ public class StatusFragment extends Fragment {
             public void onClick(Card card, View view) {
                 Intent intent = new Intent(getActivity(), SoundActivity.class);
                 intent.putExtra(Constants.CURRENT_SOUND_MODE,
-                        Constants.MUSIC);
-                intent.putExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
+                        mSoundMode);
+                intent.putExtra(Constants.PLAY_STATE, mPlayState);
                 startActivity(intent);
+                Log.d(TAG, mSoundMode + ":" + mPlayState);
             }
         });
 
@@ -150,8 +153,9 @@ public class StatusFragment extends Fragment {
             @Override
             public void onClick(Card card, View view) {
                 Intent intent = new Intent(getActivity(), SwingActivity.class);
-                intent.putExtra(Constants.CURRENT_SWING_MODE, Constants.SLEEP);
+                intent.putExtra(Constants.CURRENT_SWING_MODE, mSwingMode);
                 startActivity(intent);
+                Log.d(TAG, mSwingMode);
             }
         });
 
@@ -164,7 +168,7 @@ public class StatusFragment extends Fragment {
 //        humidityText = (TextView) view.findViewById(R.id.humidity_state);
         soundText = (TextView) view.findViewById(R.id.sound_state);
         swingText = (TextView) view.findViewById(R.id.swing_state);
-        setCardStatus();
+//        mListener.geMessageFromServer("T.C.36;SO.S.1;SW.C;");
     }
 
     public void getCardStatus(int temperature,String heatingState, String soundMode,

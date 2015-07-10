@@ -227,15 +227,42 @@ public class HomeActivity extends BaseActivity implements
 
     @Override
     public void geMessageFromServer(String readMessage) {
-        Log.d(TAG, "is in getMachineState : " + readMessage);
+//        Log.d(TAG, "is in getMachineState : " + readMessage);
 
         try {
-            String state[] = readMessage.split(":");
+            String state[] = readMessage.split(";");
             //TODO:process status and display it in UI
-            String temperature = state[0];//like TO25,get the '25'
-            String sound = state[1];//like SOM1,get the 'M' and '1'
-            String swing = state[2];//like SWS, get the 'S'
-            //setCard(25, Music, Stop, Sleep);
+            String A = state[0];//like T.O.25,get the '25'
+            String temperatureList[] = A.split("\\.");
+            String temperatureTag = temperatureList[0];
+            String heatingState = temperatureList[1];
+            String temperature = temperatureList[2];
+
+            String B = state[1];//like SO.M.1,get the 'M' and '1'
+            String soundList[] = B.split("\\.");
+            String soundTag = soundList[0];
+            String soundMode = soundList[1];
+            String playState = soundList[2];
+
+            String C = state[2];//like SW.S, get the 'S'
+            String swingList[] = C.split("\\.");
+            String swingTag = swingList[0];
+            String swingMode = swingList[1];
+
+//            Toast.makeText(this,
+//                    temperatureTag  + "\n" + heatingState + "\n" + temperature + "\n"
+//                            + soundTag + "\n" + soundMode + "\n" + playState
+//                            + "\n" + swingTag  + "\n" + swingMode
+//                    ,Toast.LENGTH_SHORT).show();
+//
+
+//            Toast.makeText(this, A + "\n" + B + "\n" + C
+//                    ,Toast.LENGTH_SHORT).show();
+//            Log.d(TAG, A + "\n" + B + "\n" + C);
+
+            setCard(Integer.valueOf(temperature),
+                    heatingState, soundMode,
+                    Integer.valueOf(playState), swingMode);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -248,15 +275,17 @@ public class HomeActivity extends BaseActivity implements
     @Override
     public void onRefresh() {
 
-        if (messageBinder.getConnectState()) {
-            // TODO:get data from server and update UI
-            messageBinder.sendMessage(Constants.COMMAND_REFRESH + "\n");
-
-        } else {
-            // TODO:get data from SharedPreferences and update UI
-            StatusService.startActionGetStatus(this);
-        }
-        Toast.makeText(this, "refresh done", Toast.LENGTH_SHORT).show();
+//        if (messageBinder.getConnectState()) {
+//            // TODO:get data from server and update UI
+//            messageBinder.sendMessage(Constants.COMMAND_REFRESH + "\n");
+//
+//        } else {
+//            // TODO:get data from SharedPreferences and update UI
+//            StatusService.startActionGetStatus(this);
+//        }
+        geMessageFromServer("T.O.25;SO.M.1;SW.S;");
+//
+//        Toast.makeText(this, "refresh done", Toast.LENGTH_SHORT).show();
         hideRefreshProgress();
     }
 

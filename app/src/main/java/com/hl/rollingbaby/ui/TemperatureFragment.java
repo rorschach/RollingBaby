@@ -211,6 +211,8 @@ public class TemperatureFragment extends Fragment {
     }
 
     public void setTemperature(int temperature, String heatingState) {
+//        mTemperature = temperature;
+//        mHeatingState = heatingState;
         mSeekArc.setProgress(temperature);
         mSeekArcProgress.setText(temperature + "/" + heatingState);
     }

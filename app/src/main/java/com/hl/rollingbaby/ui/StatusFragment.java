@@ -174,6 +174,8 @@ public class StatusFragment extends Fragment {
         mSoundMode = soundMode;
         mPlayState = playState;
         mSwingMode = swingMode;
+        Log.d(TAG,
+                mTemperature + mHeatingState + mSoundMode + mPlayState + mSwingMode);
         setCardStatus();
     }
 

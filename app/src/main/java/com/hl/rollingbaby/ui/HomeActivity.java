@@ -238,16 +238,17 @@ public class HomeActivity extends BaseActivity implements
             String heatingState = temperatureList[1];
             String temperature = temperatureList[2];
 
-            String B = state[1];//like SO.M.1,get the 'M' and '1'
-            String soundList[] = B.split("\\.");
-            String soundTag = soundList[0];
-            String soundMode = soundList[1];
-            String playState = soundList[2];
+            if (state.length == 3) {
+                String B = state[1];//like SO.M.1,get the 'M' and '1'
+                String soundList[] = B.split("\\.");
+                String soundTag = soundList[0];
+                String soundMode = soundList[1];
+                String playState = soundList[2];
 
-            String C = state[2];//like SW.S, get the 'S'
-            String swingList[] = C.split("\\.");
-            String swingTag = swingList[0];
-            String swingMode = swingList[1];
+                String C = state[2];//like SW.S, get the 'S'
+                String swingList[] = C.split("\\.");
+                String swingTag = swingList[0];
+                String swingMode = swingList[1];
 
 //            Toast.makeText(this,
 //                    temperatureTag  + "\n" + heatingState + "\n" + temperature + "\n"
@@ -260,9 +261,14 @@ public class HomeActivity extends BaseActivity implements
 //                    ,Toast.LENGTH_SHORT).show();
 //            Log.d(TAG, A + "\n" + B + "\n" + C);
 
-            setCard(Integer.valueOf(temperature),
-                    heatingState, soundMode,
-                    Integer.valueOf(playState), swingMode);
+                setCard(Integer.valueOf(temperature),
+                        heatingState, soundMode,
+                        Integer.valueOf(playState), swingMode);
+            } else if(state.length == 1){
+                Toast.makeText(this,
+                    temperatureTag  + "\n" + heatingState + "\n" + temperature
+                    ,Toast.LENGTH_SHORT).show();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

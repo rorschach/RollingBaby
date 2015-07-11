@@ -20,8 +20,12 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
 
     private static final String TAG = "SoundActivity";
     private SoundFragment soundFragment;
-    private int mPlayState;
+
+    private int mTemperature;
+    private String mHeatingState;
     private String mSoundMode;
+    private int mPlayState;
+    private String mSwingMode;
 
     private MessageService.MessageBinder messageBinder;
     private MessageService messageService;
@@ -33,16 +37,29 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
         setContentView(R.layout.activity_sound);
 
         Intent intent = getIntent();
-        mSoundMode = intent.getStringExtra(Constants.CURRENT_SOUND_MODE);
-        mPlayState = intent.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
+//        mSoundMode = intent.getStringExtra(Constants.CURRENT_SOUND_MODE);
+//        mPlayState = intent.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
+
+        getIntentFromHome();
 
         if (savedInstanceState == null) {
-            soundFragment = SoundFragment.newInstance(mSoundMode, mPlayState);
+            soundFragment = SoundFragment.newInstance(
+                    mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
             soundFragment.setArguments(getIntent().getExtras());
             getFragmentManager().beginTransaction().add(
                     R.id.sound_container, soundFragment).commit();
         }
         init();
+    }
+
+    private void getIntentFromHome() {
+        Intent intent = getIntent();
+        mTemperature = intent.getIntExtra(
+                Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
+        mHeatingState = intent.getStringExtra(Constants.HEATING_STATE);
+        mSoundMode = intent.getStringExtra(Constants.CURRENT_SOUND_MODE);
+        mPlayState = intent.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
+        mSwingMode = intent.getStringExtra(Constants.CURRENT_SWING_MODE);
     }
 
     private void init() {
@@ -94,7 +111,7 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
         if (id == R.id.action_sync) {
 
 //            StatusService.startActionProcessTemperature(this, mTemperature);
-            messageBinder.sendMessage(mPlayState + mSoundMode + "\n");
+            setSoundState(mPlayState, mSoundMode);
 
             return true;
         }
@@ -115,7 +132,9 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
     }
 
     public void setSoundState(int playState, String soundMode){
-        messageBinder.sendMessage(Constants.COMMAND_TAG + Constants.COMMAND_EXECUTE
-                + Constants.SOUND_TAG + soundMode + playState);
+        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                + mTemperature + ";"
+                + Constants.SWING_TAG + mSwingMode + ";"
+                + Constants.SOUND_TAG + soundMode + playState + ";\n");
     };
 }

@@ -24,6 +24,10 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
     private MessageService messageService;
     private SwingFragment swingFragment;
 
+    private int mTemperature;
+    private String mHeatingState;
+    private String mSoundMode;
+    private int mPlayState;
     private String mSwingMode;
 
     @Override
@@ -31,11 +35,14 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swing);
 
-        Intent intent = getIntent();
-        mSwingMode = intent.getStringExtra(Constants.CURRENT_SWING_MODE);
+//        Intent intent = getIntent();
+//        mSwingMode = intent.getStringExtra(Constants.CURRENT_SWING_MODE);
+
+        getIntentFromHome();
 
         if (savedInstanceState == null) {
-            swingFragment = SwingFragment.newInstance(mSwingMode);
+            swingFragment = SwingFragment.newInstance(
+                    mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
             swingFragment.setArguments(getIntent().getExtras());
             getFragmentManager().beginTransaction().add(
                     R.id.swing_container, swingFragment).commit();
@@ -44,6 +51,15 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
         init();
     }
 
+    private void getIntentFromHome() {
+        Intent intent = getIntent();
+        mTemperature = intent.getIntExtra(
+                Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
+        mHeatingState = intent.getStringExtra(Constants.HEATING_STATE);
+        mSoundMode = intent.getStringExtra(Constants.CURRENT_SOUND_MODE);
+        mPlayState = intent.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
+        mSwingMode = intent.getStringExtra(Constants.CURRENT_SWING_MODE);
+    }
 
     private void init() {
         initViews();
@@ -95,7 +111,7 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
         if (id == R.id.action_sync) {
 
 //            StatusService.startActionProcessTemperature(this, mTemperature);
-            messageBinder.sendMessage(mSwingMode + "\n");
+            setSwingMode(mSwingMode);
 
             return true;
         }
@@ -116,9 +132,11 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
     }
 
     @Override
-    public void setSwingMode(String soundMode) {
-        messageBinder.sendMessage(Constants.COMMAND_TAG + Constants.COMMAND_EXECUTE
-                + Constants.SWING_TAG + soundMode);
+    public void setSwingMode(String swingMode) {
+        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                + mTemperature + ";"
+                + Constants.SWING_TAG + swingMode + ";"
+                + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
 
     }
 }

@@ -63,30 +63,23 @@ public class HomeActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+//        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
+
+        geMessageFromServer("T.C.36;SO.S.0;SW.C;");//just for test
+
+        if (savedInstanceState == null) {
+            statusFragment = StatusFragment.newInstance(
+                    mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+            getFragmentManager().beginTransaction().add(
+                    R.id.root_container, statusFragment).commit();
+        }
+
         mSwipeRefreshWidget =
                 (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_widget);
         mSwipeRefreshWidget.setColorScheme(R.color.red, R.color.yellow,
                 R.color.blue, R.color.green);
         mSwipeRefreshWidget.setOnRefreshListener(this);
         isInActivity = true;
-//        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
-
-        geMessageFromServer("T.C.36;SO.S.0;SW.C;");//just for test
-
-//        Log.d(TAG, "." + mTemperature + mHeatingState
-//                + mSoundMode + mPlayState + mSwingMode + ".");
-
-        if (savedInstanceState == null) {
-            statusFragment = StatusFragment.newInstance(
-                    mTemperature,
-                    mHeatingState,
-                    mSoundMode,
-                    mPlayState,
-                    mSwingMode);
-
-            getFragmentManager().beginTransaction().add(
-                    R.id.root_container, statusFragment).commit();
-        }
     }
 
     public void initViews() {
@@ -145,7 +138,7 @@ public class HomeActivity extends BaseActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_home, menu);
+        getMenuInflater().inflate(R.menu.menu_common, menu);
         return true;
     }
 
@@ -156,9 +149,20 @@ public class HomeActivity extends BaseActivity implements
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+
+            case R.id.action_sync:
+                sendStatuesToServer();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void sendStatuesToServer() {
+        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                + mTemperature + ";"
+                + Constants.SWING_TAG + mSwingMode + ";"
+                + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
     }
 
     @Override
@@ -298,7 +302,7 @@ public class HomeActivity extends BaseActivity implements
     public void onRefresh() {
         if (messageBinder.getConnectState()) {
             // TODO:get data from server and update UI
-            messageBinder.sendMessage(Constants.COMMAND_REFRESH + "\n");
+            messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
             geMessageFromServer("T.O.25;SO.M.1;SW.S;");
             setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
         } else {
@@ -306,7 +310,6 @@ public class HomeActivity extends BaseActivity implements
             setDialog();
         }
 
-//
     }
 
     public void showRefreshProgress() {

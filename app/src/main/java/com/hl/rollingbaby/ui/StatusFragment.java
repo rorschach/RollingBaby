@@ -53,7 +53,7 @@ public class StatusFragment extends Fragment {
     private TextView swingText;
 //    private ArrayList<String> list = new ArrayList<>();
 
-    public static StatusFragment newInstance( int temperature, String heatingState,
+    public static StatusFragment newInstance(int temperature, String heatingState,
                 String soundMode, int playState, String swingMode) {
         StatusFragment fragment  = new StatusFragment();
         Bundle args = new Bundle();
@@ -115,11 +115,13 @@ public class StatusFragment extends Fragment {
         card_temperature.setOnClickListener(new Card.OnCardClickListener() {
             @Override
             public void onClick(Card card, View view) {
+//                Intent intent = new Intent(getActivity(), TemperatureActivity.class);
+//                intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE,
+//                        mTemperature);//notice here!
+//                intent.putExtra(Constants.HEATING_STATE, mHeatingState);
+//                startActivity(intent);
                 Intent intent = new Intent(getActivity(), TemperatureActivity.class);
-                intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE,
-                        mTemperature);//notice here!
-                intent.putExtra(Constants.HEATING_STATE, mHeatingState);
-                startActivity(intent);
+                sendIntent(intent);
                 Log.d(TAG, mTemperature + ":" + mHeatingState);
             }
         });
@@ -136,10 +138,11 @@ public class StatusFragment extends Fragment {
             @Override
             public void onClick(Card card, View view) {
                 Intent intent = new Intent(getActivity(), SoundActivity.class);
-                intent.putExtra(Constants.CURRENT_SOUND_MODE,
-                        mSoundMode);
-                intent.putExtra(Constants.PLAY_STATE, mPlayState);
-                startActivity(intent);
+//                intent.putExtra(Constants.CURRENT_SOUND_MODE,
+//                        mSoundMode);
+//                intent.putExtra(Constants.PLAY_STATE, mPlayState);
+//                startActivity(intent);
+                sendIntent(intent);
                 Log.d(TAG, mSoundMode + ":" + mPlayState);
             }
         });
@@ -148,8 +151,9 @@ public class StatusFragment extends Fragment {
             @Override
             public void onClick(Card card, View view) {
                 Intent intent = new Intent(getActivity(), SwingActivity.class);
-                intent.putExtra(Constants.CURRENT_SWING_MODE, mSwingMode);
-                startActivity(intent);
+//                intent.putExtra(Constants.CURRENT_SWING_MODE, mSwingMode);
+//                startActivity(intent);
+                sendIntent(intent);
                 Log.d(TAG, mSwingMode);
             }
         });
@@ -168,6 +172,16 @@ public class StatusFragment extends Fragment {
 
     }
 
+    private void sendIntent(Intent intent) {
+        intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE,
+                mTemperature);//notice here!
+        intent.putExtra(Constants.HEATING_STATE, mHeatingState);
+        intent.putExtra(Constants.CURRENT_SOUND_MODE,
+                mSoundMode);
+        intent.putExtra(Constants.PLAY_STATE, mPlayState);
+        intent.putExtra(Constants.CURRENT_SWING_MODE, mSwingMode);
+        startActivity(intent);
+    }
 
 
     @Override
@@ -200,33 +214,39 @@ public class StatusFragment extends Fragment {
     }
 
     public void setCardStatus() {
+        String temper_tem = mTemperature + "℃";
+        String heating_tem = "";
+        String sound_tem = "";
+        String swing_tem = "";
+        String play_tem = "";
+
         if (mHeatingState.equals(Constants.HEATING_CLOSE)) {
-            mHeatingState = "UnHeating";
+            heating_tem = "UnHeating";
         }else if(mHeatingState.equals(Constants.HEATING_OPEN)){
-            mHeatingState = "Heating";
+            heating_tem = "Heating";
         }
 
         if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
-            mSoundMode = "Music";
+            sound_tem = "Music";
         }else if (mSoundMode.equals(Constants.SOUND_STORY)){
-            mSoundMode = "Story";
+            sound_tem = "Story";
         }
 
         if (mSwingMode.equals(Constants.SWING_SLEEP)) {
-            mSwingMode = "Sleep";
+            swing_tem = "Sleep";
         }else if (mSwingMode.equals(Constants.SWING_CLOSE)) {
-            mSwingMode = "Close";
+            swing_tem = "Close";
         }
 
         if (mPlayState == 1) {
-            soundText.setText(mSoundMode + " / Playing");
+            play_tem = "Playing";
         }else {
-            soundText.setText(mSoundMode + " / Stop");
+            play_tem = "Stop";
         }
-        temperatureText.setText(mTemperature + " / " + mHeatingState);
-//        soundText.setText(mSoundMode + " / " + mPlayState);
-        Log.d(TAG, mPlayState + "");
-        swingText.setText(mSwingMode);
+
+        temperatureText.setText(temper_tem + " / " + heating_tem);
+        soundText.setText(sound_tem + " / " + play_tem);
+        swingText.setText(sound_tem);
     }
 
 //    public void setMessageManager(MessageManager obj) {

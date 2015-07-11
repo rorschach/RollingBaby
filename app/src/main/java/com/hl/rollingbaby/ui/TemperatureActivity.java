@@ -27,6 +27,9 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
 
     private int mTemperature;
     private String mHeatingState;
+    private String mSoundMode;
+    private int mPlayState;
+    private String mSwingMode;
 
     private TemperatureFragment temperatureFragment;
 
@@ -35,19 +38,25 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temperature);
 
-        Intent intent = getIntent();
-        mTemperature = intent.getIntExtra(
-                Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
-        mHeatingState = intent.getStringExtra(Constants.HEATING_STATE);
-        Log.d(TAG, mTemperature + ":" + mHeatingState + ":" + 0);
+        getIntentFromHome();
 
         if (savedInstanceState == null) {
             temperatureFragment = TemperatureFragment.newInstance(
-                    mTemperature, mHeatingState);
+                    mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
             temperatureFragment.setArguments(getIntent().getExtras());
             getFragmentManager().beginTransaction().add(
                     R.id.temperature_container, temperatureFragment).commit();
         }
+    }
+
+    private void getIntentFromHome() {
+        Intent intent = getIntent();
+        mTemperature = intent.getIntExtra(
+                Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
+        mHeatingState = intent.getStringExtra(Constants.HEATING_STATE);
+        mSoundMode = intent.getStringExtra(Constants.CURRENT_SOUND_MODE);
+        mPlayState = intent.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
+        mSwingMode = intent.getStringExtra(Constants.CURRENT_SWING_MODE);
     }
 
     @Override
@@ -96,7 +105,7 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
         if (id == R.id.action_sync) {
 
 //            StatusService.startActionProcessTemperature(this, mTemperature);
-            messageBinder.sendMessage(mTemperature + mHeatingState + "\n");
+            setTemperatureState(mTemperature);
 
             return true;
         }
@@ -117,8 +126,10 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
 
     @Override
     public void setTemperatureState(int temperature) {
-        messageBinder.sendMessage(Constants.COMMAND_TAG + Constants.COMMAND_EXECUTE
-                + Constants.TEMPERATURE_TAG + temperature);
+        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                + temperature + ";"
+                + Constants.SWING_TAG + mSwingMode + ";"
+                + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
     }
 
 }

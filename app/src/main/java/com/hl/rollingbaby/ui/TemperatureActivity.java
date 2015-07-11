@@ -108,7 +108,6 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
     public void onServiceConnected(ComponentName name, IBinder service) {
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
-//        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
     }
 
     @Override

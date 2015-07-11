@@ -47,7 +47,7 @@ public class TemperatureFragment extends Fragment {
         args.putInt(ARG_TEMPERATURE, temperature);
         args.putString(ARG_HEATING_STATE, heatingState);
         fragment.setArguments(args);
-        Log.d(TAG, temperature + ":" + heatingState);
+        Log.d(TAG, temperature + ":" + heatingState + ":" + "1");
         return fragment;
     }
 

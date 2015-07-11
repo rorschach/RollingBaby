@@ -1,5 +1,6 @@
 package com.hl.rollingbaby.network;
 
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,6 +15,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
@@ -112,7 +114,9 @@ public class MessageService extends Service {
         }
 
         public void sendMessage(String message) {
-            messageManager.write(message.getBytes());
+            if (getConnectState()) {
+                messageManager.write(message.getBytes());
+            }
         }
 
         public void buildNotification(int requestCode, String title, String content) {
@@ -148,5 +152,16 @@ public class MessageService extends Service {
                 manager.notify(requestCode, mBuilder.build());
             }
         }
+
+//        public void buildConnectedFailedDialog() {
+//            AlertDialog.Builder builder = new AlertDialog.Builder(context)
+//                    .setTitle("Ok")
+//                    .setPositiveButton("Ok", null)
+//                    .setNegativeButton("False", null);
+//
+//            AlertDialog dialog = builder.create();
+//            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_DIALOG);
+//            dialog.show();
+//        }
     }
 }

@@ -37,15 +37,13 @@ public class StatusFragment extends Fragment {
 
     private OnStatusFragmentInteractionListener mListener;
 
-    private MessageManager messageManager;
-
     private Card card_temperature;
 //    private Card card_humidity;
     private Card card_music;
     private Card card_swing;
 
     private CardViewNative cardView_temperature;
-    private CardViewNative cardView_humidity;
+//    private CardViewNative cardView_humidity;
     private CardViewNative cardView_music;
     private CardViewNative cardView_swing;
 
@@ -55,9 +53,8 @@ public class StatusFragment extends Fragment {
     private TextView swingText;
 //    private ArrayList<String> list = new ArrayList<>();
 
-    public static StatusFragment newInstance(
-            int temperature, String heatingState,
-            String soundMode, int playState, String swingMode) {
+    public static StatusFragment newInstance( int temperature, String heatingState,
+                String soundMode, int playState, String swingMode) {
         StatusFragment fragment  = new StatusFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_TEMPERATURE, temperature);
@@ -66,26 +63,19 @@ public class StatusFragment extends Fragment {
         args.putInt(ARG_PLAY_STATE, playState);
         args.putString(ARG_SWING_MODE, swingMode);
         fragment.setArguments(args);
+        Log.d(TAG, ".." + temperature + heatingState
+                + soundMode + playState + swingMode + "..");
         return fragment;
     }
 
     public StatusFragment() {
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnStatusFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        StatusService.startActionGetStatus(getActivity());
+//        StatusService.startActionGetStatus(getActivity());
 
         if (getArguments() != null) {
             mTemperature = getArguments().getInt(ARG_TEMPERATURE);
@@ -93,7 +83,12 @@ public class StatusFragment extends Fragment {
             mSoundMode = getArguments().getString(ARG_SOUND_MODE);
             mPlayState = getArguments().getInt(ARG_PLAY_STATE);
             mSwingMode = getArguments().getString(ARG_SWING_MODE);
+            Log.d(TAG, "getArguments() != null");
+        }else {
+            Log.d(TAG, "getArguments() == null");
         }
+        Log.d(TAG, "..." + mTemperature + mHeatingState
+                + mSoundMode + mPlayState + mSwingMode + "...");
     }
 
     @Override
@@ -169,6 +164,27 @@ public class StatusFragment extends Fragment {
         soundText = (TextView) view.findViewById(R.id.sound_state);
         swingText = (TextView) view.findViewById(R.id.swing_state);
 //        mListener.geMessageFromServer("T.C.36;SO.S.1;SW.C;");
+        setCardStatus();
+
+    }
+
+
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnStatusFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
     public void getCardStatus(int temperature,String heatingState, String soundMode,
@@ -184,26 +200,39 @@ public class StatusFragment extends Fragment {
     }
 
     public void setCardStatus() {
+        if (mHeatingState.equals(Constants.HEATING_CLOSE)) {
+            mHeatingState = "UnHeating";
+        }else if(mHeatingState.equals(Constants.HEATING_OPEN)){
+            mHeatingState = "Heating";
+        }
+
+        if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
+            mSoundMode = "Music";
+        }else if (mSoundMode.equals(Constants.SOUND_STORY)){
+            mSoundMode = "Story";
+        }
+
+        if (mSwingMode.equals(Constants.SWING_SLEEP)) {
+            mSwingMode = "Sleep";
+        }else if (mSwingMode.equals(Constants.SWING_CLOSE)) {
+            mSwingMode = "Close";
+        }
+
+        if (mPlayState == 1) {
+            soundText.setText(mSoundMode + " / Playing");
+        }else {
+            soundText.setText(mSoundMode + " / Stop");
+        }
         temperatureText.setText(mTemperature + " / " + mHeatingState);
-        soundText.setText(mSoundMode + " / " + mPlayState);
+//        soundText.setText(mSoundMode + " / " + mPlayState);
+        Log.d(TAG, mPlayState + "");
         swingText.setText(mSwingMode);
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    public void setMessageManager(MessageManager obj) {
-        messageManager = obj;
-        Log.d(TAG, "is in MessageManager : " + obj);
-    }
+//    public void setMessageManager(MessageManager obj) {
+//        messageManager = obj;
+//        Log.d(TAG, "is in MessageManager : " + obj);
+//    }
 
     public interface OnStatusFragmentInteractionListener {
 

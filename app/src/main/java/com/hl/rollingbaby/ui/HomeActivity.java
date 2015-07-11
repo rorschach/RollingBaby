@@ -1,8 +1,10 @@
 package com.hl.rollingbaby.ui;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -12,9 +14,11 @@ import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
@@ -37,19 +41,13 @@ public class HomeActivity extends BaseActivity implements
     private MessageService.MessageBinder messageBinder;
     private MessageService messageService;
 
-    private static final String ARG_TEMPERATURE = Constants.CURRENT_TEMPERATURE_VALUE;
-    private static final String ARG_HEATING_STATE = Constants.HEATING_STATE;
-    private static final String ARG_SOUND_MODE = Constants.CURRENT_SOUND_MODE;
-    private static final String ARG_PLAY_STATE = Constants.PLAY_STATE;
-    private static final String ARG_SWING_MODE = Constants.CURRENT_SWING_MODE;
-
     private int mTemperature;
     private String mHeatingState;
     private String mSoundMode;
     private int mPlayState;
     private String mSwingMode;
 
-    private UpdateUIReceiver receiver;
+//    private UpdateUIReceiver receiver;
 
     private StatusFragment statusFragment;
 
@@ -58,54 +56,6 @@ public class HomeActivity extends BaseActivity implements
     @Override
     public Handler getHandler() {
         return handler;
-    }
-
-    @Override
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-
-            case Constants.CONNECT_SUCCESS:
-                if (!isInActivity) {
-                    messageBinder.buildNotification(
-                            MessageService.NOTIFICATION_CONNECT_SUCCESS,
-                            "CONNECT_SUCCESS", "CONNECT_SUCCESS");
-                }else {
-                    Log.d(TAG, String.valueOf(isInActivity));
-                }
-                break;
-
-            case Constants.CONNECT_FAILED:
-                if (!isInActivity) {
-                    messageBinder.buildNotification(
-                            MessageService.NOTIFICATION_CONNECT_FAILED,
-                            "CONNECT_FAIL", "CONNECT_FAIL");
-                }else {
-                    Log.d(TAG, String.valueOf(isInActivity));
-                }
-                break;
-
-            case Constants.MESSAGE_READ:
-                if (!isInActivity) {
-                    showRefreshProgress();
-                    byte[] readBuf = (byte[]) msg.obj;
-                    // construct a string from the valid bytes in the buffer
-                    String readMessage = new String(readBuf, 0, msg.arg1);
-                    geMessageFromServer(readMessage);
-                    messageBinder.buildNotification(
-                            MessageService.NOTIFICATION_READ_MESSAGE,
-                            "READ", readMessage);
-                    hideRefreshProgress();
-                }else {
-                    Log.d(TAG, String.valueOf(isInActivity));
-                }
-                break;
-
-            case Constants.MESSAGE_SEND:
-                Object obj = msg.obj;
-//                statusFragment.setMessageManager((MessageManager) obj);
-//                messageBinder.sendMessage(obj + "");
-        }
-        return true;
     }
 
     @Override
@@ -118,24 +68,25 @@ public class HomeActivity extends BaseActivity implements
         mSwipeRefreshWidget.setColorScheme(R.color.red, R.color.yellow,
                 R.color.blue, R.color.green);
         mSwipeRefreshWidget.setOnRefreshListener(this);
-
         isInActivity = true;
-        Log.d(TAG, String.valueOf(isInActivity));
+//        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
 
-//        geMessageFromServer("T.C.36;SO.S.1;SW.C;");
+        geMessageFromServer("T.C.36;SO.S.1;SW.C;");//just for test
+
+//        Log.d(TAG, "." + mTemperature + mHeatingState
+//                + mSoundMode + mPlayState + mSwingMode + ".");
 
         if (savedInstanceState == null) {
             statusFragment = StatusFragment.newInstance(
-                    Constants.DEFAULT_TEMPERATURE,
-                    Constants.CLOSE,
-                    Constants.SOUND_MUSIC,
-                    Constants.SOUND_STOP,
-                    Constants.SWING_SLEEP);
-            statusFragment.setArguments(getIntent().getExtras());
+                    mTemperature,
+                    mHeatingState,
+                    mSoundMode,
+                    mPlayState,
+                    mSwingMode);
+
             getFragmentManager().beginTransaction().add(
                     R.id.root_container, statusFragment).commit();
         }
-
     }
 
     public void initViews() {
@@ -150,29 +101,28 @@ public class HomeActivity extends BaseActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-
-        LocalBroadcastManager broadcastManager =
-                LocalBroadcastManager.getInstance(this);
-        broadcastManager.unregisterReceiver(receiver);
-
+//        LocalBroadcastManager broadcastManager =
+//                LocalBroadcastManager.getInstance(this);
+//        broadcastManager.unregisterReceiver(receiver);
         isInActivity = false;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+//        geMessageFromServer("T.C.36;SO.S.1;SW.C;");
+
         Intent intent = new Intent(this, MessageService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
+//        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
 
-        LocalBroadcastManager broadcastManager =
-                LocalBroadcastManager.getInstance(this);
-        IntentFilter intentFilter = new IntentFilter(StatusService.ACTION_UPDATE_MAIN_UI);
-        receiver = new UpdateUIReceiver();
-        broadcastManager.registerReceiver(receiver, intentFilter);
-
+//        LocalBroadcastManager broadcastManager =
+//                LocalBroadcastManager.getInstance(this);
+//        IntentFilter intentFilter = new IntentFilter(StatusService.ACTION_UPDATE_MAIN_UI);
+//        receiver = new UpdateUIReceiver();
+//        broadcastManager.registerReceiver(receiver, intentFilter);
         isInActivity = true;
     }
-
 
     @Override
     protected void onDestroy() {
@@ -191,7 +141,6 @@ public class HomeActivity extends BaseActivity implements
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        Toast.makeText(this, "Service disconnected", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -213,8 +162,75 @@ public class HomeActivity extends BaseActivity implements
     }
 
     @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+
+            case Constants.CONNECT_SUCCESS:
+                if (!isInActivity) {
+                    messageBinder.buildNotification(
+                            MessageService.NOTIFICATION_CONNECT_SUCCESS,
+                            "CONNECT_SUCCESS", "CONNECT_SUCCESS");
+                }
+                break;
+
+            case Constants.CONNECT_FAILED:
+//                if (!isInActivity) {
+//                    messageBinder.buildNotification(
+//                            MessageService.NOTIFICATION_CONNECT_FAILED,
+//                            "CONNECT_FAIL", "CONNECT_FAIL");
+//                }
+                setDialog();
+                break;
+
+            case Constants.MESSAGE_READ:
+                showRefreshProgress();
+                byte[] readBuf = (byte[]) msg.obj;
+                // construct a string from the valid bytes in the buffer
+                String readMessage = new String(readBuf, 0, msg.arg1);
+                geMessageFromServer(readMessage);
+                if (!isInActivity) {
+                    messageBinder.buildNotification(
+                            MessageService.NOTIFICATION_READ_MESSAGE,
+                            "READ", readMessage);
+
+                }
+                setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+
+                hideRefreshProgress();
+                break;
+
+            case Constants.MESSAGE_SEND:
+                Object obj = msg.obj;
+//                statusFragment.setMessageManager((MessageManager) obj);
+//                messageBinder.sendMessage(obj + "");
+        }
+        return true;
+    }
+
+    private void setDialog() {
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(this);
+        builder.setTitle("CONNECT_FAIL");
+        builder.setMessage("CONNECT_FAIL");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+//                            Intent intent = new Intent(getApplicationContext(), );
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.create().show();
+        Log.d(TAG, "setDialog");
+    }
+
+    @Override
     public void geMessageFromServer(String readMessage) {
-//        Log.d(TAG, "is in getMachineState : " + readMessage);
 
         try {
             String state[] = readMessage.split(";");
@@ -237,18 +253,6 @@ public class HomeActivity extends BaseActivity implements
                 String swingTag = swingList[0];
                 mSwingMode = swingList[1];
 
-//            Toast.makeText(this,
-//                    temperatureTag  + "\n" + heatingState + "\n" + temperature + "\n"
-//                            + soundTag + "\n" + soundMode + "\n" + playState
-//                            + "\n" + swingTag  + "\n" + swingMode
-//                    ,Toast.LENGTH_SHORT).show();
-//
-
-//            Toast.makeText(this, A + "\n" + B + "\n" + C
-//                    ,Toast.LENGTH_SHORT).show();
-//            Log.d(TAG, A + "\n" + B + "\n" + C);
-
-//                setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
             } else if(state.length == 1){
                 Toast.makeText(this,
                     temperatureTag  + "\n" + mHeatingState + "\n" + mTemperature
@@ -259,30 +263,30 @@ public class HomeActivity extends BaseActivity implements
         }
     }
 
-    public class UpdateUIReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            Log.d("UpdateUIReceiver", "onReceive");
-            if (StatusService.ACTION_UPDATE_MAIN_UI.equals(action)) {
-
-                mTemperature =
-                        intent.getIntExtra(StatusService.EXTRA_TEMPERATURE_VALUE,36);
-                mHeatingState =
-                        intent.getStringExtra(StatusService.EXTRA_HEATING_STATE);
-
-                mSoundMode =
-                        intent.getStringExtra(StatusService.EXTRA_SOUND_MODE);
-                mPlayState =
-                        intent.getIntExtra(StatusService.EXTRA_PLAY_STATE, 0);
-
-                mSwingMode =
-                        intent.getStringExtra(StatusService.EXTRA_SWING_MODE);
-
-                setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
-            }
-        }
-    }
+//    public class UpdateUIReceiver extends BroadcastReceiver {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            String action = intent.getAction();
+//            Log.d("UpdateUIReceiver", "onReceive");
+//            if (StatusService.ACTION_UPDATE_MAIN_UI.equals(action)) {
+//
+//                mTemperature =
+//                        intent.getIntExtra(StatusService.EXTRA_TEMPERATURE_VALUE,36);
+//                mHeatingState =
+//                        intent.getStringExtra(StatusService.EXTRA_HEATING_STATE);
+//
+//                mSoundMode =
+//                        intent.getStringExtra(StatusService.EXTRA_SOUND_MODE);
+//                mPlayState =
+//                        intent.getIntExtra(StatusService.EXTRA_PLAY_STATE, 0);
+//
+//                mSwingMode =
+//                        intent.getStringExtra(StatusService.EXTRA_SWING_MODE);
+//
+//                setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+//            }
+//        }
+//    }
 
     public void setCard(int temperature, String heatingState,
                         String soundMode, int playState, String swingMode) {
@@ -297,20 +301,17 @@ public class HomeActivity extends BaseActivity implements
 
     @Override
     public void onRefresh() {
-
 //        if (messageBinder.getConnectState()) {
 //            // TODO:get data from server and update UI
 //            messageBinder.sendMessage(Constants.COMMAND_REFRESH + "\n");
 //
 //        } else {
 //            // TODO:get data from SharedPreferences and update UI
-//            StatusService.startActionGetStatus(this);
+////            StatusService.startActionGetStatus(this);
 //        }
         geMessageFromServer("T.O.25;SO.M.1;SW.S;");
         setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
 //
-//        Toast.makeText(this, "refresh done", Toast.LENGTH_SHORT).show();
-        hideRefreshProgress();
     }
 
     public void showRefreshProgress() {

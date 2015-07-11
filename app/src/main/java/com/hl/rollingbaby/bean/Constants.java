@@ -55,8 +55,8 @@ public interface Constants {
 //    public int SET_HUMIDITY = 0;
 
     public static final String TEMPERATURE_TAG = "T";
-    public static final String HEATING_CLOSE = TEMPERATURE_TAG + "C";
-    public static final String HEATING_OPEN = TEMPERATURE_TAG + "O";
+    public static final String HEATING_CLOSE = "C";
+    public static final String HEATING_OPEN = "O";
     public int SET_TEMPERATURE = 0;
 
     public static final String SOUND_TAG = "SO";

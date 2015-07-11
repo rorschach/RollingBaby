@@ -33,6 +33,7 @@ public class MessageManager extends Thread {
     }
 
     public boolean getConnectState() {
+        Log.d(TAG, "isConnecting : " + isConnecting);
         return isConnecting;
     }
 

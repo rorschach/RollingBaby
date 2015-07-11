@@ -116,12 +116,9 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
     }
 
     @Override
-    public String getSwingMode() {
-        return null;
-    }
-
-    @Override
-    public void saveSwingMode(String soundMode) {
+    public void setSwingMode(String soundMode) {
+        messageBinder.sendMessage(Constants.COMMAND_TAG + Constants.COMMAND_EXECUTE
+                + Constants.SWING_TAG + soundMode);
 
     }
 }

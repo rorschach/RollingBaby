@@ -116,13 +116,9 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
     }
 
     @Override
-    public int getTemperature() {
-        Log.d(TAG, mTemperature + " : getTemperature");
-        return mTemperature;
-    }
-
-    @Override
-    public void saveTemperature(int temperature) {
+    public void setTemperatureState(int temperature) {
+        messageBinder.sendMessage(Constants.COMMAND_TAG + Constants.COMMAND_EXECUTE
+                + Constants.TEMPERATURE_TAG + temperature);
     }
 
 }

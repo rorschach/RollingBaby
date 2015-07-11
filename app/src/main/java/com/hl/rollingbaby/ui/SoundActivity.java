@@ -114,23 +114,8 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
         Toast.makeText(this, "Service disconnected", Toast.LENGTH_LONG).show();
     }
 
-    @Override
-    public int getPlayState() {
-        return mPlayState;
-    }
-
-    @Override
-    public void savePlayState(int playState) {
-//       messageBinder.savePlayState(playState);
-    }
-
-    @Override
-    public String getSoundMode() {
-        return mSoundMode;
-    }
-
-    @Override
-    public void saveSoundMode(String soundMode) {
-//        messageBinder.saveSoundMode(soundMode);
-    }
+    public void setSoundState(int playState, String soundMode){
+        messageBinder.sendMessage(Constants.COMMAND_TAG + Constants.COMMAND_EXECUTE
+                + Constants.SOUND_TAG + soundMode + playState);
+    };
 }

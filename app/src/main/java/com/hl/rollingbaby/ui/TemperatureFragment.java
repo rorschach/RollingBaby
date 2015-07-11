@@ -241,8 +241,7 @@ public class TemperatureFragment extends Fragment {
 
 
     public interface OnTemperatureFragmentInteractionListener {
-        public int getTemperature();
 
-        public void saveTemperature(int temperature);
+        public void setTemperatureState(int temperature);
     }
 }

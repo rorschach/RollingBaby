@@ -66,6 +66,7 @@ public class SwingFragment extends Fragment {
         super.onAttach(activity);
         try {
             mListener = (OnSwingFragmentInteractionListener) activity;
+
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -80,9 +81,8 @@ public class SwingFragment extends Fragment {
 
     public interface OnSwingFragmentInteractionListener {
 
-        public String getSwingMode();
-
-        public void saveSwingMode(String soundMode);
+        public void setSwingMode(String soundMode);
+        //mListener.setSwingMode(mSwingMode);
     }
 
 }

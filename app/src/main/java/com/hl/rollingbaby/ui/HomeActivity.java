@@ -71,7 +71,7 @@ public class HomeActivity extends BaseActivity implements
         isInActivity = true;
 //        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
 
-        geMessageFromServer("T.C.36;SO.S.1;SW.C;");//just for test
+        geMessageFromServer("T.C.36;SO.S.0;SW.C;");//just for test
 
 //        Log.d(TAG, "." + mTemperature + mHeatingState
 //                + mSoundMode + mPlayState + mSwingMode + ".");
@@ -294,23 +294,18 @@ public class HomeActivity extends BaseActivity implements
                 soundMode, playState, swingMode);
     }
 
-
-    public void sendMessage(String message) {
-        messageBinder.sendMessage(message);
-    }
-
     @Override
     public void onRefresh() {
-//        if (messageBinder.getConnectState()) {
-//            // TODO:get data from server and update UI
-//            messageBinder.sendMessage(Constants.COMMAND_REFRESH + "\n");
-//
-//        } else {
-//            // TODO:get data from SharedPreferences and update UI
-////            StatusService.startActionGetStatus(this);
-//        }
-        geMessageFromServer("T.O.25;SO.M.1;SW.S;");
-        setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+        if (messageBinder.getConnectState()) {
+            // TODO:get data from server and update UI
+            messageBinder.sendMessage(Constants.COMMAND_REFRESH + "\n");
+            geMessageFromServer("T.O.25;SO.M.1;SW.S;");
+            setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+        } else {
+            // TODO:get data from SharedPreferences and update UI
+            setDialog();
+        }
+
 //
     }
 

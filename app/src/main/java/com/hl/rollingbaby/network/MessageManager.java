@@ -15,7 +15,7 @@ import java.net.Socket;
  * Created by test on 15-5-28.
  */
 public class MessageManager extends Thread {
-    private volatile boolean isConnecting;
+    private boolean isConnecting;
     private static final String TAG = "MessageManager";
     private Handler handler;
     private String mAddress;
@@ -33,8 +33,11 @@ public class MessageManager extends Thread {
     }
 
     public boolean getConnectState() {
-        Log.d(TAG, "isConnecting : " + isConnecting);
-        return isConnecting;
+        if (oStream != null && iStream != null) {
+            return isConnecting;
+        } else {
+            return false;
+        }
     }
 
 /**
@@ -64,6 +67,7 @@ public class MessageManager extends Thread {
                     read(buffer);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    isConnecting = false;
                 } finally {
                     try {
                         socket.close();
@@ -72,17 +76,20 @@ public class MessageManager extends Thread {
                         Log.d(TAG, "socket is closed");
                     } catch (IOException e) {
                         e.printStackTrace();
+                        isConnecting = false;
                     }
                 }
 
             } catch (IOException e) {
                 e.printStackTrace();
+                isConnecting = false;
                 try {
                     socket.close();
                     handler.obtainMessage(Constants.CONNECT_FAILED, this)
                             .sendToTarget();
                 } catch (IOException e1) {
                     e1.printStackTrace();
+                    isConnecting = false;
                 }
                 return;
             }
@@ -105,6 +112,7 @@ public class MessageManager extends Thread {
                         bytes, -1, buffer).sendToTarget();
                 Log.d(TAG, "handler is obtain readMessage...");
             } catch (IOException e) {
+                isConnecting = false;
                 Log.e(TAG, "socket is disconnected", e);
                 handler.obtainMessage(Constants.CONNECT_FAILED, this)
                         .sendToTarget();
@@ -118,6 +126,7 @@ public class MessageManager extends Thread {
             String sendMessage = new String(buffer, "UTF-8");
             Log.d(TAG, "Send : " + sendMessage);
         } catch (IOException e) {
+            isConnecting = false;
             Log.e(TAG, "Exception during write", e);
         }
     }

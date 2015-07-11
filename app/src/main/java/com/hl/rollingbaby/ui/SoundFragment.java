@@ -21,7 +21,9 @@ public class SoundFragment extends Fragment {
 
     private SeekBar seekBar;
     private WaveView waveView;
-    private ImageButton playButton;
+    private ImageButton playBt;
+    private ImageButton rewindBt;
+    private ImageButton forwardBt;
 
     private int mPlayState;
     private String mSoundMode;
@@ -68,7 +70,9 @@ public class SoundFragment extends Fragment {
     public void initViews(View view) {
         waveView = (WaveView) view.findViewById(R.id.wave_view);
         seekBar = (SeekBar)  view.findViewById(R.id.seek_bar);
-        playButton = (ImageButton) view.findViewById(R.id.play);
+        playBt = (ImageButton) view.findViewById(R.id.play);
+        rewindBt = (ImageButton) view.findViewById(R.id.rewind);
+        forwardBt = (ImageButton) view.findViewById(R.id.forward);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -87,29 +91,46 @@ public class SoundFragment extends Fragment {
 
 
         setPlayButton();
-        playButton.setOnClickListener(new View.OnClickListener() {
+        playBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPlayState = Math.abs(mPlayState - 1);
-                if (mPlayState == 1) {
+                if (mPlayState == 0) {
                     waveView.setPlayStation(true);
                 } else {
                     waveView.setPlayStation(false);
                 }
                 Log.d(TAG, "Play state after click: " + mPlayState);
                 setPlayButton();
-                mListener.savePlayState(mPlayState);
+                mListener.setSoundState(mPlayState, mSoundMode);
             }
         });
+
+        rewindBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayState = 3;
+                mListener.setSoundState(mPlayState, mSoundMode);
+            }
+        });
+
+        forwardBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayState = 2;
+                mListener.setSoundState(mPlayState, mSoundMode);
+            }
+        });
+
     }
 
     private void setPlayButton() {
-        if (mPlayState == 1) {
+        if (mPlayState == 0) {
             waveView.setPlayStation(true);
-            playButton.setImageResource(R.drawable.pause);
+            playBt.setImageResource(R.drawable.pause);
         }else {
             waveView.setPlayStation(false);
-            playButton.setImageResource(R.drawable.play);
+            playBt.setImageResource(R.drawable.play);
         }
         Toast.makeText(getActivity(), mSoundMode, Toast.LENGTH_SHORT).show();
     }
@@ -133,14 +154,7 @@ public class SoundFragment extends Fragment {
 
     public interface OnSoundFragmentInteractionListener {
 
-        public int getPlayState();
-
-        public void savePlayState(int playState);
-
-        public String getSoundMode();
-
-        public void saveSoundMode(String soundMode);
+        public void setSoundState(int playState, String soundMode);
     }
-
 
 }

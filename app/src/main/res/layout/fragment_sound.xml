@@ -31,6 +31,7 @@
             android:orientation="horizontal" >
 
             <ImageButton
+                android:id="@+id/rewind"
                 android:background="@color/white"
                 android:src="@drawable/rewind"
                 android:layout_width="0dp"
@@ -45,6 +46,7 @@
                 android:layout_weight="1"/>
 
             <ImageButton
+                android:id="@+id/forward"
                 android:background="@color/white"
                 android:src="@drawable/forward"
                 android:layout_width="0dp"

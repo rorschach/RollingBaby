@@ -103,6 +103,7 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_sync) {
+            mSwingMode = swingFragment.getSwingMode();
             setSwingMode(mSwingMode);
             return true;
         }

@@ -35,8 +35,8 @@ public class MessageService extends Service {
     public static final int NOTIFICATION_READ_MESSAGE = 3;
     public static final int NOTIFICATION_TEST = 4;
 
-    public static String SERVER_HOST;
-    public static int SERVER_PORT;
+    public static String SERVER_HOST = "192.168.23.5";
+    public static int SERVER_PORT = 7838;
 
     private MessageManager messageManager;
     private MessageBinder messageBinder = new MessageBinder();
@@ -92,7 +92,7 @@ public class MessageService extends Service {
         }
 
         public void startConnect(Handler handler) {
-            getData();
+//            getData();
             messageManager = new MessageManager(handler, SERVER_HOST, SERVER_PORT);
             messageManager.setConnectState(true);
             messageManager.start();

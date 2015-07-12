@@ -65,7 +65,7 @@ public class HomeActivity extends BaseActivity implements
 
 //        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
 
-        geMessageFromServer("T.O.25;SO.S.1;SW.S;");//just for test
+        geMessageFromServer("t.o.25;so.s.1;sw.s;");//just for test
 
         if (savedInstanceState == null) {
             statusFragment = StatusFragment.newInstance(
@@ -257,6 +257,9 @@ public class HomeActivity extends BaseActivity implements
                 String swingTag = swingList[0];
                 mSwingMode = swingList[1];
 
+                Log.d(TAG,
+                        mTemperature + mHeatingState + mSoundMode + mPlayState + mSwingMode);
+
             } else if(state.length == 1){
                 Toast.makeText(this,
                     temperatureTag  + "\n" + mHeatingState + "\n" + mTemperature
@@ -303,7 +306,7 @@ public class HomeActivity extends BaseActivity implements
         if (messageBinder.getConnectState()) {
             // TODO:get data from server and update UI
             messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
-            geMessageFromServer("T.O.25;SO.M.1;SW.S;");
+//            geMessageFromServer("t.o.25;so.m.1;sw.s;");
             setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
         } else {
             // TODO:get data from SharedPreferences and update UI

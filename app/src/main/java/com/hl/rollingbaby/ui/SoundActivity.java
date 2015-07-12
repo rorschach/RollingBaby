@@ -111,6 +111,8 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
         if (id == R.id.action_sync) {
 
 //            StatusService.startActionProcessTemperature(this, mTemperature);
+            mPlayState = soundFragment.getPlayState();
+            mSoundMode = soundFragment.getSoundMode();
             setSoundState(mPlayState, mSoundMode);
 
             return true;

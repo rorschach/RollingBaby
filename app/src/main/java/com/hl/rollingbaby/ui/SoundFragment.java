@@ -159,6 +159,14 @@ public class SoundFragment extends Fragment {
         mListener = null;
     }
 
+    public int getPlayState() {
+       return mPlayState;
+    }
+
+    public String getSoundMode() {
+        return mSoundMode;
+    }
+
     public interface OnSoundFragmentInteractionListener {
 
         public void setSoundState(int playState, String soundMode);

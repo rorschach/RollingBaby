@@ -245,10 +245,13 @@ public class TemperatureFragment extends Fragment {
        Log.d(TAG, "test");
     }
 
-
+    public int getTemperatureState() {
+        return mTemperature;
+    }
 
     public interface OnTemperatureFragmentInteractionListener {
 
         public void setTemperatureState(int temperature);
+
     }
 }

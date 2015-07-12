@@ -40,7 +40,7 @@ public interface Constants {
     /*
      *constants for translate to server
      */
-    public static final String COMMAND_TAG = "CT";
+    public static final String COMMAND_TAG = "ct";
     public static final String COMMAND_REFRESH = COMMAND_TAG + 0;
     public static final String COMMAND_EXECUTE = COMMAND_TAG + 1;
 
@@ -54,24 +54,24 @@ public interface Constants {
 //    public static final String HUMIDITY_TAG = "H";
 //    public int SET_HUMIDITY = 0;
 
-    public static final String TEMPERATURE_TAG = "T";
-    public static final String HEATING_CLOSE = "C";
-    public static final String HEATING_OPEN = "O";
+//    public static final String TEMPERATURE_TAG = "T";
+    public static final String HEATING_CLOSE = "c";
+    public static final String HEATING_OPEN = "o";
     public int SET_TEMPERATURE = 0;
 
-    public static final String SOUND_TAG = "SO";
+    public static final String SOUND_TAG = "so";
 //    public static final String SOUND_CLOSE = "C";
-    public static final String SOUND_MUSIC = "M";
-    public static final String SOUND_STORY = "S";
+    public static final String SOUND_MUSIC = "m";
+    public static final String SOUND_STORY = "s";
 
     public static final int SOUND_PAUSE_PLAY = 0;
     public static final int SOUND_STOP = 1;
     public static final int SOUND_NEXT = 2;
     public static final int SOUND_PERVIOUS = 3;
 
-    public static final String SWING_TAG = "SW";
-    public static final String SWING_SLEEP = "S";
+    public static final String SWING_TAG = "sw";
+    public static final String SWING_SLEEP = "s";
 //    public static final String SWING_ENTERTAINMENT = "E";
-    public static final String SWING_CLOSE = "C";
+    public static final String SWING_CLOSE = "c";
 
 }

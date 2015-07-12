@@ -101,6 +101,10 @@ public class SwingFragment extends Fragment {
         mListener = null;
     }
 
+    public String getSwingMode() {
+        return mSwingMode;
+    }
+
     public interface OnSwingFragmentInteractionListener {
 
         public void setSwingMode(String soundMode);

@@ -34,10 +34,8 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swing);
-
 //        Intent intent = getIntent();
 //        mSwingMode = intent.getStringExtra(Constants.CURRENT_SWING_MODE);
-
         getIntentFromHome();
 
         if (savedInstanceState == null) {
@@ -69,19 +67,15 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
 
     @Override
     public void initViews() {
-
     }
 
     @Override
     public void getData() {
-
     }
 
     @Override
     public void showContent() {
-
     }
-
 
     @Override
     protected void onResume() {
@@ -109,10 +103,7 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_sync) {
-
-//            StatusService.startActionProcessTemperature(this, mTemperature);
             setSwingMode(mSwingMode);
-
             return true;
         }
 
@@ -123,7 +114,6 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
     public void onServiceConnected(ComponentName name, IBinder service) {
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
-//        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
     }
 
     @Override

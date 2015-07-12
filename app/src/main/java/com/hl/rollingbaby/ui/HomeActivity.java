@@ -65,7 +65,7 @@ public class HomeActivity extends BaseActivity implements
 
 //        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
 
-        geMessageFromServer("T.C.36;SO.S.0;SW.C;");//just for test
+        geMessageFromServer("T.O.25;SO.S.1;SW.S;");//just for test
 
         if (savedInstanceState == null) {
             statusFragment = StatusFragment.newInstance(

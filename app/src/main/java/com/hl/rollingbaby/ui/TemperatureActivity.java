@@ -103,10 +103,7 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_sync) {
-
-//            StatusService.startActionProcessTemperature(this, mTemperature);
             setTemperatureState(mTemperature);
-
             return true;
         }
 

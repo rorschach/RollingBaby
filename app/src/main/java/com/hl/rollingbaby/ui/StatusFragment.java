@@ -63,8 +63,6 @@ public class StatusFragment extends Fragment {
         args.putInt(ARG_PLAY_STATE, playState);
         args.putString(ARG_SWING_MODE, swingMode);
         fragment.setArguments(args);
-        Log.d(TAG, ".." + temperature + heatingState
-                + soundMode + playState + swingMode + "..");
         return fragment;
     }
 
@@ -83,12 +81,7 @@ public class StatusFragment extends Fragment {
             mSoundMode = getArguments().getString(ARG_SOUND_MODE);
             mPlayState = getArguments().getInt(ARG_PLAY_STATE);
             mSwingMode = getArguments().getString(ARG_SWING_MODE);
-            Log.d(TAG, "getArguments() != null");
-        }else {
-            Log.d(TAG, "getArguments() == null");
         }
-        Log.d(TAG, "..." + mTemperature + mHeatingState
-                + mSoundMode + mPlayState + mSwingMode + "...");
     }
 
     @Override
@@ -239,14 +232,14 @@ public class StatusFragment extends Fragment {
         }
 
         if (mPlayState == 1) {
-            play_tem = "Playing";
-        }else {
             play_tem = "Stop";
+        }else {
+            play_tem = "Playing";
         }
 
         temperatureText.setText(temper_tem + " / " + heating_tem);
         soundText.setText(sound_tem + " / " + play_tem);
-        swingText.setText(sound_tem);
+        swingText.setText(swing_tem);
     }
 
 //    public void setMessageManager(MessageManager obj) {

@@ -55,7 +55,6 @@ public class TemperatureFragment extends Fragment {
         args.putInt(ARG_PLAY_STATE, playState);
         args.putString(ARG_SWING_MODE, swingMode);
         fragment.setArguments(args);
-        Log.d(TAG, temperature + ":" + heatingState + ":" + "1");
         return fragment;
     }
 
@@ -68,7 +67,6 @@ public class TemperatureFragment extends Fragment {
         if (getArguments() != null) {
             mTemperature = getArguments().getInt(ARG_TEMPERATURE);
             mHeatingState = getArguments().getString(ARG_HEATING_STATE);
-            Log.d(TAG, mTemperature + ":" + mHeatingState + ":" + 2);
         }
     }
 
@@ -108,6 +106,7 @@ public class TemperatureFragment extends Fragment {
             @Override
             public void onProgressChanged(SeekArc seekArc, int progress,
                                           boolean fromUser) {
+                mTemperature = progress;
                 mSeekArcProgress.setText(String.valueOf(progress));
             }
         });

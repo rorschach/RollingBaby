@@ -61,10 +61,22 @@ public class SwingFragment extends Fragment {
         final RippleBackground rippleBackground=
                 (RippleBackground)view.findViewById(R.id.content);
         ImageView imageView=(ImageView)view.findViewById(R.id.centerImage);
+
+        if (mSwingMode.equals(Constants.SWING_CLOSE)) {
+            rippleBackground.stopRippleAnimation();
+        } else {
+            rippleBackground.startRippleAnimation();
+        }
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                rippleBackground.startRippleAnimation();
+                if (mSwingMode.equals(Constants.SWING_CLOSE)) {
+                    mSwingMode = Constants.SWING_SLEEP;
+                    rippleBackground.startRippleAnimation();
+                } else {
+                    mSwingMode = Constants.SWING_CLOSE;
+                    rippleBackground.stopRippleAnimation();
+                }
             }
         });
 

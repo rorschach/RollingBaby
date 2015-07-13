@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.network.MessageService;
-import com.hl.rollingbaby.network.StatusService;
 
 public class SwingActivity extends BaseActivity implements ServiceConnection,
         SwingFragment.OnSwingFragmentInteractionListener {
@@ -101,13 +100,19 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_sync) {
-            mSwingMode = swingFragment.getSwingMode();
-            setSwingMode(mSwingMode);
-            return true;
-        }
+        switch (item.getItemId()) {
+            case R.id.action_sync:
+                mSwingMode = swingFragment.getSwingMode();
+                setSwingMode(mSwingMode);
+                return true;
 
+            case android.R.id.home:
+                Intent intent = new Intent();
+                intent.putExtra(Constants.CURRENT_SWING_MODE, mSwingMode);
+                setResult(RESULT_OK, intent);
+                Log.d(TAG, "onBackPressed : " + mSwingMode);
+                finish();
+        }
         return super.onOptionsItemSelected(item);
     }
 

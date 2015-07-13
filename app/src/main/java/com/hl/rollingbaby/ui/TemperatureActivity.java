@@ -101,19 +101,27 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_sync) {
-            mTemperature = temperatureFragment.getTemperatureState();
-            setTemperatureState(mTemperature);
-            if (mTemperature > temp) {
-                mHeatingState = Constants.HEATING_OPEN;
-            } else {
-                mHeatingState = Constants.HEATING_CLOSE;
-            }
-            Log.d(TAG, "mHeatingState is " + mHeatingState);
-            return true;
-        }
 
+        switch (item.getItemId()) {
+            case R.id.action_sync:
+                mTemperature = temperatureFragment.getTemperatureState();
+                setTemperatureState(mTemperature);
+                if (mTemperature > temp) {
+                    mHeatingState = Constants.HEATING_OPEN;
+                } else {
+                    mHeatingState = Constants.HEATING_CLOSE;
+                }
+                Log.d(TAG, "mHeatingState is " + mHeatingState);
+                return true;
+
+            case android.R.id.home:
+                Intent intent = new Intent();
+                intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE, mTemperature);
+                intent.putExtra(Constants.HEATING_STATE, mHeatingState);
+                setResult(RESULT_OK, intent);
+                Log.d(TAG, "onBackPressed : " + mTemperature);
+                finish();
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -132,6 +140,8 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
         Log.d(TAG, "onBackPressed : " + mTemperature);
         finish();
     }
+
+    
 
     @Override
     public void onServiceDisconnected(ComponentName name) {

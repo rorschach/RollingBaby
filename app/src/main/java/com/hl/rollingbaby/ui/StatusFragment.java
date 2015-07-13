@@ -12,8 +12,6 @@ import android.widget.TextView;
 
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
-import com.hl.rollingbaby.network.MessageManager;
-import com.hl.rollingbaby.network.StatusService;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.view.CardViewNative;
@@ -37,15 +35,15 @@ public class StatusFragment extends Fragment {
 
     private OnStatusFragmentInteractionListener mListener;
 
-    private Card card_temperature;
+//    private Card card_temperature;
 //    private Card card_humidity;
-    private Card card_music;
-    private Card card_swing;
+//    private Card card_music;
+//    private Card card_swing;
 
-    private CardViewNative cardView_temperature;
+//    private CardViewNative cardView_temperature;
 //    private CardViewNative cardView_humidity;
-    private CardViewNative cardView_music;
-    private CardViewNative cardView_swing;
+//    private CardViewNative cardView_music;
+//    private CardViewNative cardView_swing;
 
     private TextView temperatureText;
 //    private TextView humidityText;
@@ -67,7 +65,6 @@ public class StatusFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
     public StatusFragment() {
     }
 
@@ -75,8 +72,6 @@ public class StatusFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        StatusService.startActionGetStatus(getActivity());
-
         if (getArguments() != null) {
             mTemperature = getArguments().getInt(ARG_TEMPERATURE);
             mHeatingState = getArguments().getString(ARG_HEATING_STATE);
@@ -99,15 +94,15 @@ public class StatusFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        card_temperature = new Card(getActivity());
+        Card card_temperature = new Card(getActivity());
 //        card_humidity = new Card(getActivity());
-        card_music = new Card(getActivity());
-        card_swing = new Card(getActivity());
+        Card card_music = new Card(getActivity());
+        Card card_swing = new Card(getActivity());
 
-        cardView_temperature = (CardViewNative) view.findViewById(R.id.carddemo);
+        CardViewNative cardView_temperature = (CardViewNative) view.findViewById(R.id.carddemo);
 //        cardView_humidity = (CardViewNative) view.findViewById(R.id.carddemo1);
-        cardView_music = (CardViewNative) view.findViewById(R.id.carddemo2);
-        cardView_swing = (CardViewNative) view.findViewById(R.id.carddemo3);
+        CardViewNative cardView_music = (CardViewNative) view.findViewById(R.id.carddemo2);
+        CardViewNative cardView_swing = (CardViewNative) view.findViewById(R.id.carddemo3);
 
         card_temperature.setOnClickListener(new Card.OnCardClickListener() {
             @Override
@@ -205,15 +200,6 @@ public class StatusFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, requestCode + ":" + resultCode);
-//        mTemperature = data.getIntExtra(Constants.CURRENT_TEMPERATURE_VALUE,
-//                Constants.DEFAULT_TEMPERATURE);
-//
-//        mSoundMode = data.getStringExtra(Constants.PLAY_STATE);
-//        mPlayState = data.getIntExtra(Constants.CURRENT_SOUND_MODE,
-//                Constants.SOUND_STOP);
-
-
         Log.d(TAG, "onActivityResult : " + mTemperature);
         setCardStatus();
         switch (requestCode) {
@@ -225,12 +211,9 @@ public class StatusFragment extends Fragment {
             case 1:
                 mSoundMode = data.getStringExtra(Constants.CURRENT_SOUND_MODE);
                 mPlayState = data.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
-//                setCardStatus();
                 break;
             case 2:
                 mSwingMode = data.getStringExtra(Constants.CURRENT_SWING_MODE);
-//                setCardStatus();
-
                 break;
             default:
                 break;
@@ -238,9 +221,7 @@ public class StatusFragment extends Fragment {
         setCardStatus();
         Log.d(TAG, "onActivityResult : " + mTemperature + mHeatingState
                 + mSoundMode + mPlayState + mSwingMode);
-
     }
-
 
     public void getCardStatus(int temperature,String heatingState, String soundMode,
                               int playState, String swingMode) {
@@ -258,30 +239,30 @@ public class StatusFragment extends Fragment {
         String heating_tem = "";
         String sound_tem = "";
         String swing_tem = "";
-        String play_tem = "";
+        String play_tem;
 
         if (mHeatingState.equals(Constants.HEATING_CLOSE)) {
-            heating_tem = "UnHeating";
+            heating_tem = getActivity().getResources().getString(R.string.unHeating);
         }else if(mHeatingState.equals(Constants.HEATING_OPEN)){
-            heating_tem = "Heating";
+            heating_tem = getActivity().getResources().getString(R.string.heating);
         }
 
         if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
-            sound_tem = "Music";
+            sound_tem = getActivity().getResources().getString(R.string.music_mode);
         }else if (mSoundMode.equals(Constants.SOUND_STORY)){
-            sound_tem = "Story";
+            sound_tem = getActivity().getResources().getString(R.string.story_mode);
         }
 
         if (mSwingMode.equals(Constants.SWING_SLEEP)) {
-            swing_tem = "Sleep";
+            swing_tem = getActivity().getResources().getString(R.string.swing_sleep);
         }else if (mSwingMode.equals(Constants.SWING_CLOSE)) {
-            swing_tem = "Close";
+            swing_tem = getActivity().getResources().getString(R.string.swing_close);
         }
 
-        if (mPlayState == 1) {
-            play_tem = "Stop";
+        if (mPlayState == 0) {
+            play_tem = getActivity().getResources().getString(R.string.isPlaying);
         }else {
-            play_tem = "Playing";
+            play_tem = getActivity().getResources().getString(R.string.stop);
         }
 
         temperatureText.setText(temper_tem + " / " + heating_tem);
@@ -296,10 +277,8 @@ public class StatusFragment extends Fragment {
 //    }
 
     public interface OnStatusFragmentInteractionListener {
+        void geMessageFromServer(String readMessage);
 
-        public void geMessageFromServer(String readMessage);
-
-        public void hideRefresh();
-
+        void hideRefresh();
     }
 }

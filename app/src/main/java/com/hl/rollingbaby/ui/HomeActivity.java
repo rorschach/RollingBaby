@@ -1,25 +1,19 @@
 package com.hl.rollingbaby.ui;
 
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
@@ -175,26 +169,6 @@ public class HomeActivity extends BaseActivity implements
                 + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        switch (requestCode) {
-//            case 0:
-//                if () {
-//                }
-//                break;
-//            case 1:
-//                if () {
-//                }
-//                break;
-//            case 2:
-//                if () {
-//                }
-//                break;
-//            default:
-//                break;
-//        }
-//    }
-
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
@@ -203,12 +177,20 @@ public class HomeActivity extends BaseActivity implements
                 if (!isInActivity) {
                     messageBinder.buildNotification(
                             MessageService.NOTIFICATION_CONNECT_SUCCESS,
-                            "CONNECT_SUCCESS", "CONNECT_SUCCESS");
+                            getResources().getString(R.string.success_title),
+                            getResources().getString(R.string.success_content));
                 }
                 break;
 
             case Constants.CONNECT_FAILED:
-                setDialog();
+                if (!isInActivity) {
+                    messageBinder.buildNotification(
+                            MessageService.NOTIFICATION_CONNECT_FAILED,
+                            getResources().getString(R.string.fail_title),
+                            getResources().getString(R.string.fail_content));
+                }else {
+                    setDialog();
+                }
                 break;
 
             case Constants.MESSAGE_READ:
@@ -221,14 +203,13 @@ public class HomeActivity extends BaseActivity implements
                 if (!isInActivity) {
                     messageBinder.buildNotification(
                             MessageService.NOTIFICATION_READ_MESSAGE,
-                            "READ", readMessage);
-
+                            getResources().getString(R.string.read_title),
+                            getResources().getString(R.string.read_content));
                 }
-
                 break;
 
             case Constants.MESSAGE_SEND:
-                Object obj = msg.obj;
+//                Object obj = msg.obj;
 //                statusFragment.setMessageManager((MessageManager) obj);
 //                messageBinder.sendMessage(obj + "");
         }
@@ -238,19 +219,21 @@ public class HomeActivity extends BaseActivity implements
     private void setDialog() {
         AlertDialog.Builder builder =
                 new AlertDialog.Builder(this);
-        builder.setTitle("CONNECT_FAIL");
-        builder.setMessage("CONNECT_FAIL");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setTitle(getResources().getString(R.string.fail_title));
+        builder.setMessage( getResources().getString(R.string.fail_content));
+        builder.setPositiveButton(getResources().getString(R.string.position_bt),
+                new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-//                            Intent intent = new Intent(getApplicationContext(), );
+                Intent intent = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
+                startActivity(intent);
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getResources().getString(R.string.navigation_bt),
+                new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
             }
         });
         builder.create().show();
@@ -342,31 +325,31 @@ public class HomeActivity extends BaseActivity implements
         } else {
             setDialog();
         }
-
     }
 
     public void showRefreshProgress() {
         mSwipeRefreshWidget.setRefreshing(true);
     }
 
-    public void hideRefreshProgress() {
-        mSwipeRefreshWidget.setRefreshing(false);
-    }
-
-    public void enableSwipe() {
-        mSwipeRefreshWidget.setEnabled(true);
-    }
-
-    public void disableSwipe() {
-        mSwipeRefreshWidget.setEnabled(false);
-    }
+//    public void hideRefreshProgress() {
+//        mSwipeRefreshWidget.setRefreshing(false);
+//    }
+//
+//    public void enableSwipe() {
+//        mSwipeRefreshWidget.setEnabled(true);
+//    }
+//
+//    public void disableSwipe() {
+//        mSwipeRefreshWidget.setEnabled(false);
+//    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if ((System.currentTimeMillis() - mExitTime) > 2000) {//
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
                 // 如果两次按键时间间隔大于2000毫秒，则不退出
-                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.back_bt),
+                        Toast.LENGTH_SHORT).show();
                 mExitTime = System.currentTimeMillis();// 更新mExitTime
             } else {
                 System.exit(0);// 否则退出程序
@@ -374,7 +357,5 @@ public class HomeActivity extends BaseActivity implements
             return true;
         }
         return super.onKeyDown(keyCode, event);
-
     }
-
 }

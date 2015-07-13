@@ -7,7 +7,7 @@
     tools:context="com.hl.rollingbaby.ui.StatusFragment" >
 
     <TextView
-        android:text="HELLO WORLD"
+        android:text="@string/show_card"
         android:textSize="30sp"
         android:gravity="center"
         android:layout_width="match_parent"

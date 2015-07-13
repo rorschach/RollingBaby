@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.network.MessageService;
-import com.hl.rollingbaby.network.StatusService;
 
 public class SoundActivity extends BaseActivity implements ServiceConnection,
         SoundFragment.OnSoundFragmentInteractionListener{
@@ -70,17 +69,14 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
 
     @Override
     public void initViews() {
-
     }
 
     @Override
     public void getData() {
-
     }
 
     @Override
     public void showContent() {
-
     }
 
     @Override
@@ -107,17 +103,21 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_sync) {
+        switch (item.getItemId()) {
+            case R.id.action_sync:
+                mPlayState = soundFragment.getPlayState();
+                mSoundMode = soundFragment.getSoundMode();
+                setSoundState(mPlayState, mSoundMode);
+                return true;
 
-//            StatusService.startActionProcessTemperature(this, mTemperature);
-            mPlayState = soundFragment.getPlayState();
-            mSoundMode = soundFragment.getSoundMode();
-            setSoundState(mPlayState, mSoundMode);
-
-            return true;
+            case android.R.id.home:
+                Intent intent = new Intent();
+                intent.putExtra(Constants.CURRENT_SOUND_MODE, mSoundMode);
+                intent.putExtra(Constants.PLAY_STATE, mPlayState);
+                setResult(RESULT_OK, intent);
+                Log.d(TAG, "onBackPressed : " + mSoundMode + mPlayState);
+                finish();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -148,5 +148,5 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
                 + mTemperature + ";"
                 + Constants.SWING_TAG + mSwingMode + ";"
                 + Constants.SOUND_TAG + soundMode + playState + ";\n");
-    };
+    }
 }

@@ -19,11 +19,8 @@ public class SoundFragment extends Fragment {
 
     private static final String TAG = "SoundFragment";
 
-    private SeekBar seekBar;
     private WaveView waveView;
     private ImageButton playBt;
-    private ImageButton rewindBt;
-    private ImageButton forwardBt;
 
     private int mPlayState;
     private String mSoundMode;
@@ -59,8 +56,6 @@ public class SoundFragment extends Fragment {
         if (getArguments() != null) {
             mSoundMode = getArguments().getString(ARG_SOUND_MODE);
             mPlayState = getArguments().getInt(ARG_PLAY_STATE);
-
-            Log.d(TAG, mSoundMode + ":" + mPlayState);
         }
     }
 
@@ -76,10 +71,10 @@ public class SoundFragment extends Fragment {
 
     public void initViews(View view) {
         waveView = (WaveView) view.findViewById(R.id.wave_view);
-        seekBar = (SeekBar)  view.findViewById(R.id.seek_bar);
+        SeekBar seekBar = (SeekBar)  view.findViewById(R.id.seek_bar);
         playBt = (ImageButton) view.findViewById(R.id.play);
-        rewindBt = (ImageButton) view.findViewById(R.id.rewind);
-        forwardBt = (ImageButton) view.findViewById(R.id.forward);
+        ImageButton rewindBt = (ImageButton) view.findViewById(R.id.rewind);
+        ImageButton forwardBt = (ImageButton) view.findViewById(R.id.forward);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -95,7 +90,6 @@ public class SoundFragment extends Fragment {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-
 
         setPlayButton();
         playBt.setOnClickListener(new View.OnClickListener() {
@@ -128,7 +122,6 @@ public class SoundFragment extends Fragment {
                 mListener.setSoundState(mPlayState, mSoundMode);
             }
         });
-
     }
 
     private void setPlayButton() {
@@ -139,7 +132,13 @@ public class SoundFragment extends Fragment {
             waveView.setPlayStation(false);
             playBt.setImageResource(R.drawable.play);
         }
-        Toast.makeText(getActivity(), mSoundMode, Toast.LENGTH_SHORT).show();
+        String temp;
+        if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
+            temp = getActivity().getResources().getString(R.string.music_toast);
+        } else {
+            temp = getActivity().getResources().getString(R.string.story_toast);
+        }
+        Toast.makeText(getActivity(), temp, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -168,8 +167,7 @@ public class SoundFragment extends Fragment {
     }
 
     public interface OnSoundFragmentInteractionListener {
-
-        public void setSoundState(int playState, String soundMode);
+        void setSoundState(int playState, String soundMode);
     }
 
 }

@@ -1,14 +1,32 @@
 <resources>
-    <string name="app_name">RollingBaby</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_sync">Sync</string>
+    <string name="app_name">翻滚吧，Baby！</string>
+    <string name="action_settings">设置</string>
+    <string name="action_sync">刷新</string>
 
-    <string name="title_activity_temperature">Temperature</string>
-    <string name="title_activity_swing">Swing</string>
-    <string name="title_activity_music">Music</string>
+    <string name="title_activity_temperature">温度</string>
+    <string name="title_activity_swing">摇摆</string>
+    <string name="title_activity_music">音乐</string>
     <string name="title_activity_humidity">Humidity</string>
+    <string name="success_title">连接成功</string>
+    <string name="success_content">成功连接到您宝宝的婴儿床，可以开始使用</string>
+    <string name="fail_title">连接失败</string>
+    <string name="fail_content">连接婴儿床失败，请检查网络连接或婴儿床状态</string>
+    <string name="read_title">您的宝宝有动静了</string>
+    <string name="read_content">您的宝宝有动静了，请点击查看</string>
+    <string name="position_bt">检查网络设置</string>
+    <string name="navigation_bt">取消</string>
+    <string name="back_bt">"再按一次退出程序"</string>
+    <string name="music_toast">"当前为音乐模式"</string>
+    <string name="story_toast">"当前为故事机模式"</string>
+    <string name="show_card">"欢迎使用\n翻滚吧，Baby\n智能婴儿床"</string>
 
-    <string name="card_playState"></string>
+    <string name="heating">加热模式</string>
+    <string name="unHeating">未加热</string>
+    <string name="music_mode">音乐</string>
+    <string name="story_mode">故事机</string>
+    <string name="isPlaying">播放中</string>
+    <string name="stop">停止</string>
+    <string name="swing_sleep">睡眠模式</string>
+    <string name="swing_close">摇摆关闭</string>
 
 </resources>

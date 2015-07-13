@@ -79,7 +79,6 @@ public class SwingFragment extends Fragment {
                 }
             }
         });
-
         return view;
     }
 
@@ -106,9 +105,7 @@ public class SwingFragment extends Fragment {
     }
 
     public interface OnSwingFragmentInteractionListener {
-
-        public void setSwingMode(String soundMode);
-        //mListener.setSwingMode(mSwingMode);
+        void setSwingMode(String soundMode);
     }
 
 }

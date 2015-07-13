@@ -36,7 +36,7 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sound);
 
-        Intent intent = getIntent();
+//        Intent intent = getIntent();
 //        mSoundMode = intent.getStringExtra(Constants.CURRENT_SOUND_MODE);
 //        mPlayState = intent.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
 
@@ -131,6 +131,16 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
     @Override
     public void onServiceDisconnected(ComponentName name) {
         Toast.makeText(this, "Service disconnected", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.CURRENT_SOUND_MODE, mSoundMode);
+        intent.putExtra(Constants.PLAY_STATE, mPlayState);
+        setResult(RESULT_OK, intent);
+        Log.d(TAG, "onBackPressed : " + mSoundMode + mPlayState);
+        finish();
     }
 
     public void setSoundState(int playState, String soundMode){

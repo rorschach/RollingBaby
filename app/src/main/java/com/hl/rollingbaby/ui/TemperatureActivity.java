@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,9 +12,7 @@ import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
-import com.hl.rollingbaby.bean.MessageTarget;
 import com.hl.rollingbaby.network.MessageService;
-import com.hl.rollingbaby.network.StatusService;
 
 public class TemperatureActivity extends BaseActivity implements ServiceConnection,
         TemperatureFragment.OnTemperatureFragmentInteractionListener{
@@ -31,6 +28,8 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
     private int mPlayState;
     private String mSwingMode;
 
+    private int temp;
+
     private TemperatureFragment temperatureFragment;
 
     @Override
@@ -38,7 +37,7 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temperature);
 
-        getIntentFromHome();
+        getIntentFromHomeActivity();
 
         if (savedInstanceState == null) {
             temperatureFragment = TemperatureFragment.newInstance(
@@ -47,9 +46,10 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
             getFragmentManager().beginTransaction().add(
                     R.id.temperature_container, temperatureFragment).commit();
         }
+        temp = mTemperature;
     }
 
-    private void getIntentFromHome() {
+    private void getIntentFromHomeActivity() {
         Intent intent = getIntent();
         mTemperature = intent.getIntExtra(
                 Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
@@ -105,6 +105,12 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
         if (id == R.id.action_sync) {
             mTemperature = temperatureFragment.getTemperatureState();
             setTemperatureState(mTemperature);
+            if (mTemperature > temp) {
+                mHeatingState = Constants.HEATING_OPEN;
+            } else {
+                mHeatingState = Constants.HEATING_CLOSE;
+            }
+            Log.d(TAG, "mHeatingState is " + mHeatingState);
             return true;
         }
 
@@ -115,6 +121,16 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
     public void onServiceConnected(ComponentName name, IBinder service) {
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE, mTemperature);
+        intent.putExtra(Constants.HEATING_STATE, mHeatingState);
+        setResult(RESULT_OK, intent);
+        Log.d(TAG, "onBackPressed : " + mTemperature);
+        finish();
     }
 
     @Override

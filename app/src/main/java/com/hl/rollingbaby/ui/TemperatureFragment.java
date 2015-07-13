@@ -41,6 +41,7 @@ public class TemperatureFragment extends Fragment {
 
     private int mTemperature;
     private String mHeatingState;
+    private int temp;
 
     private OnTemperatureFragmentInteractionListener mListener;
 
@@ -67,6 +68,7 @@ public class TemperatureFragment extends Fragment {
         if (getArguments() != null) {
             mTemperature = getArguments().getInt(ARG_TEMPERATURE);
             mHeatingState = getArguments().getString(ARG_HEATING_STATE);
+            temp = mTemperature;
         }
     }
 
@@ -92,7 +94,7 @@ public class TemperatureFragment extends Fragment {
 //        mArcWidth.setProgress(mSeekArc.getArcWidth());
 //        mProgressWidth.setProgress(mSeekArc.getProgressWidth());
 
-        setTemperature(mTemperature, mHeatingState);
+        setTemperature(mTemperature);
 
         mSeekArc.setOnSeekArcChangeListener(new OnSeekArcChangeListener() {
 
@@ -217,11 +219,11 @@ public class TemperatureFragment extends Fragment {
         return view;
     }
 
-    public void setTemperature(int temperature, String heatingState) {
+    public void setTemperature(int temperature) {
 //        mTemperature = temperature;
 //        mHeatingState = heatingState;
         mSeekArc.setProgress(temperature);
-        mSeekArcProgress.setText(temperature + "/" + heatingState);
+        mSeekArcProgress.setText(temperature + "");
     }
 
     @Override
@@ -241,12 +243,16 @@ public class TemperatureFragment extends Fragment {
         mListener = null;
     }
 
-    public void test() {
-       Log.d(TAG, "test");
-    }
-
     public int getTemperatureState() {
         return mTemperature;
+    }
+
+    public String getHeatingState() {
+        if (mTemperature > temp) {
+            return Constants.HEATING_OPEN;
+        } else {
+            return Constants.HEATING_CLOSE;
+        }
     }
 
     public interface OnTemperatureFragmentInteractionListener {

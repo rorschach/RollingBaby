@@ -16,6 +16,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +47,7 @@ public class HomeActivity extends BaseActivity implements
     private String mSoundMode;
     private int mPlayState;
     private String mSwingMode;
+    private long mExitTime = 0;
 
 //    private UpdateUIReceiver receiver;
 
@@ -63,13 +65,15 @@ public class HomeActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-//        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
+        geMessageFromServer("t.c.25;sw.c;so.m.1;");//just for test
 
-        geMessageFromServer("t.o.25;so.s.1;sw.s;");//just for test
+        Log.d(TAG, "." + mTemperature + mHeatingState + mSoundMode
+                + mPlayState + mSwingMode + ".");
 
         if (savedInstanceState == null) {
             statusFragment = StatusFragment.newInstance(
                     mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+
             getFragmentManager().beginTransaction().add(
                     R.id.root_container, statusFragment).commit();
         }
@@ -103,18 +107,21 @@ public class HomeActivity extends BaseActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-//        geMessageFromServer("T.C.36;SO.S.1;SW.C;");
-
-        Intent intent = new Intent(this, MessageService.class);
-        bindService(intent, this, BIND_AUTO_CREATE);
-//        messageBinder.sendMessage(Constants.COMMAND_REFRESH);
 
 //        LocalBroadcastManager broadcastManager =
 //                LocalBroadcastManager.getInstance(this);
-//        IntentFilter intentFilter = new IntentFilter(StatusService.ACTION_UPDATE_MAIN_UI);
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(StatusService.ACTION_PROCESS_TEMPERATURE);
+//        intentFilter.addAction(StatusService.ACTION_PROCESS_SWING);
+//        intentFilter.addAction(StatusService.ACTION_PROCESS_SOUND);
 //        receiver = new UpdateUIReceiver();
 //        broadcastManager.registerReceiver(receiver, intentFilter);
         isInActivity = true;
+
+//        setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+
+        Intent intent = new Intent(this, MessageService.class);
+        bindService(intent, this, BIND_AUTO_CREATE);
     }
 
     @Override
@@ -151,6 +158,9 @@ public class HomeActivity extends BaseActivity implements
                 return true;
 
             case R.id.action_sync:
+                StatusService.startActionProcessTemperature(this, mTemperature, mHeatingState);
+//                StatusService.startActionProcessSwing(this, mSwingMode);
+//                StatusService.startActionProcessSound(this, mPlayState, mSoundMode);
                 sendStatuesToServer();
                 return true;
         }
@@ -165,6 +175,26 @@ public class HomeActivity extends BaseActivity implements
                 + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
     }
 
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        switch (requestCode) {
+//            case 0:
+//                if () {
+//                }
+//                break;
+//            case 1:
+//                if () {
+//                }
+//                break;
+//            case 2:
+//                if () {
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//    }
+
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
@@ -178,11 +208,6 @@ public class HomeActivity extends BaseActivity implements
                 break;
 
             case Constants.CONNECT_FAILED:
-//                if (!isInActivity) {
-//                    messageBinder.buildNotification(
-//                            MessageService.NOTIFICATION_CONNECT_FAILED,
-//                            "CONNECT_FAIL", "CONNECT_FAIL");
-//                }
                 setDialog();
                 break;
 
@@ -192,15 +217,14 @@ public class HomeActivity extends BaseActivity implements
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
                 geMessageFromServer(readMessage);
+                setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
                 if (!isInActivity) {
                     messageBinder.buildNotification(
                             MessageService.NOTIFICATION_READ_MESSAGE,
                             "READ", readMessage);
 
                 }
-                setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
 
-                hideRefreshProgress();
                 break;
 
             case Constants.MESSAGE_SEND:
@@ -236,61 +260,68 @@ public class HomeActivity extends BaseActivity implements
     @Override
     public void geMessageFromServer(String readMessage) {
 
+        Log.d(TAG, readMessage);
         try {
             String state[] = readMessage.split(";");
             //TODO:process status and display it in UI
             String A = state[0];//like T.O.25,get the '25'
             String temperatureList[] = A.split("\\.");
-            String temperatureTag = temperatureList[0];
+//            String temperatureTag = temperatureList[0];
             mHeatingState = temperatureList[1];
             mTemperature = Integer.valueOf(temperatureList[2]);
 
-            if (state.length == 3) {
-                String B = state[1];//like SO.M.1,get the 'M' and '1'
-                String soundList[] = B.split("\\.");
-                String soundTag = soundList[0];
-                mSoundMode = soundList[1];
-                mPlayState = Integer.valueOf(soundList[2]);
+            String C = state[1];//like SW.S, get the 'S'
+            String swingList[] = C.split("\\.");
+//               String swingTag = swingList[0];
+            mSwingMode = swingList[1];
+            String B = state[2];//like SO.M.1,get the 'M' and '1'
+            String soundList[] = B.split("\\.");
+//               String soundTag = soundList[0];
+            mSoundMode = soundList[1];
+            mPlayState = Integer.valueOf(soundList[2]);
+            Log.d(TAG, mTemperature + ":"
+                    + mHeatingState + ":"
+                    + mSoundMode + ":"
+                    + mPlayState + ":"
+                    + mSwingMode);
 
-                String C = state[2];//like SW.S, get the 'S'
-                String swingList[] = C.split("\\.");
-                String swingTag = swingList[0];
-                mSwingMode = swingList[1];
-
-                Log.d(TAG,
-                        mTemperature + mHeatingState + mSoundMode + mPlayState + mSwingMode);
-
-            } else if(state.length == 1){
-                Toast.makeText(this,
-                    temperatureTag  + "\n" + mHeatingState + "\n" + mTemperature
-                    ,Toast.LENGTH_SHORT).show();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-//    public class UpdateUIReceiver extends BroadcastReceiver {
+    @Override
+    public void hideRefresh() {
+        mSwipeRefreshWidget.setRefreshing(false);
+    }
+
+//        public class UpdateUIReceiver extends BroadcastReceiver {
 //        @Override
 //        public void onReceive(Context context, Intent intent) {
 //            String action = intent.getAction();
 //            Log.d("UpdateUIReceiver", "onReceive");
-//            if (StatusService.ACTION_UPDATE_MAIN_UI.equals(action)) {
-//
+//            if (StatusService.ACTION_PROCESS_TEMPERATURE.equals(action)) {
 //                mTemperature =
-//                        intent.getIntExtra(StatusService.EXTRA_TEMPERATURE_VALUE,36);
-//                mHeatingState =
-//                        intent.getStringExtra(StatusService.EXTRA_HEATING_STATE);
-//
-//                mSoundMode =
-//                        intent.getStringExtra(StatusService.EXTRA_SOUND_MODE);
-//                mPlayState =
-//                        intent.getIntExtra(StatusService.EXTRA_PLAY_STATE, 0);
+//                        intent.getIntExtra(StatusService.EXTRA_TEMPERATURE_VALUE,
+//                                Constants.DEFAULT_TEMPERATURE);
+//                Log.d(TAG, "onReceive temperature" + mTemperature);
+////                mHeatingState =
+////                        intent.getStringExtra(StatusService.EXTRA_HEATING_STATE);
+//                Log.d(TAG, "onReceive temperature" + mTemperature + ":" + mHeatingState);
+//                setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+//            }else if (StatusService.ACTION_PROCESS_SWING.equals(action)) {
 //
 //                mSwingMode =
 //                        intent.getStringExtra(StatusService.EXTRA_SWING_MODE);
-//
+//                Log.d(TAG, "onReceive swing" + mSwingMode);
 //                setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+//            }else if (StatusService.ACTION_PROCESS_SOUND.equals(action)) {
+//                mSoundMode =
+//                        intent.getStringExtra(StatusService.EXTRA_SOUND_MODE);
+//                mPlayState =
+//                        intent.getIntExtra(StatusService.EXTRA_PLAY_STATE,
+//                                Constants.SOUND_STOP);
+//                Log.d(TAG, "onReceive sound" + mPlayState + ":" + mSoundMode);
 //            }
 //        }
 //    }
@@ -299,17 +330,16 @@ public class HomeActivity extends BaseActivity implements
                         String soundMode, int playState, String swingMode) {
         statusFragment.getCardStatus(temperature, heatingState,
                 soundMode, playState, swingMode);
+        Log.d(TAG, "setCard" + temperature + heatingState + soundMode + playState + swingMode);
     }
 
     @Override
     public void onRefresh() {
+        showRefreshProgress();
         if (messageBinder.getConnectState()) {
-            // TODO:get data from server and update UI
             messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
-//            geMessageFromServer("t.o.25;so.m.1;sw.s;");
             setCard(mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
         } else {
-            // TODO:get data from SharedPreferences and update UI
             setDialog();
         }
 
@@ -331,5 +361,20 @@ public class HomeActivity extends BaseActivity implements
         mSwipeRefreshWidget.setEnabled(false);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {//
+                // 如果两次按键时间间隔大于2000毫秒，则不退出
+                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                mExitTime = System.currentTimeMillis();// 更新mExitTime
+            } else {
+                System.exit(0);// 否则退出程序
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+
+    }
 
 }

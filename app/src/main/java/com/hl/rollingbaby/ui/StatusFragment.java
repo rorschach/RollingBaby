@@ -62,6 +62,8 @@ public class StatusFragment extends Fragment {
         args.putString(ARG_SOUND_MODE, soundMode);
         args.putInt(ARG_PLAY_STATE, playState);
         args.putString(ARG_SWING_MODE, swingMode);
+        Log.d(TAG, ".." + temperature + heatingState + soundMode
+                + playState + swingMode + "..");
         fragment.setArguments(args);
         return fragment;
     }
@@ -81,6 +83,8 @@ public class StatusFragment extends Fragment {
             mSoundMode = getArguments().getString(ARG_SOUND_MODE);
             mPlayState = getArguments().getInt(ARG_PLAY_STATE);
             mSwingMode = getArguments().getString(ARG_SWING_MODE);
+            Log.d(TAG, "..." +mTemperature + mHeatingState + mSoundMode
+                    + mPlayState + mSwingMode + "...");
         }
     }
 
@@ -115,6 +119,7 @@ public class StatusFragment extends Fragment {
 //                startActivity(intent);
                 Intent intent = new Intent(getActivity(), TemperatureActivity.class);
                 sendIntent(intent);
+                startActivityForResult(intent, 0);
                 Log.d(TAG, mTemperature + ":" + mHeatingState);
             }
         });
@@ -136,6 +141,7 @@ public class StatusFragment extends Fragment {
 //                intent.putExtra(Constants.PLAY_STATE, mPlayState);
 //                startActivity(intent);
                 sendIntent(intent);
+                startActivityForResult(intent, 1);
                 Log.d(TAG, mSoundMode + ":" + mPlayState);
             }
         });
@@ -147,6 +153,7 @@ public class StatusFragment extends Fragment {
 //                intent.putExtra(Constants.CURRENT_SWING_MODE, mSwingMode);
 //                startActivity(intent);
                 sendIntent(intent);
+                startActivityForResult(intent, 2);
                 Log.d(TAG, mSwingMode);
             }
         });
@@ -165,6 +172,7 @@ public class StatusFragment extends Fragment {
 
     }
 
+
     private void sendIntent(Intent intent) {
         intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE,
                 mTemperature);//notice here!
@@ -173,7 +181,8 @@ public class StatusFragment extends Fragment {
                 mSoundMode);
         intent.putExtra(Constants.PLAY_STATE, mPlayState);
         intent.putExtra(Constants.CURRENT_SWING_MODE, mSwingMode);
-        startActivity(intent);
+        getActivity().setResult(Activity.RESULT_OK, intent);
+//        startActivity(intent);
     }
 
 
@@ -194,6 +203,45 @@ public class StatusFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, requestCode + ":" + resultCode);
+//        mTemperature = data.getIntExtra(Constants.CURRENT_TEMPERATURE_VALUE,
+//                Constants.DEFAULT_TEMPERATURE);
+//
+//        mSoundMode = data.getStringExtra(Constants.PLAY_STATE);
+//        mPlayState = data.getIntExtra(Constants.CURRENT_SOUND_MODE,
+//                Constants.SOUND_STOP);
+
+
+        Log.d(TAG, "onActivityResult : " + mTemperature);
+        setCardStatus();
+        switch (requestCode) {
+            case 0:
+                mTemperature = data.getIntExtra(Constants.CURRENT_TEMPERATURE_VALUE,
+                        Constants.DEFAULT_TEMPERATURE);
+                mHeatingState = data.getStringExtra(Constants.HEATING_STATE);
+                break;
+            case 1:
+                mSoundMode = data.getStringExtra(Constants.CURRENT_SOUND_MODE);
+                mPlayState = data.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
+//                setCardStatus();
+                break;
+            case 2:
+                mSwingMode = data.getStringExtra(Constants.CURRENT_SWING_MODE);
+//                setCardStatus();
+
+                break;
+            default:
+                break;
+        }
+        setCardStatus();
+        Log.d(TAG, "onActivityResult : " + mTemperature + mHeatingState
+                + mSoundMode + mPlayState + mSwingMode);
+
+    }
+
+
     public void getCardStatus(int temperature,String heatingState, String soundMode,
                               int playState, String swingMode) {
         mTemperature = temperature;
@@ -201,8 +249,7 @@ public class StatusFragment extends Fragment {
         mSoundMode = soundMode;
         mPlayState = playState;
         mSwingMode = swingMode;
-        Log.d(TAG,
-                mTemperature + mHeatingState + mSoundMode + mPlayState + mSwingMode);
+        Log.d(TAG, mTemperature + mHeatingState + mSoundMode + mPlayState + mSwingMode);
         setCardStatus();
     }
 
@@ -240,6 +287,7 @@ public class StatusFragment extends Fragment {
         temperatureText.setText(temper_tem + " / " + heating_tem);
         soundText.setText(sound_tem + " / " + play_tem);
         swingText.setText(swing_tem);
+        mListener.hideRefresh();
     }
 
 //    public void setMessageManager(MessageManager obj) {
@@ -250,6 +298,8 @@ public class StatusFragment extends Fragment {
     public interface OnStatusFragmentInteractionListener {
 
         public void geMessageFromServer(String readMessage);
+
+        public void hideRefresh();
 
     }
 }

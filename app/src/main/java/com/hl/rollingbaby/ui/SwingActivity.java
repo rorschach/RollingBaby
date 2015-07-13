@@ -123,6 +123,15 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
     }
 
     @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.CURRENT_SWING_MODE, mSwingMode);
+        setResult(RESULT_OK, intent);
+        Log.d(TAG, "onBackPressed : " + mSwingMode);
+        finish();
+    }
+
+    @Override
     public void setSwingMode(String swingMode) {
         messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
                 + mTemperature + ";"

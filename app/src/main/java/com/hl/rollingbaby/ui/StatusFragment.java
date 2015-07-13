@@ -204,16 +204,22 @@ public class StatusFragment extends Fragment {
         setCardStatus();
         switch (requestCode) {
             case 0:
-                mTemperature = data.getIntExtra(Constants.CURRENT_TEMPERATURE_VALUE,
-                        Constants.DEFAULT_TEMPERATURE);
-                mHeatingState = data.getStringExtra(Constants.HEATING_STATE);
+                if (resultCode == -1) {
+                    mTemperature = data.getIntExtra(Constants.CURRENT_TEMPERATURE_VALUE,
+                            Constants.DEFAULT_TEMPERATURE);
+                    mHeatingState = data.getStringExtra(Constants.HEATING_STATE);
+                }
                 break;
             case 1:
-                mSoundMode = data.getStringExtra(Constants.CURRENT_SOUND_MODE);
-                mPlayState = data.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
+                if (resultCode == -1) {
+                    mSoundMode = data.getStringExtra(Constants.CURRENT_SOUND_MODE);
+                    mPlayState = data.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
+                }
                 break;
             case 2:
-                mSwingMode = data.getStringExtra(Constants.CURRENT_SWING_MODE);
+                if (resultCode == -1) {
+                    mSwingMode = data.getStringExtra(Constants.CURRENT_SWING_MODE);
+                }
                 break;
             default:
                 break;

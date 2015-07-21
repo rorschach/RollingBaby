@@ -7,8 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
@@ -26,6 +28,7 @@ public class SoundFragment extends Fragment {
     private String mSoundMode;
 
     private static final String ARG_TEMPERATURE = Constants.CURRENT_TEMPERATURE_VALUE;
+    private static final String ARG_SETTING_TEMPERATURE = Constants.SETTING_TEMPERATURE_VALUE;
     private static final String ARG_HEATING_STATE = Constants.HEATING_STATE;
     private static final String ARG_SOUND_MODE = Constants.CURRENT_SOUND_MODE;
     private static final String ARG_PLAY_STATE = Constants.PLAY_STATE;
@@ -34,11 +37,12 @@ public class SoundFragment extends Fragment {
     private OnSoundFragmentInteractionListener mListener;
 
     public static SoundFragment newInstance(
-            int temperature, String heatingState,
+            int currentTem, int settingTem,String heatingState,
             String soundMode, int playState, String swingMode) {
         SoundFragment fragment = new SoundFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_TEMPERATURE, temperature);
+        args.putInt(ARG_TEMPERATURE, currentTem);
+        args.putInt(ARG_SETTING_TEMPERATURE, settingTem);
         args.putString(ARG_HEATING_STATE, heatingState);
         args.putString(ARG_SOUND_MODE, soundMode);
         args.putInt(ARG_PLAY_STATE, playState);
@@ -75,6 +79,7 @@ public class SoundFragment extends Fragment {
         playBt = (ImageButton) view.findViewById(R.id.play);
         ImageButton rewindBt = (ImageButton) view.findViewById(R.id.rewind);
         ImageButton forwardBt = (ImageButton) view.findViewById(R.id.forward);
+        Switch modeSwitch = (Switch) view.findViewById(R.id.mode_switch);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -122,6 +127,29 @@ public class SoundFragment extends Fragment {
                 mListener.setSoundState(mPlayState, mSoundMode);
             }
         });
+
+        if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
+            modeSwitch.setChecked(true);
+        } else {
+            modeSwitch.setChecked(false);
+        }
+        modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mSoundMode = Constants.SOUND_MUSIC;
+                } else {
+                    mSoundMode = Constants.SOUND_STORY;
+                }
+                String temp;
+                if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
+                    temp = getActivity().getResources().getString(R.string.music_toast);
+                } else {
+                    temp = getActivity().getResources().getString(R.string.story_toast);
+                }
+                Toast.makeText(getActivity(), temp, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setPlayButton() {
@@ -132,13 +160,7 @@ public class SoundFragment extends Fragment {
             waveView.setPlayStation(false);
             playBt.setImageResource(R.drawable.play);
         }
-        String temp;
-        if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
-            temp = getActivity().getResources().getString(R.string.music_toast);
-        } else {
-            temp = getActivity().getResources().getString(R.string.story_toast);
-        }
-        Toast.makeText(getActivity(), temp, Toast.LENGTH_SHORT).show();
+
     }
 
     @Override

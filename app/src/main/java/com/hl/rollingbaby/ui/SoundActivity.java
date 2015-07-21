@@ -20,7 +20,8 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
     private static final String TAG = "SoundActivity";
     private SoundFragment soundFragment;
 
-    private int mTemperature;
+    private int currentTemperature;
+    private int settingTemperature;
     private String mHeatingState;
     private String mSoundMode;
     private int mPlayState;
@@ -43,7 +44,8 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
 
         if (savedInstanceState == null) {
             soundFragment = SoundFragment.newInstance(
-                    mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+                    currentTemperature, settingTemperature,
+                    mHeatingState, mSoundMode, mPlayState, mSwingMode);
             soundFragment.setArguments(getIntent().getExtras());
             getFragmentManager().beginTransaction().add(
                     R.id.sound_container, soundFragment).commit();
@@ -53,8 +55,10 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
 
     private void getIntentFromHome() {
         Intent intent = getIntent();
-        mTemperature = intent.getIntExtra(
+        currentTemperature = intent.getIntExtra(
                 Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
+        settingTemperature = intent.getIntExtra(
+                Constants.SETTING_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
         mHeatingState = intent.getStringExtra(Constants.HEATING_STATE);
         mSoundMode = intent.getStringExtra(Constants.CURRENT_SOUND_MODE);
         mPlayState = intent.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
@@ -107,7 +111,7 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
             case R.id.action_sync:
                 mPlayState = soundFragment.getPlayState();
                 mSoundMode = soundFragment.getSoundMode();
-                setSoundState(mPlayState, mSoundMode);
+//                setSoundState(mPlayState, mSoundMode);
                 return true;
 
             case android.R.id.home:
@@ -135,6 +139,8 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
 
     @Override
     public void onBackPressed() {
+        mPlayState = soundFragment.getPlayState();
+        mSoundMode = soundFragment.getSoundMode();
         Intent intent = new Intent();
         intent.putExtra(Constants.CURRENT_SOUND_MODE, mSoundMode);
         intent.putExtra(Constants.PLAY_STATE, mPlayState);
@@ -145,7 +151,7 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
 
     public void setSoundState(int playState, String soundMode){
         messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                + mTemperature + ";"
+                + settingTemperature + ";"
                 + Constants.SWING_TAG + mSwingMode + ";"
                 + Constants.SOUND_TAG + soundMode + playState + ";\n");
     }

@@ -23,7 +23,8 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
     private MessageService messageService;
     private SwingFragment swingFragment;
 
-    private int mTemperature;
+    private int currentTemperature;
+    private int settingTemperature;
     private String mHeatingState;
     private String mSoundMode;
     private int mPlayState;
@@ -39,7 +40,8 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
 
         if (savedInstanceState == null) {
             swingFragment = SwingFragment.newInstance(
-                    mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+                    currentTemperature, settingTemperature, mHeatingState,
+                    mSoundMode, mPlayState, mSwingMode);
             swingFragment.setArguments(getIntent().getExtras());
             getFragmentManager().beginTransaction().add(
                     R.id.swing_container, swingFragment).commit();
@@ -50,8 +52,10 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
 
     private void getIntentFromHome() {
         Intent intent = getIntent();
-        mTemperature = intent.getIntExtra(
+        currentTemperature = intent.getIntExtra(
                 Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
+        settingTemperature = intent.getIntExtra(
+                Constants.SETTING_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
         mHeatingState = intent.getStringExtra(Constants.HEATING_STATE);
         mSoundMode = intent.getStringExtra(Constants.CURRENT_SOUND_MODE);
         mPlayState = intent.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
@@ -139,7 +143,7 @@ public class SwingActivity extends BaseActivity implements ServiceConnection,
     @Override
     public void setSwingMode(String swingMode) {
         messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                + mTemperature + ";"
+                + settingTemperature + ";"
                 + Constants.SWING_TAG + swingMode + ";"
                 + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
 

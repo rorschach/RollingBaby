@@ -38,6 +38,9 @@ public class MessageService extends Service {
     public static String SERVER_HOST = "192.168.23.5";
     public static int SERVER_PORT = 7838;
 
+//    public static String SERVER_HOST = "192.168.97.86";
+//    public static int SERVER_PORT = 8888;
+
     private MessageManager messageManager;
     private MessageBinder messageBinder = new MessageBinder();
     private Context context;
@@ -131,7 +134,7 @@ public class MessageService extends Service {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 Notification notification = new Notification.Builder(context)
                         .setTicker(TAG)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.drawable.info)
                         .setContentTitle(title)
                         .setContentText(content)
                         .setAutoCancel(true)
@@ -143,7 +146,7 @@ public class MessageService extends Service {
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(context)
                                 .setTicker(TAG)
-                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setSmallIcon(R.drawable.info)
                                 .setContentTitle(title)
                                 .setContentText(content)
                                 .setAutoCancel(true)

@@ -19,6 +19,7 @@ public interface Constants {
     public static final String FILE_NAME = "data";
 
     public static final String CURRENT_TEMPERATURE_VALUE = "TEMPERATURE";
+    public static final String SETTING_TEMPERATURE_VALUE = "SETTING_TEMPERATURE";
     public static final String HEATING_STATE = "HEATING_STATE";
 
     public static final int DEFAULT_TEMPERATURE = 36;

@@ -22,7 +22,7 @@
             seekarc:rotation="180"
             seekarc:startAngle="30"
             seekarc:sweepAngle="300"
-            seekarc:max="55"
+            seekarc:max="30"
             seekarc:touchInside="true" />
 
         <TextView

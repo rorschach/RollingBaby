@@ -22,17 +22,19 @@ public class SwingFragment extends Fragment {
     private String mSwingMode;
 
     private static final String ARG_TEMPERATURE = Constants.CURRENT_TEMPERATURE_VALUE;
+    private static final String ARG_SETTING_TEMPERATURE = Constants.SETTING_TEMPERATURE_VALUE;
     private static final String ARG_HEATING_STATE = Constants.HEATING_STATE;
     private static final String ARG_SOUND_MODE = Constants.CURRENT_SOUND_MODE;
     private static final String ARG_PLAY_STATE = Constants.PLAY_STATE;
     private static final String ARG_SWING_MODE = Constants.CURRENT_SWING_MODE;
 
     public static SwingFragment newInstance(
-            int temperature, String heatingState,
+            int currentTem, int settingTem, String heatingState,
             String soundMode, int playState, String swingMode) {
         SwingFragment fragment = new SwingFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_TEMPERATURE, temperature);
+        args.putInt(ARG_TEMPERATURE, currentTem);
+        args.putInt(ARG_SETTING_TEMPERATURE, settingTem);
         args.putString(ARG_HEATING_STATE, heatingState);
         args.putString(ARG_SOUND_MODE, soundMode);
         args.putInt(ARG_PLAY_STATE, playState);

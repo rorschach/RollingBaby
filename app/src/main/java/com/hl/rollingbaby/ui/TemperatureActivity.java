@@ -22,7 +22,8 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
     private MessageService.MessageBinder messageBinder;
     private MessageService messageService;
 
-    private int mTemperature;
+    private int currentTemperature;
+    private int settingTemperature;
     private String mHeatingState;
     private String mSoundMode;
     private int mPlayState;
@@ -41,18 +42,21 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
 
         if (savedInstanceState == null) {
             temperatureFragment = TemperatureFragment.newInstance(
-                    mTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
+                    currentTemperature, settingTemperature, mHeatingState,
+                    mSoundMode, mPlayState, mSwingMode);
             temperatureFragment.setArguments(getIntent().getExtras());
             getFragmentManager().beginTransaction().add(
                     R.id.temperature_container, temperatureFragment).commit();
         }
-        temp = mTemperature;
+        temp = currentTemperature;
     }
 
     private void getIntentFromHomeActivity() {
         Intent intent = getIntent();
-        mTemperature = intent.getIntExtra(
+        currentTemperature = intent.getIntExtra(
                 Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
+        settingTemperature = intent.getIntExtra(
+                Constants.SETTING_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
         mHeatingState = intent.getStringExtra(Constants.HEATING_STATE);
         mSoundMode = intent.getStringExtra(Constants.CURRENT_SOUND_MODE);
         mPlayState = intent.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
@@ -104,9 +108,9 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
 
         switch (item.getItemId()) {
             case R.id.action_sync:
-                mTemperature = temperatureFragment.getTemperatureState();
-                setTemperatureState(mTemperature);
-                if (mTemperature > temp) {
+                settingTemperature = temperatureFragment.getTemperatureState();
+                setTemperatureState(settingTemperature);
+                if (settingTemperature > currentTemperature) {
                     mHeatingState = Constants.HEATING_OPEN;
                 } else {
                     mHeatingState = Constants.HEATING_CLOSE;
@@ -116,10 +120,11 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
 
             case android.R.id.home:
                 Intent intent = new Intent();
-                intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE, mTemperature);
+                intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE, currentTemperature);
+                intent.putExtra(Constants.SETTING_TEMPERATURE_VALUE, settingTemperature);
                 intent.putExtra(Constants.HEATING_STATE, mHeatingState);
                 setResult(RESULT_OK, intent);
-                Log.d(TAG, "onBackPressed : " + mTemperature);
+                Log.d(TAG, "onBackPressed : " + currentTemperature);
                 finish();
         }
         return super.onOptionsItemSelected(item);
@@ -134,14 +139,13 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
-        intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE, mTemperature);
+        intent.putExtra(Constants.CURRENT_TEMPERATURE_VALUE, currentTemperature);
+        intent.putExtra(Constants.SETTING_TEMPERATURE_VALUE, settingTemperature);
         intent.putExtra(Constants.HEATING_STATE, mHeatingState);
         setResult(RESULT_OK, intent);
-        Log.d(TAG, "onBackPressed : " + mTemperature);
+        Log.d(TAG, "onBackPressed : " + currentTemperature);
         finish();
     }
-
-    
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
@@ -149,11 +153,12 @@ public class TemperatureActivity extends BaseActivity implements ServiceConnecti
     }
 
     @Override
-    public void setTemperatureState(int temperature) {
+    public void setTemperatureState(int settingTemperature) {
         messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                + temperature + ";"
+                + settingTemperature + ";"
                 + Constants.SWING_TAG + mSwingMode + ";"
                 + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
+        Log.d(TAG, settingTemperature + "");
     }
 
 }

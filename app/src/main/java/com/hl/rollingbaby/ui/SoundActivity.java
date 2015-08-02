@@ -56,13 +56,13 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
     private void getIntentFromHome() {
         Intent intent = getIntent();
         currentTemperature = intent.getIntExtra(
-                Constants.CURRENT_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
+                Constants.ARG_CURRENT_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
         settingTemperature = intent.getIntExtra(
-                Constants.SETTING_TEMPERATURE_VALUE, Constants.DEFAULT_TEMPERATURE);
-        mHeatingState = intent.getStringExtra(Constants.HEATING_STATE);
-        mSoundMode = intent.getStringExtra(Constants.CURRENT_SOUND_MODE);
-        mPlayState = intent.getIntExtra(Constants.PLAY_STATE, Constants.SOUND_STOP);
-        mSwingMode = intent.getStringExtra(Constants.CURRENT_SWING_MODE);
+                Constants.ARG_SETTING_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
+        mHeatingState = intent.getStringExtra(Constants.ARG_HEATING_STATE);
+        mSoundMode = intent.getStringExtra(Constants.ARG_SOUND_MODE);
+        mPlayState = intent.getIntExtra(Constants.ARG_PLAY_STATE, Constants.SOUND_STOP);
+        mSwingMode = intent.getStringExtra(Constants.ARG_SWING_MODE);
     }
 
     private void init() {
@@ -116,8 +116,8 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
 
             case android.R.id.home:
                 Intent intent = new Intent();
-                intent.putExtra(Constants.CURRENT_SOUND_MODE, mSoundMode);
-                intent.putExtra(Constants.PLAY_STATE, mPlayState);
+                intent.putExtra(Constants.ARG_SOUND_MODE, mSoundMode);
+                intent.putExtra(Constants.ARG_PLAY_STATE, mPlayState);
                 setResult(RESULT_OK, intent);
                 Log.d(TAG, "onBackPressed : " + mSoundMode + mPlayState);
                 finish();
@@ -142,8 +142,8 @@ public class SoundActivity extends BaseActivity implements ServiceConnection,
         mPlayState = soundFragment.getPlayState();
         mSoundMode = soundFragment.getSoundMode();
         Intent intent = new Intent();
-        intent.putExtra(Constants.CURRENT_SOUND_MODE, mSoundMode);
-        intent.putExtra(Constants.PLAY_STATE, mPlayState);
+        intent.putExtra(Constants.ARG_SOUND_MODE, mSoundMode);
+        intent.putExtra(Constants.ARG_PLAY_STATE, mPlayState);
         setResult(RESULT_OK, intent);
         Log.d(TAG, "onBackPressed : " + mSoundMode + mPlayState);
         finish();

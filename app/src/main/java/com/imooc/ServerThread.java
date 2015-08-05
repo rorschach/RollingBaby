@@ -27,21 +27,23 @@ public class ServerThread extends Thread {
         OutputStream os=null;
         PrintWriter pw=null;
         String hello = "Hello Client";
+        String hello1 = "Hello Client...";
         try {
             //获取输入流，并读取客户端信息
             is = socket.getInputStream();
             isr = new InputStreamReader(is);
             br = new BufferedReader(isr);
-            String info=null;
+            String info;
             while((info=br.readLine())!=null){//循环读取客户端的信息
                 System.out.println("我是服务器，客户端说："+info);
             }
             socket.shutdownInput();//关闭输入流
             //获取输出流，响应客户端的请求
             os = socket.getOutputStream();
+            os.write(hello1.getBytes());
             pw = new PrintWriter(os);
+            pw.write(hello);
             pw.flush();//调用flush()方法将缓冲输出
-            os.write(hello.getBytes());
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

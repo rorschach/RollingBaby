@@ -27,13 +27,12 @@ public class MessageService extends Service {
     public static final int NOTIFICATION_CONNECT_SUCCESS = 1;
     public static final int NOTIFICATION_SEND_MESSAGE = 2;
     public static final int NOTIFICATION_READ_MESSAGE = 3;
-    public static final int NOTIFICATION_TEST = 4;
 
-    public static String SERVER_HOST = "192.168.23.5";
-    public static int SERVER_PORT = 7838;
+//    public static String SERVER_HOST = "192.168.23.5";
+//    public static int SERVER_PORT = 7838;
 
-//    public static String SERVER_HOST = "192.168.97.86";
-//    public static int SERVER_PORT = 8888;
+    public static String SERVER_HOST = "192.168.97.86";
+    public static int SERVER_PORT = 8888;
 
     private MessageManager messageManager;
     private MessageBinder messageBinder = new MessageBinder();
@@ -76,7 +75,10 @@ public class MessageService extends Service {
 //            String ip[] = ipPref.split(":");
 //            SERVER_HOST = ip[0];
 //            SERVER_PORT = Integer.valueOf(ip[1]);
+<<<<<<< HEAD
 ////            Log.d(TAG, SERVER_HOST + ":" + SERVER_PORT);
+=======
+>>>>>>> RollingBaby/master
 //        } catch (NumberFormatException e) {
 //            e.printStackTrace();
 //        }
@@ -149,16 +151,5 @@ public class MessageService extends Service {
                 manager.notify(requestCode, mBuilder.build());
             }
         }
-
-//        public void buildConnectedFailedDialog() {
-//            AlertDialog.Builder builder = new AlertDialog.Builder(context)
-//                    .setTitle("Ok")
-//                    .setPositiveButton("Ok", null)
-//                    .setNegativeButton("False", null);
-//
-//            AlertDialog dialog = builder.create();
-//            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_DIALOG);
-//            dialog.show();
-//        }
     }
 }

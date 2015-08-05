@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AndroidDexCompilerConfiguration">
+<<<<<<< HEAD
     <option name="PROGUARD_VM_OPTIONS" value="-Xmx2048m -XX:MaxPermSize=512m" />
+=======
+    <option name="PROGUARD_VM_OPTIONS" value="-Xmx1024m -XX:MwxPermSize=512m" />
+>>>>>>> RollingBaby/master
   </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
+<<<<<<< HEAD
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -13,6 +18,8 @@
       </MavenGeneralSettings>
     </option>
   </component>
+=======
+>>>>>>> RollingBaby/master
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
     <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />

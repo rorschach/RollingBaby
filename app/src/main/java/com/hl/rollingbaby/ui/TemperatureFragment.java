@@ -20,13 +20,6 @@ public class TemperatureFragment extends Fragment {
     private SeekArc mSeekArc;
     private TextView mSeekArcProgress;
 
-    private static final String ARG_TEMPERATURE = Constants.CURRENT_TEMPERATURE_VALUE;
-    private static final String ARG_SETTING_TEMPERATURE = Constants.SETTING_TEMPERATURE_VALUE;
-    private static final String ARG_HEATING_STATE = Constants.HEATING_STATE;
-    private static final String ARG_SOUND_MODE = Constants.CURRENT_SOUND_MODE;
-    private static final String ARG_PLAY_STATE = Constants.PLAY_STATE;
-    private static final String ARG_SWING_MODE = Constants.CURRENT_SWING_MODE;
-
     private int currentTemperature;
     private int settingTemperature;
     private String mHeatingState;
@@ -38,12 +31,12 @@ public class TemperatureFragment extends Fragment {
             String soundMode, int playState, String swingMode) {
         TemperatureFragment fragment = new TemperatureFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_TEMPERATURE, currentTem);
-        args.putInt(ARG_SETTING_TEMPERATURE, settingTem);
-        args.putString(ARG_HEATING_STATE, heatingState);
-        args.putString(ARG_SOUND_MODE, soundMode);
-        args.putInt(ARG_PLAY_STATE, playState);
-        args.putString(ARG_SWING_MODE, swingMode);
+        args.putInt(Constants.ARG_CURRENT_TEMPERATURE, currentTem);
+        args.putInt(Constants.ARG_SETTING_TEMPERATURE, settingTem);
+        args.putString(Constants.ARG_HEATING_STATE, heatingState);
+        args.putString(Constants.ARG_SOUND_MODE, soundMode);
+        args.putInt(Constants.ARG_PLAY_STATE, playState);
+        args.putString(Constants.ARG_SWING_MODE, swingMode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,9 +48,9 @@ public class TemperatureFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            currentTemperature = getArguments().getInt(ARG_TEMPERATURE);
-            settingTemperature = getArguments().getInt(ARG_SETTING_TEMPERATURE);
-            mHeatingState = getArguments().getString(ARG_HEATING_STATE);
+            currentTemperature = getArguments().getInt(Constants.ARG_CURRENT_TEMPERATURE);
+            settingTemperature = getArguments().getInt(Constants.ARG_SETTING_TEMPERATURE);
+            mHeatingState = getArguments().getString(Constants.ARG_HEATING_STATE);
         }
     }
 

@@ -8,7 +8,7 @@
         android:id="@+id/wave_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ff702e8c"
+        android:background="#3498bd"
         wave:above_wave_color="@android:color/white"
         wave:blow_wave_color="@android:color/white"
         wave:wave_progress="61"

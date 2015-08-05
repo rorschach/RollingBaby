@@ -1,6 +1,5 @@
 package com.hl.rollingbaby.network;
 
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -15,14 +14,9 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.WindowManager;
 
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.ui.HomeActivity;
-import com.hl.rollingbaby.ui.SettingsActivity;
-
-import java.util.ArrayList;
 
 public class MessageService extends Service {
 
@@ -75,18 +69,18 @@ public class MessageService extends Service {
         messageManager.setConnectState(false);
     }
 
-    public void getData() {
-        try {
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-            String ipPref = pref.getString(SettingsActivity.KEY_IP, "192.168.97.86:8888");
-            String ip[] = ipPref.split(":");
-            SERVER_HOST = ip[0];
-            SERVER_PORT = Integer.valueOf(ip[1]);
-//            Log.d(TAG, SERVER_HOST + ":" + SERVER_PORT);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void getData() {
+//        try {
+//            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+//            String ipPref = pref.getString(SettingsActivity.KEY_IP, "192.168.97.86:8888");
+//            String ip[] = ipPref.split(":");
+//            SERVER_HOST = ip[0];
+//            SERVER_PORT = Integer.valueOf(ip[1]);
+////            Log.d(TAG, SERVER_HOST + ":" + SERVER_PORT);
+//        } catch (NumberFormatException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public class MessageBinder extends Binder {
 

@@ -8,14 +8,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+//import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
 
-import it.gmariotti.cardslib.library.internal.Card;
-import it.gmariotti.cardslib.library.view.CardViewNative;
+//import it.gmariotti.cardslib.library.internal.Card;
+//import it.gmariotti.cardslib.library.view.CardViewNative;
 
 
 public class StatusFragment extends Fragment {
@@ -83,12 +83,12 @@ public class StatusFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_status, container, false);
 
-        initViews(view);
+//        initViews(view);
 
         return view;
     }
 
-    private void initViews(View view) {
+   /* private void initViews(View view) {
         Card card_temperature = new Card(getActivity());
 //        card_humidity = new Card(getActivity());
         Card card_music = new Card(getActivity());
@@ -159,7 +159,7 @@ public class StatusFragment extends Fragment {
         swingText = (TextView) view.findViewById(R.id.swing_state);
         setCardStatus();
 
-    }
+    }*/
 
 
     private void sendIntent(Intent intent) {
@@ -183,7 +183,7 @@ public class StatusFragment extends Fragment {
             mListener = (OnStatusFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnSoundInteractionListener");
         }
     }
 

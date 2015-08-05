@@ -11,7 +11,6 @@ import android.widget.ImageView;
 
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
-import com.skyfishjy.library.RippleBackground;
 
 public class SwingFragment extends Fragment {
 
@@ -60,27 +59,6 @@ public class SwingFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_swing, container, false);
 
-        final RippleBackground rippleBackground=
-                (RippleBackground)view.findViewById(R.id.content);
-        ImageView imageView=(ImageView)view.findViewById(R.id.centerImage);
-
-        if (mSwingMode.equals(Constants.SWING_CLOSE)) {
-            rippleBackground.stopRippleAnimation();
-        } else {
-            rippleBackground.startRippleAnimation();
-        }
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mSwingMode.equals(Constants.SWING_CLOSE)) {
-                    mSwingMode = Constants.SWING_SLEEP;
-                    rippleBackground.startRippleAnimation();
-                } else {
-                    mSwingMode = Constants.SWING_CLOSE;
-                    rippleBackground.stopRippleAnimation();
-                }
-            }
-        });
         return view;
     }
 
@@ -92,7 +70,7 @@ public class SwingFragment extends Fragment {
 
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnSoundInteractionListener");
         }
     }
 

@@ -15,6 +15,8 @@ import com.hl.rollingbaby.R;
 
 public class SwingDialogFragment extends DialogFragment {
 
+    private static final String TAG = "SwingDialogFragment";
+
     private static final String ARG_SWING_MODE = "SWING_MODE";
 
     private String mSwingMode;
@@ -56,15 +58,9 @@ public class SwingDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new AppCompatDialog(getActivity(), getTheme());
-//        dialog.getWindow().setLayout(
-//                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 400);
-
         return dialog;
     }
-
-
 
     @Override
     public void onAttach(Activity activity) {
@@ -87,15 +83,12 @@ public class SwingDialogFragment extends DialogFragment {
     public void onPause() {
         super.onPause();
         dialog.dismiss();
-//        mListener.refreshSwingItem(mSwingMode);
         mListener.setSwingState(mSwingMode);
     }
 
     public interface OnSwingInteractionListener {
 
         void showSwingDialog();
-
-//        void refreshSwingItem(String text);
 
         void setSwingState(String swingMode);
 

@@ -35,11 +35,7 @@ import com.race604.flyrefresh.FlyRefreshLayout;
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.views.SampleItemAnimator;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements
         MessageTarget, Handler.Callback, ServiceConnection,
@@ -55,19 +51,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private FlyRefreshLayout mFlyLayout;
     private RecyclerView mListView;
-
     private ItemAdapter mAdapter;
-
     private ArrayList<ItemData> mDataSet = new ArrayList<>();
-    private Handler mHandler = new Handler();
     private LinearLayoutManager mLayoutManager;
+
     private SoundDialogFragment soundDialog;
     private TemperatureDialogFragment temperatureDialog;
     private SwingDialogFragment swingDialog;
-
-    private boolean isInActivity = false;
-
-    private Handler handler = new Handler(this);
 
     private int mCurrentTemperature;
     private int mSettingTemperature;
@@ -75,7 +65,13 @@ public class MainActivity extends AppCompatActivity implements
     private String mSoundMode;
     private int mPlayState;
     private String mSwingMode;
+
     private long mExitTime = 0;
+
+    private boolean isInActivity = false;
+    private boolean isDataChanged = false;
+
+    private Handler handler = new Handler(this);
 
     @Override
     public Handler getHandler() {
@@ -88,6 +84,10 @@ public class MainActivity extends AppCompatActivity implements
         initDataSet();
         setContentView(R.layout.activity_main);
 
+        initView();
+    }
+
+    private void initView() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -109,18 +109,20 @@ public class MainActivity extends AppCompatActivity implements
         soundDialog = SoundDialogFragment.newInstance("Music", 0);
         temperatureDialog = TemperatureDialogFragment.newInstance(36, 36, "Heating");
         swingDialog = SwingDialogFragment.newInstance("Sleep");
-
     }
 
     private void initDataSet() {
         mDataSet.add(new ItemData(Color.parseColor("#76A9FC"),
-                R.drawable.thermometer, "Meeting Minutes"));
-        mDataSet.add(new ItemData(Color.GRAY, R.drawable.thermometer, "Favorites Photos"));
-        mDataSet.add(new ItemData(Color.GRAY, R.drawable.thermometer, "Photos"));
+                R.drawable.thermometer_white_64, "Temperature Status"));
+        mDataSet.add(new ItemData(Color.GRAY,
+                R.drawable.music_white_64, "Sound Status"));
+        mDataSet.add(new ItemData(Color.GRAY,
+                R.drawable.music_white_64, "Swing Status"));
     }
 
     private void addItemData() {
-        ItemData itemData = new ItemData(Color.parseColor("#FFC970"), R.drawable.thermometer, "Magic Cube Show");
+        ItemData itemData = new ItemData(Color.parseColor("#FFC970"),
+                R.drawable.thermometer, "Magic Cube Show");
         mDataSet.add(0, itemData);
         mAdapter.notifyItemInserted(0);
         mLayoutManager.scrollToPosition(0);
@@ -176,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, MessageService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
         isInActivity = true;
-
 //        LocalBroadcastManager broadcastManager =
 //                LocalBroadcastManager.getInstance(this);
 //        IntentFilter intentFilter = new IntentFilter();
@@ -226,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements
                             getResources().getString(R.string.fail_title),
                             getResources().getString(R.string.fail_content));
                 } else {
-//                    setDialog();
+                    //TODO:connect failed, show to user
                 }
                 break;
 
@@ -244,38 +245,9 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case Constants.MESSAGE_SEND:
-//                Object obj = msg.obj;
-//                statusFragment.setMessageManager((MessageManager) obj);
-//                messageBinder.sendMessage(obj + "");
         }
         return true;
     }
-
-/*
-    private void setDialog() {
-        AlertDialog.Builder builder =
-                new AlertDialog.Builder(this);
-        builder.setTitle(getResources().getString(R.string.fail_title));
-        builder.setMessage( getResources().getString(R.string.fail_content));
-        builder.setPositiveButton(getResources().getString(R.string.position_bt),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
-                        startActivity(intent);
-                    }
-                });
-
-        builder.setNegativeButton(getResources().getString(R.string.navigation_bt),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-        builder.create().show();
-        Log.d(TAG, "setDialog");
-    }
-*/
 
     public void geMessageFromServer(String readMessage) {
 
@@ -298,19 +270,10 @@ public class MainActivity extends AppCompatActivity implements
             if (mSettingTemperature == 0) {
                 mSettingTemperature = mCurrentTemperature;
             }
-
-            Log.d(TAG, mCurrentTemperature + ":"
-                    + mSettingTemperature + ":"
-                    + mHeatingState + ":"
-                    + mSoundMode + ":"
-                    + mPlayState + ":"
-                    + mSwingMode);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void onRefresh(FlyRefreshLayout view) {
@@ -319,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements
             bounceAnimateView(child.findViewById(R.id.icon));
         }
 
-        mHandler.postDelayed(new Runnable() {
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mFlyLayout.onRefreshFinish();
@@ -340,18 +303,30 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onRefreshAnimationEnd(FlyRefreshLayout view) {
-//        addItemData();
-        resetItemData();
+        if (messageBinder.getConnectState()) {
+            if (isDataChanged) {
+                sendCommand();
+            } else {
+                messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
+            }
+        } else {
+            //TODO:connect failed, show to user
+        }
+    }
+
+    public void sendCommand() {
+        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                + mSettingTemperature + ";"
+                + Constants.SWING_TAG + mSwingMode + ";"
+                + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
     }
 
     private class ItemAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
         private LayoutInflater mInflater;
-//        private DateFormat dateFormat;
 
         public ItemAdapter(Context context) {
             mInflater = LayoutInflater.from(context);
-//            dateFormat = SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
         }
 
         @Override
@@ -366,10 +341,8 @@ public class MainActivity extends AppCompatActivity implements
             ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
             drawable.getPaint().setColor(data.color);
             itemViewHolder.icon.setBackgroundDrawable(drawable);
-//            itemViewHolder.icon.setBackground(drawable);
             itemViewHolder.icon.setImageResource(data.icon);
             itemViewHolder.title.setText(data.title);
-//            itemViewHolder.subTitle.setText(dateFormat.format(data.time));
         }
 
         @Override
@@ -383,13 +356,11 @@ public class MainActivity extends AppCompatActivity implements
 
         ImageView icon;
         TextView title;
-//        TextView subTitle;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
             icon = (ImageView) itemView.findViewById(R.id.icon);
             title = (TextView) itemView.findViewById(R.id.title);
-//            subTitle = (TextView) itemView.findViewById(R.id.subtitle);
             itemView.setOnClickListener(this);
         }
 
@@ -410,7 +381,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-
     @Override
     public void showTemperatureDialog() {
         temperatureDialog.show(getFragmentManager(), "temperatureDialog");
@@ -423,6 +393,7 @@ public class MainActivity extends AppCompatActivity implements
         mHeatingState = heatingState;
         mDataSet.get(0).title = settingTemperature + ":" + heatingState;
         mAdapter.notifyDataSetChanged();
+        isDataChanged = true;
     }
 
     @Override
@@ -437,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements
         mPlayState = playState;
         mDataSet.get(1).title = soundMode + ":" + playState;
         mAdapter.notifyDataSetChanged();
+        isDataChanged = true;
     }
 
     @Override
@@ -447,18 +419,14 @@ public class MainActivity extends AppCompatActivity implements
     //TODO:update swing item in here
     @Override
     public void setSwingState(String swingMode) {
+        mSwingMode = swingMode;
         mDataSet.get(2).title = "mode : " + swingMode;
         mAdapter.notifyDataSetChanged();
+        isDataChanged = true;
     }
+}
 
-    public void sendCommand() {
-        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                + mSettingTemperature + ";"
-                + Constants.SWING_TAG + mSwingMode + ";"
-                + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
-    }
-
-    //        public class UpdateUIReceiver extends BroadcastReceiver {
+//        public class UpdateUIReceiver extends BroadcastReceiver {
 //        @Override
 //        public void onReceive(Context context, Intent intent) {
 //            String action = intent.getAction();
@@ -488,6 +456,33 @@ public class MainActivity extends AppCompatActivity implements
 //            }
 //        }
 //    }
-}
+
+
+/*
+    private void setDialog() {
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.fail_title));
+        builder.setMessage( getResources().getString(R.string.fail_content));
+        builder.setPositiveButton(getResources().getString(R.string.position_bt),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
+                        startActivity(intent);
+                    }
+                });
+
+        builder.setNegativeButton(getResources().getString(R.string.navigation_bt),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        builder.create().show();
+        Log.d(TAG, "setDialog");
+    }
+*/
+
 
 

@@ -6,17 +6,15 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.ui.HomeActivity;
+import com.hl.rollingbaby.ui.MainActivity;
 
 public class MessageService extends Service {
 
@@ -75,10 +73,7 @@ public class MessageService extends Service {
 //            String ip[] = ipPref.split(":");
 //            SERVER_HOST = ip[0];
 //            SERVER_PORT = Integer.valueOf(ip[1]);
-<<<<<<< HEAD
 ////            Log.d(TAG, SERVER_HOST + ":" + SERVER_PORT);
-=======
->>>>>>> RollingBaby/master
 //        } catch (NumberFormatException e) {
 //            e.printStackTrace();
 //        }
@@ -121,7 +116,7 @@ public class MessageService extends Service {
         public void buildNotification(int requestCode, String title, String content) {
 
             PendingIntent intent = PendingIntent.getActivity(
-                    context, requestCode, new Intent(context, HomeActivity.class),
+                    context, requestCode, new Intent(context, MainActivity.class),
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationManager manager =

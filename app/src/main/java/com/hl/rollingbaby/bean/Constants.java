@@ -40,6 +40,7 @@ public interface Constants {
 
     String HEATING_CLOSE = "c";
     String HEATING_OPEN = "o";
+    //TODO:drop temperature
 
     String SOUND_TAG = "so";
     String SOUND_MUSIC = "m";
@@ -48,7 +49,7 @@ public interface Constants {
     int SOUND_PAUSE_PLAY = 0;
     int SOUND_STOP = 1;
     int SOUND_NEXT = 2;
-    int SOUND_PREVIOUS = 3;
+    int SOUND_LAST = 3;
 
     String SWING_TAG = "sw";
     String SWING_SLEEP = "s";

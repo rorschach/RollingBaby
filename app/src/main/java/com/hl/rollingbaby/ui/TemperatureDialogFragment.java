@@ -3,17 +3,25 @@ package com.hl.rollingbaby.ui;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.hl.rollingbaby.R;
+import com.hl.rollingbaby.bean.Constants;
 
 public class TemperatureDialogFragment extends DialogFragment {
+
+    private static final String TAG = "TemperatureDialogFragment";
+
     private static final String ARG_CURRENT_TEMPERATURE = "CURRENT_TEMPERATURE";
     private static final String ARG_SETTING_TEMPERATURE = "SETTING_TEMPERATURE";
     private static final String ARG_HEATING_STATE = "HEATING_STATE";
@@ -25,9 +33,10 @@ public class TemperatureDialogFragment extends DialogFragment {
     private OnTemperatureInteractionListener mListener;
 
     private AppCompatDialog dialog;
-    private TextView mCurrentTmeTx;
-    private TextView mSettingTemTx;
-    private SeekBar mTemperatureSeekBar;
+    private TextView currentText;
+    private TextView settingText;
+    private ImageView heatingIcon;
+    private SeekBar seekBar;
 
     public static TemperatureDialogFragment newInstance(
             int currentTemperature, int settingTemperature, String heatingState) {
@@ -57,18 +66,27 @@ public class TemperatureDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_temperature_dialog, container, false);
-        mCurrentTmeTx = (TextView) view.findViewById(R.id.current_temperature);
-        mSettingTemTx = (TextView) view.findViewById(R.id.setting_temperature);
-        mTemperatureSeekBar = (SeekBar) view.findViewById(R.id.temperature_seekBar);
+        currentText = (TextView) view.findViewById(R.id.current_temperature);
+        settingText = (TextView) view.findViewById(R.id.setting_temperature);
+        heatingIcon = (ImageView) view.findViewById(R.id.heating_icon);
 
-        mCurrentTmeTx.setText("Current : " + mCurrentTemperature);
-        mSettingTemTx.setText("Setting : " + mSettingTemperature);
-        mTemperatureSeekBar.setProgress(mSettingTemperature);
-        mTemperatureSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        seekBar = (SeekBar) view.findViewById(R.id.temperature_seekBar);
+
+        settingText.setTextColor(
+                getActivity().getResources().getColor(R.color.green));
+        currentText.setTextColor(
+                getActivity().getResources().getColor(R.color.green));
+        currentText.setText("Current : " + mCurrentTemperature);
+        settingText.setText("Setting : " + mSettingTemperature);
+
+        seekBar.setProgress(mSettingTemperature);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                mSettingTemperature = progress;
-                mSettingTemTx.setText("Setting : " + progress);
+                progress += 25;
+                mSettingTemperature = progress;
+                settingText.setText("Setting : " + progress);
+                resetView();
             }
 
             @Override
@@ -82,15 +100,47 @@ public class TemperatureDialogFragment extends DialogFragment {
             }
         });
 
+        seekBar.setProgress(mSettingTemperature - 25);
+
+        resetView();
+
         return view;
+    }
+
+    private void resetView() {
+        if (mSettingTemperature > mCurrentTemperature) {
+            //TODO:change heatingState
+            heatingIcon.setBackgroundResource(R.drawable.sun_50);
+            settingText.setTextColor(
+                    getActivity().getResources().getColor(R.color.red));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ffdb4437"), PorterDuff.Mode.SRC_IN);
+                seekBar.getThumb().setColorFilter(Color.parseColor("#ffdb4437"), PorterDuff.Mode.SRC_IN);
+            }
+
+        } else if(mSettingTemperature < mCurrentTemperature) {
+            //TODO:change heatingState
+            heatingIcon.setBackgroundResource(R.drawable.winter_50);
+            settingText.setTextColor(
+                    getActivity().getResources().getColor(R.color.blue));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ff4285f4"), PorterDuff.Mode.SRC_IN);
+                seekBar.getThumb().setColorFilter(Color.parseColor("#ff4285f4"), PorterDuff.Mode.SRC_IN);
+            }
+        }else {
+//            heatingIcon.setBackground(null);
+            settingText.setTextColor(
+                    getActivity().getResources().getColor(R.color.green));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ff0f9d58"), PorterDuff.Mode.SRC_IN);
+                seekBar.getThumb().setColorFilter(Color.parseColor("#ff0f9d58"), PorterDuff.Mode.SRC_IN);
+            }
+        }
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new AppCompatDialog(getActivity(), getTheme());
-//        dialog.getWindow().setLayout(
-//                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 400);
 
         return dialog;
@@ -117,7 +167,6 @@ public class TemperatureDialogFragment extends DialogFragment {
     public void onPause() {
         super.onPause();
         dialog.dismiss();
-        mSettingTemperature = mTemperatureSeekBar.getProgress();
         mListener.setTemperatureState(mSettingTemperature, mHeatingState);
     }
 

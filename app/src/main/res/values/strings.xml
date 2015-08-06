@@ -16,12 +16,13 @@
     <string name="position_bt">检查网络设置</string>
     <string name="navigation_bt">取消</string>
     <string name="back_bt">"再按一次退出程序"</string>
-    <string name="music_toast">"当前为音乐模式"</string>
-    <string name="story_toast">"当前为故事机模式"</string>
+    <string name="music_toast">"音乐模式"</string>
+    <string name="story_toast">"故事机模式"</string>
     <string name="show_card">"欢迎使用\n翻滚吧，Baby\n智能婴儿床"</string>
 
-    <string name="heating">加热模式</string>
-    <string name="unHeating">未加热</string>
+    <string name="heating">  /  升温中</string>
+    <string name="unHeating"> </string>
+    <string name="cool_down">  /  降温中</string>
     <string name="music_mode">音乐</string>
     <string name="story_mode">故事机</string>
     <string name="isPlaying">播放中</string>

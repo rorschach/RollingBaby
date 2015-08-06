@@ -1,14 +1,33 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.hl.rollingbaby.ui.SwingDialogFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff3f3f3"
+    android:padding="16dp"
+    tools:context="com.hl.rollingbaby.ui.SwingDialogFragment">
 
-    <TextView
-        android:id="@+id/tx"
-        android:background="@color/blue"
+    <ImageView
+        android:id="@+id/swing_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="23sp"
         android:layout_gravity="center"
-        android:gravity="center"/>
+        android:background="#fff3f3f3"
+        android:src="@drawable/bell_color_100" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        app:backgroundTint="@color/white"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp" />
+
+    <Switch
+        android:id="@+id/swing_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 
 </FrameLayout>

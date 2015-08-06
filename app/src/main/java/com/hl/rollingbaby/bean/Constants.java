@@ -29,7 +29,7 @@ public interface Constants {
     String PLAY_STATE = "PLAY_STATE";
     String CURRENT_SWING_MODE = "SWING_MODE";
 
-    int DEFAULT_TEMPERATURE = 25;
+    int DEFAULT_TEMPERATURE = 30;
 
     /*
      *constants for translate to server
@@ -40,6 +40,7 @@ public interface Constants {
 
     String HEATING_CLOSE = "c";
     String HEATING_OPEN = "o";
+    String COOL_DOWN = "cd";
     //TODO:drop temperature
 
     String SOUND_TAG = "so";

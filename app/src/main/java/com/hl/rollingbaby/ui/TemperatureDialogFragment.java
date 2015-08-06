@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,8 @@ public class TemperatureDialogFragment extends DialogFragment {
     private int mSettingTemperature;
     private String mHeatingState;
 
+    private static int sSettingTem;
+
     private OnTemperatureInteractionListener mListener;
 
     private AppCompatDialog dialog;
@@ -42,9 +45,9 @@ public class TemperatureDialogFragment extends DialogFragment {
             int currentTemperature, int settingTemperature, String heatingState) {
         TemperatureDialogFragment fragment = new TemperatureDialogFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_CURRENT_TEMPERATURE, currentTemperature);
-        args.putInt(ARG_SETTING_TEMPERATURE, settingTemperature);
-        args.putString(ARG_HEATING_STATE, heatingState);
+        args.putInt(Constants.ARG_CURRENT_TEMPERATURE, currentTemperature);
+        args.putInt(Constants.ARG_SETTING_TEMPERATURE, settingTemperature);
+        args.putString(Constants.ARG_HEATING_STATE, heatingState);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,10 +59,11 @@ public class TemperatureDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mCurrentTemperature = getArguments().getInt(ARG_CURRENT_TEMPERATURE, 36);
-            mSettingTemperature = getArguments().getInt(ARG_SETTING_TEMPERATURE, 36);
-            mHeatingState = getArguments().getString(ARG_HEATING_STATE);
+            mCurrentTemperature = getArguments().getInt(Constants.ARG_CURRENT_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
+            mSettingTemperature = getArguments().getInt(Constants.ARG_SETTING_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
+            mHeatingState = getArguments().getString(Constants.ARG_HEATING_STATE);
         }
+        sSettingTem = mSettingTemperature;
     }
 
     @Override
@@ -110,6 +114,7 @@ public class TemperatureDialogFragment extends DialogFragment {
     private void resetView() {
         if (mSettingTemperature > mCurrentTemperature) {
             //TODO:change heatingState
+            mHeatingState = Constants.HEATING_OPEN;
             heatingIcon.setBackgroundResource(R.drawable.sun_50);
             settingText.setTextColor(
                     getActivity().getResources().getColor(R.color.red));
@@ -120,6 +125,7 @@ public class TemperatureDialogFragment extends DialogFragment {
 
         } else if(mSettingTemperature < mCurrentTemperature) {
             //TODO:change heatingState
+            mHeatingState = Constants.COOL_DOWN;
             heatingIcon.setBackgroundResource(R.drawable.winter_50);
             settingText.setTextColor(
                     getActivity().getResources().getColor(R.color.blue));
@@ -129,6 +135,7 @@ public class TemperatureDialogFragment extends DialogFragment {
             }
         }else {
 //            heatingIcon.setBackground(null);
+            mHeatingState = Constants.HEATING_CLOSE;
             settingText.setTextColor(
                     getActivity().getResources().getColor(R.color.green));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -141,8 +148,7 @@ public class TemperatureDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new AppCompatDialog(getActivity(), getTheme());
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 400);
-
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 800);
         return dialog;
     }
 
@@ -167,7 +173,21 @@ public class TemperatureDialogFragment extends DialogFragment {
     public void onPause() {
         super.onPause();
         dialog.dismiss();
-        mListener.setTemperatureState(mSettingTemperature, mHeatingState);
+//        if (mSettingTemperature != sSettingTem) {
+            mListener.setTemperatureState(mSettingTemperature, mHeatingState);
+//        }
+    }
+
+    public void refreshView(
+            int currentTemperature, int settingTemperature, String heatingState) {
+        mCurrentTemperature = currentTemperature;
+        mSettingTemperature = settingTemperature;
+        mHeatingState = heatingState;
+        Bundle args = new Bundle();
+        mCurrentTemperature = getArguments().getInt(ARG_CURRENT_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
+        mSettingTemperature = getArguments().getInt(ARG_SETTING_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
+        mHeatingState = getArguments().getString(ARG_HEATING_STATE);
+        this.setArguments(args);
     }
 
     public interface OnTemperatureInteractionListener {

@@ -73,6 +73,12 @@ public class MainActivity extends AppCompatActivity implements
 
     private Handler handler = new Handler(this);
 
+    String temperatureTemp = "";
+    String heatingTemp = "";
+    String soundTemp = "";
+    String playTemp = "";
+    String swingTemp = "";
+
     @Override
     public Handler getHandler() {
         return handler;
@@ -81,13 +87,14 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initDataSet();
+//        initDataSet();
         setContentView(R.layout.activity_main);
-
+        getMessageFromServer("t.c.30;sw.c;so.s.1");
         initView();
     }
 
     private void initView() {
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -106,42 +113,25 @@ public class MainActivity extends AppCompatActivity implements
 
         mListView.setItemAnimator(new SampleItemAnimator());
 
-        soundDialog = SoundDialogFragment.newInstance("Music", 0);
-        temperatureDialog = TemperatureDialogFragment.newInstance(36, 36, "Heating");
-        swingDialog = SwingDialogFragment.newInstance("Sleep");
-    }
+        soundDialog = SoundDialogFragment.newInstance(mSoundMode, mPlayState);
+        temperatureDialog = TemperatureDialogFragment.newInstance(
+                mCurrentTemperature, mSettingTemperature, mHeatingState);
+        swingDialog = SwingDialogFragment.newInstance(mSwingMode);
 
-    private void initDataSet() {
-        mDataSet.add(new ItemData(Color.parseColor("#76A9FC"),
-                R.drawable.thermometer_white_64, "Temperature Status"));
-        mDataSet.add(new ItemData(Color.GRAY,
-                R.drawable.music_white_64, "Sound Status"));
-        mDataSet.add(new ItemData(Color.GRAY,
-                R.drawable.music_white_64, "Swing Status"));
-    }
-
-    private void addItemData() {
-        ItemData itemData = new ItemData(Color.parseColor("#FFC970"),
-                R.drawable.thermometer, "Magic Cube Show");
-        mDataSet.add(0, itemData);
-        mAdapter.notifyItemInserted(0);
-        mLayoutManager.scrollToPosition(0);
+        resetItemData();
     }
 
     private void resetItemData() {
         mDataSet.clear();
-        mDataSet.add(new ItemData(
-                Color.parseColor("#76A9FC"),
-                R.drawable.thermometer,
-                "Open heating"));
-        mDataSet.add(new ItemData(
-                Color.GRAY,
-                R.drawable.thermometer,
-                "Music playing"));
-        mDataSet.add(new ItemData(
-                Color.parseColor("#76A7FC"),
-                R.drawable.thermometer,
-                "Swing in sleep mode"));
+        mDataSet.add(new ItemData(Color.parseColor("#ff3498db"),
+                R.drawable.thermometer_white_64, temperatureTemp + heatingTemp));
+        mDataSet.add(new ItemData( Color.parseColor("#ff3498db"),
+                R.drawable.music_white_64, soundTemp + "  /  " + playTemp));
+        mDataSet.add(new ItemData(Color.parseColor("#ff3498db"),
+                R.drawable.carousel_white_64, swingTemp));
+        resetTemperatureItemData();
+        resetSoundItemData();
+        resetSwingItemData();
         mAdapter.notifyDataSetChanged();
     }
 
@@ -154,12 +144,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_settings) {
             showSoundDialog();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -178,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, MessageService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
         isInActivity = true;
+
+        Log.d(TAG, "onResume" + mSoundMode + ":" + mPlayState);
 //        LocalBroadcastManager broadcastManager =
 //                LocalBroadcastManager.getInstance(this);
 //        IntentFilter intentFilter = new IntentFilter();
@@ -235,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements
                 byte[] readBuf = (byte[]) msg.obj;
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
-                geMessageFromServer(readMessage);
+                getMessageFromServer(readMessage);
                 if (!isInActivity) {
                     messageBinder.buildNotification(
                             MessageService.NOTIFICATION_READ_MESSAGE,
@@ -249,9 +239,7 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
-    public void geMessageFromServer(String readMessage) {
-
-        Log.d(TAG, readMessage);
+    public void getMessageFromServer(String readMessage) {
         try {
             String state[] = readMessage.split(";");
             String A = state[0];//like T.O.25,get the '25'
@@ -270,6 +258,9 @@ public class MainActivity extends AppCompatActivity implements
             if (mSettingTemperature == 0) {
                 mSettingTemperature = mCurrentTemperature;
             }
+
+            resetItemData();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -304,21 +295,22 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onRefreshAnimationEnd(FlyRefreshLayout view) {
         if (messageBinder.getConnectState()) {
-            if (isDataChanged) {
-                sendCommand();
-            } else {
-                messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
-            }
+            sendCommand();
         } else {
             //TODO:connect failed, show to user
         }
+        resetItemData();
     }
 
     public void sendCommand() {
-        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                + mSettingTemperature + ";"
-                + Constants.SWING_TAG + mSwingMode + ";"
-                + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
+        if (isDataChanged) {
+            messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                    + mSettingTemperature + ";"
+                    + Constants.SWING_TAG + mSwingMode + ";"
+                    + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
+        } else {
+            messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
+        }
     }
 
     private class ItemAdapter extends RecyclerView.Adapter<ItemViewHolder> {
@@ -384,45 +376,90 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void showTemperatureDialog() {
         temperatureDialog.show(getFragmentManager(), "temperatureDialog");
+        temperatureDialog.refreshView(mCurrentTemperature, mSettingTemperature, mHeatingState);
     }
 
-    //TODO:update temperature item in here
     @Override
     public void setTemperatureState(int settingTemperature, String heatingState) {
         mSettingTemperature = settingTemperature;
         mHeatingState = heatingState;
-        mDataSet.get(0).title = settingTemperature + ":" + heatingState;
-        mAdapter.notifyDataSetChanged();
+        resetTemperatureItemData();
         isDataChanged = true;
+    }
+
+    private void resetTemperatureItemData() {
+
+        if (mHeatingState.equals(Constants.HEATING_OPEN)) {
+            heatingTemp = getResources().getString(R.string.heating);
+        } else if (mHeatingState.equals(Constants.COOL_DOWN)) {
+            heatingTemp = getResources().getString(R.string.cool_down);
+        } else {
+            heatingTemp = getResources().getString(R.string.unHeating);
+        }
+
+        if (mCurrentTemperature != mSettingTemperature) {
+            temperatureTemp = mCurrentTemperature + " ~ " + mSettingTemperature + "℃";
+        } else {
+            temperatureTemp = mCurrentTemperature + "℃";
+        }
+
+        mDataSet.get(0).title = temperatureTemp + heatingTemp;
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void showSoundDialog() {
         soundDialog.show(getFragmentManager(), "soundDialog");
+        soundDialog.refreshView(mSoundMode, mPlayState);
     }
 
-    //TODO:update sound item in here
     @Override
     public void setSoundStatus(String soundMode, int playState) {
         mSoundMode = soundMode;
         mPlayState = playState;
-        mDataSet.get(1).title = soundMode + ":" + playState;
-        mAdapter.notifyDataSetChanged();
+        resetSoundItemData();
         isDataChanged = true;
+    }
+
+    private void resetSoundItemData() {
+
+        if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
+            soundTemp = getResources().getString(R.string.music_mode);
+        } else if (mSoundMode.equals(Constants.SOUND_STORY)) {
+            soundTemp = getResources().getString(R.string.story_mode);
+        }
+
+        if (mPlayState == Constants.SOUND_STOP) {
+            playTemp = getResources().getString(R.string.stop);
+        } else {
+            playTemp = getResources().getString(R.string.isPlaying);
+        }
+
+        mDataSet.get(1).title = soundTemp + "  /  " + playTemp;
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void showSwingDialog() {
         swingDialog.show(getFragmentManager(), "swingDialog");
+        swingDialog.refreshView(mSwingMode);
     }
 
-    //TODO:update swing item in here
     @Override
     public void setSwingState(String swingMode) {
         mSwingMode = swingMode;
-        mDataSet.get(2).title = "mode : " + swingMode;
-        mAdapter.notifyDataSetChanged();
+        resetSwingItemData();
         isDataChanged = true;
+    }
+
+    private void resetSwingItemData() {
+        if (mSwingMode.equals(Constants.SWING_SLEEP)) {
+            swingTemp = getResources().getString(R.string.swing_sleep);
+        } else if (mSwingMode.equals(Constants.SWING_CLOSE)) {
+            swingTemp = getResources().getString(R.string.swing_close);
+        }
+        mDataSet.get(2).title = swingTemp;
+        mAdapter.notifyDataSetChanged();
     }
 }
 

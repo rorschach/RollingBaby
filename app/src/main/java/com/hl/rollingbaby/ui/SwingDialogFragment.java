@@ -1,14 +1,15 @@
 package com.hl.rollingbaby.ui;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.support.v7.app.AppCompatDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 
 import com.hl.rollingbaby.R;
@@ -52,6 +53,18 @@ public class SwingDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.fragment_swing_dialog, container, false);
         tx = (TextView) view.findViewById(R.id.tx);
         tx.setText(mSwingMode);
+
+//        float height = view.getMeasuredHeight();
+//        float width = view.getMeasuredWidth();
+        tx.setPivotX(50f);
+        tx.setPivotY(-100f);
+
+        ObjectAnimator animator = ObjectAnimator.ofFloat(tx, "rotation", 45F, -45F);
+        animator.setDuration(1500);
+        animator.setRepeatCount(ObjectAnimator.INFINITE);
+        animator.setRepeatMode(ObjectAnimator.REVERSE);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.start();
         return view;
     }
 

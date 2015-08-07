@@ -8,17 +8,13 @@ import java.util.Date;
  * Created by hl810 on 15-8-4.
  */
 public class ItemData {
-    public int color;
     public int icon;
     public String title;
+    public String subTitle;
 
-    public ItemData(int color, int icon, String title) {
-        this.color = color;
+    public ItemData(int icon, String title, String subTitle) {
         this.icon = icon;
         this.title = title;
-    }
-
-    public ItemData(int icon, String title) {
-        this(Color.DKGRAY, icon, title);
+        this.subTitle = subTitle;
     }
 }

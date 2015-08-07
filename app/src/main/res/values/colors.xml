@@ -6,12 +6,9 @@
     <color name="blue">#ff4285f4</color>
     <color name="green">#ff0f9d58</color>
     <color name="white">#ffffffff</color>
-    <color name="progress_gray">#FFD8D8D8</color>
-    <color name="progress_gray_dark">#FF383838</color>
+    <color name="black">#ff000000</color>
 
-    <color name="smallCircleColor">#FFDF8D81</color>
-    <color name="largeCircleColor">#FFAF3854</color>
-    <color name="outerCircleColor">#FF533456</color>
+    <color name="deep_orange">#ff5722</color>
     <color name="awesome_blue">#ff3498db</color>
 </resources>
 

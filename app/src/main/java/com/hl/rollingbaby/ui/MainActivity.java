@@ -6,9 +6,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -123,12 +120,15 @@ public class MainActivity extends AppCompatActivity implements
 
     private void resetItemData() {
         mDataSet.clear();
-        mDataSet.add(new ItemData(Color.parseColor("#ff3498db"),
-                R.drawable.thermometer_white_64, temperatureTemp + heatingTemp));
-        mDataSet.add(new ItemData( Color.parseColor("#ff3498db"),
-                R.drawable.music_white_64, soundTemp + "  /  " + playTemp));
-        mDataSet.add(new ItemData(Color.parseColor("#ff3498db"),
-                R.drawable.carousel_white_64, swingTemp));
+        mDataSet.add(new ItemData(R.drawable.thermometer_blue_48,
+                getResources().getString(R.string.title_temperature),
+                temperatureTemp + heatingTemp));
+        mDataSet.add(new ItemData(R.drawable.music_blue_48,
+                getResources().getString(R.string.title_sound),
+                soundTemp + " / " + playTemp));
+        mDataSet.add(new ItemData(R.drawable.carousel_blue_48,
+                getResources().getString(R.string.title_swing),
+                swingTemp));
         resetTemperatureItemData();
         resetSoundItemData();
         resetSwingItemData();
@@ -330,11 +330,9 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void onBindViewHolder(ItemViewHolder itemViewHolder, int i) {
             final ItemData data = mDataSet.get(i);
-            ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
-            drawable.getPaint().setColor(data.color);
-            itemViewHolder.icon.setBackgroundDrawable(drawable);
             itemViewHolder.icon.setImageResource(data.icon);
             itemViewHolder.title.setText(data.title);
+            itemViewHolder.subTitle.setText(data.subTitle);
         }
 
         @Override
@@ -348,11 +346,13 @@ public class MainActivity extends AppCompatActivity implements
 
         ImageView icon;
         TextView title;
+        TextView subTitle;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
             icon = (ImageView) itemView.findViewById(R.id.icon);
             title = (TextView) itemView.findViewById(R.id.title);
+            subTitle = (TextView) itemView.findViewById(R.id.subtitle);
             itemView.setOnClickListener(this);
         }
 
@@ -403,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements
             temperatureTemp = mCurrentTemperature + "℃";
         }
 
-        mDataSet.get(0).title = temperatureTemp + heatingTemp;
+        mDataSet.get(0).subTitle = temperatureTemp + heatingTemp;
         mAdapter.notifyDataSetChanged();
     }
 
@@ -430,12 +430,12 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         if (mPlayState == Constants.SOUND_STOP) {
-            playTemp = getResources().getString(R.string.stop);
+            playTemp = getResources().getString(R.string.close);
         } else {
-            playTemp = getResources().getString(R.string.isPlaying);
+            playTemp = getResources().getString(R.string.play);
         }
 
-        mDataSet.get(1).title = soundTemp + "  /  " + playTemp;
+        mDataSet.get(1).subTitle = soundTemp + " / " + playTemp;
         mAdapter.notifyDataSetChanged();
     }
 
@@ -454,11 +454,11 @@ public class MainActivity extends AppCompatActivity implements
 
     private void resetSwingItemData() {
         if (mSwingMode.equals(Constants.SWING_SLEEP)) {
-            swingTemp = getResources().getString(R.string.swing_sleep);
+            swingTemp = getResources().getString(R.string.open);
         } else if (mSwingMode.equals(Constants.SWING_CLOSE)) {
-            swingTemp = getResources().getString(R.string.swing_close);
+            swingTemp = getResources().getString(R.string.close);
         }
-        mDataSet.get(2).title = swingTemp;
+        mDataSet.get(2).subTitle = swingTemp;
         mAdapter.notifyDataSetChanged();
     }
 }

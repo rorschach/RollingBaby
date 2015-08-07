@@ -3,10 +3,11 @@
     <string name="action_settings">设置</string>
     <string name="action_sync">刷新</string>
 
-    <string name="title_activity_temperature">温度</string>
-    <string name="title_activity_swing">摇摆</string>
-    <string name="title_activity_music">音乐</string>
-    <string name="title_activity_humidity">Humidity</string>
+    <string name="title_temperature">温度</string>
+    <string name="title_swing">摇摆</string>
+    <string name="title_sound">声音</string>
+    <string name="title_humidity">湿度</string>
+
     <string name="success_title">连接成功</string>
     <string name="success_content">成功连接到您宝宝的婴儿床，可以开始使用</string>
     <string name="fail_title">连接失败</string>
@@ -20,15 +21,15 @@
     <string name="story_toast">"故事机模式"</string>
     <string name="show_card">"欢迎使用\n翻滚吧，Baby\n智能婴儿床"</string>
 
-    <string name="heating">  /  升温中</string>
+    <string name="heating"> / 升温中</string>
     <string name="unHeating"> </string>
-    <string name="cool_down">  /  降温中</string>
-    <string name="music_mode">音乐</string>
-    <string name="story_mode">故事机</string>
-    <string name="isPlaying">播放中</string>
+    <string name="cool_down"> / 降温中</string>
+    <string name="music_mode">音乐模式</string>
+    <string name="story_mode">故事机模式</string>
+    <string name="play">播放中</string>
     <string name="stop">停止</string>
-    <string name="swing_sleep">睡眠模式</string>
-    <string name="swing_close">摇摆关闭</string>
+    <string name="open">开启</string>
+    <string name="close">关闭</string>
     <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_world">Hello world!</string>

@@ -4,11 +4,14 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
     </style>
+    
+    <style name="comText">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAppearance">?attr/showText</item>
+        <item name="android:paddingLeft">32dp</item>
+    </style>
 
-
-    <declare-styleable name="CircleView">
-        <attr name="cv_color" format="color" />
-        <attr name="cv_radius" format="integer" />
-    </declare-styleable>
 
 </resources>

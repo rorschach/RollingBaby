@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
@@ -112,27 +113,27 @@ public class TemperatureDialogFragment extends DialogFragment {
         if (mSettingTemperature > mCurrentTemperature) {
             //TODO:change heatingState
             mHeatingState = Constants.HEATING_OPEN;
-            icon.setBackgroundResource(R.drawable.sun_icon_100);
+            icon.setBackgroundResource(R.drawable.sun_background);
             settingTx.setTextColor(
                     getActivity().getResources().getColor(R.color.red));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ffdb4437"), PorterDuff.Mode.SRC_IN);
                 seekBar.getThumb().setColorFilter(Color.parseColor("#ffdb4437"), PorterDuff.Mode.SRC_IN);
             }
-            heatingTx.setText("Heating");
+            heatingTx.setText(getActivity().getResources().getString(R.string.heating));
         } else if (mSettingTemperature < mCurrentTemperature) {
             //TODO:change heatingState
             mHeatingState = Constants.COOL_DOWN;
-            icon.setBackgroundResource(R.drawable.cold_icon_100);
+            icon.setBackgroundResource(R.drawable.moon_background);
             settingTx.setTextColor(
                     getActivity().getResources().getColor(R.color.blue));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ff4285f4"), PorterDuff.Mode.SRC_IN);
                 seekBar.getThumb().setColorFilter(Color.parseColor("#ff4285f4"), PorterDuff.Mode.SRC_IN);
             }
-            heatingTx.setText("Cool down");
+            heatingTx.setText(getActivity().getResources().getString(R.string.cool_down));
         } else {
-//            icon.setBackgroundResource(R.drawable.cold_icon_100);
+            icon.setBackgroundResource(R.drawable.sun_background);
             mHeatingState = Constants.HEATING_CLOSE;
             settingTx.setTextColor(
                     getActivity().getResources().getColor(R.color.green));
@@ -140,11 +141,14 @@ public class TemperatureDialogFragment extends DialogFragment {
                 seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ff0f9d58"), PorterDuff.Mode.SRC_IN);
                 seekBar.getThumb().setColorFilter(Color.parseColor("#ff0f9d58"), PorterDuff.Mode.SRC_IN);
             }
-            heatingTx.setText("unHeating");
+            heatingTx.setText(getActivity().getResources().getString(R.string.unHeating));
         }
 
-        if (seekBar.getProgress() > 34 || seekBar.getProgress() < 32) {
+        if (mSettingTemperature > 34 || mSettingTemperature < 32) {
             //TODO:toast
+            Toast.makeText(getActivity(),
+                    getActivity().getResources().getString(R.string.temperature_toast),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 

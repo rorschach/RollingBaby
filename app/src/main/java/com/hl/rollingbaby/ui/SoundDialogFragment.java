@@ -151,10 +151,10 @@ public class SoundDialogFragment extends DialogFragment {
                 String temp;
                 if (isChecked) {
                     mSoundMode = Constants.SOUND_MUSIC;
-                    temp = getActivity().getResources().getString(R.string.music_toast);
+                    temp = getActivity().getResources().getString(R.string.music_mode);
                 } else {
                     mSoundMode = Constants.SOUND_STORY;
-                    temp = getActivity().getResources().getString(R.string.story_toast);
+                    temp = getActivity().getResources().getString(R.string.story_mode);
                 }
                 mListener.setSoundStatus(mSoundMode, mPlayState);
                 test.setText(temp);
@@ -175,10 +175,10 @@ public class SoundDialogFragment extends DialogFragment {
         String temp;
         if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
             modeSwitch.setChecked(true);
-            temp = getActivity().getResources().getString(R.string.music_toast);
+            temp = getActivity().getResources().getString(R.string.music_mode);
         } else {
             modeSwitch.setChecked(false);
-            temp = getActivity().getResources().getString(R.string.story_toast);
+            temp = getActivity().getResources().getString(R.string.story_mode);
         }
         test.setText(temp);
         Log.d(TAG, "resetView : " + mSoundMode + ":" + mPlayState);

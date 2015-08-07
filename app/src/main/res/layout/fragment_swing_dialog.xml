@@ -1,27 +1,55 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fff3f3f3"
-    android:padding="16dp"
     tools:context="com.hl.rollingbaby.ui.SwingDialogFragment">
 
-    <ImageView
-        android:id="@+id/swing_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="#fff3f3f3"
-        android:src="@drawable/bell_color_100" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/viewA"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:background="@color/blue">
+
+            <ImageView
+                android:id="@+id/swing_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/blue"
+                android:src="@drawable/bell_color_100" />
+        </FrameLayout>
+
+
+        <TextView
+            android:id="@+id/swing_tx"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:textSize="25sp"
+            android:textAppearance="?attr/showText"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:background="@color/yellow" />
+
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
         app:backgroundTint="@color/white"
         app:elevation="6dp"
+        app:layout_anchor="@id/viewA"
+        app:layout_anchorGravity="bottom|right|end"
         app:pressedTranslationZ="12dp" />
 
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

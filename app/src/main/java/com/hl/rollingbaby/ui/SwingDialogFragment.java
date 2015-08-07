@@ -33,7 +33,7 @@ public class SwingDialogFragment extends DialogFragment {
 
     private AppCompatDialog dialog;
 
-    //    private TextView tx;
+    private TextView swingTx;
     private ImageView swingIcon;
     private FloatingActionButton actionButton;
 
@@ -62,8 +62,8 @@ public class SwingDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_swing_dialog, container, false);
-//        tx = (TextView) view.findViewById(R.id.tx);
-//        tx.setText(mSwingMode);
+        swingTx = (TextView) view.findViewById(R.id.swing_tx);
+
         swingIcon = (ImageView) view.findViewById(R.id.swing_icon);
 
         actionButton = (FloatingActionButton) view.findViewById(R.id.fab);
@@ -96,10 +96,12 @@ public class SwingDialogFragment extends DialogFragment {
             animator.cancel();
             mSwingMode = Constants.SWING_CLOSE;
             actionButton.setImageResource(R.drawable.play_bt_64);
-        }else {
+            swingTx.setText(getActivity().getResources().getString(R.string.swing_close_tx));
+        } else {
             animator.start();
             mSwingMode = Constants.SWING_SLEEP;
             actionButton.setImageResource(R.drawable.pause_bt_64);
+            swingTx.setText(getActivity().getResources().getString(R.string.swing_open_tx));
         }
     }
 

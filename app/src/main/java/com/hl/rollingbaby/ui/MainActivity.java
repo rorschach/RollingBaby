@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
 //        initDataSet();
         setContentView(R.layout.activity_main);
-        getMessageFromServer("t.c.30;sw.c;so.s.1");
+        getMessageFromServer("t.c.33;sw.c;so.m.1");
         initView();
     }
 
@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements
         resetSoundItemData();
         resetSwingItemData();
         mAdapter.notifyDataSetChanged();
+        Log.d(TAG, "resetItemData" + "PT : " + playTemp);
     }
 
     @Override
@@ -258,6 +259,8 @@ public class MainActivity extends AppCompatActivity implements
             if (mSettingTemperature == 0) {
                 mSettingTemperature = mCurrentTemperature;
             }
+
+            Log.d(TAG, "getMessage" + "MPS : " + mPlayState);
 
             resetItemData();
 
@@ -390,9 +393,9 @@ public class MainActivity extends AppCompatActivity implements
     private void resetTemperatureItemData() {
 
         if (mHeatingState.equals(Constants.HEATING_OPEN)) {
-            heatingTemp = getResources().getString(R.string.heating);
+            heatingTemp = getResources().getString(R.string.heating_main);
         } else if (mHeatingState.equals(Constants.COOL_DOWN)) {
-            heatingTemp = getResources().getString(R.string.cool_down);
+            heatingTemp = getResources().getString(R.string.cool_down_main);
         } else {
             heatingTemp = getResources().getString(R.string.unHeating);
         }
@@ -431,11 +434,13 @@ public class MainActivity extends AppCompatActivity implements
 
         if (mPlayState == Constants.SOUND_STOP) {
             playTemp = getResources().getString(R.string.close);
+            mDataSet.get(1).subTitle = playTemp;
         } else {
             playTemp = getResources().getString(R.string.play);
+            mDataSet.get(1).subTitle = soundTemp + " / " + playTemp;
         }
 
-        mDataSet.get(1).subTitle = soundTemp + " / " + playTemp;
+
         mAdapter.notifyDataSetChanged();
     }
 

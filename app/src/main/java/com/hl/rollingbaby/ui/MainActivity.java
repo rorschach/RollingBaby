@@ -4,17 +4,20 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +26,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.bean.ItemData;
@@ -76,6 +80,9 @@ public class MainActivity extends AppCompatActivity implements
     String playTemp = "";
     String swingTemp = "";
 
+    private Toast toast;
+
+
     @Override
     public Handler getHandler() {
         return handler;
@@ -88,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         getMessageFromServer("t.c.33;sw.c;so.m.1");
         initView();
+        toast = Toast.makeText(this, getResources().getString(R.string.back_bt), Toast.LENGTH_SHORT);
+
     }
 
     private void initView() {
@@ -115,10 +124,10 @@ public class MainActivity extends AppCompatActivity implements
                 mCurrentTemperature, mSettingTemperature, mHeatingState);
         swingDialog = SwingDialogFragment.newInstance(mSwingMode);
 
-        resetItemData();
+        initItemData();
     }
 
-    private void resetItemData() {
+    private void initItemData() {
         mDataSet.clear();
         mDataSet.add(new ItemData(R.drawable.thermometer_blue_48,
                 getResources().getString(R.string.title_temperature),
@@ -129,11 +138,14 @@ public class MainActivity extends AppCompatActivity implements
         mDataSet.add(new ItemData(R.drawable.carousel_blue_48,
                 getResources().getString(R.string.title_swing),
                 swingTemp));
+        refreshItemData();
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void refreshItemData() {
         resetTemperatureItemData();
         resetSoundItemData();
         resetSwingItemData();
-        mAdapter.notifyDataSetChanged();
-        Log.d(TAG, "resetItemData" + "PT : " + playTemp);
     }
 
     @Override
@@ -219,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements
                             getResources().getString(R.string.fail_content));
                 } else {
                     //TODO:connect failed, show to user
+                    showFailedDialog();
                 }
                 break;
 
@@ -260,9 +273,7 @@ public class MainActivity extends AppCompatActivity implements
                 mSettingTemperature = mCurrentTemperature;
             }
 
-            Log.d(TAG, "getMessage" + "MPS : " + mPlayState);
-
-            resetItemData();
+            refreshItemData();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -301,8 +312,10 @@ public class MainActivity extends AppCompatActivity implements
             sendCommand();
         } else {
             //TODO:connect failed, show to user
+            showFailedDialog();
+
         }
-        resetItemData();
+//        refreshItemData();
     }
 
     public void sendCommand() {
@@ -466,6 +479,46 @@ public class MainActivity extends AppCompatActivity implements
         mDataSet.get(2).subTitle = swingTemp;
         mAdapter.notifyDataSetChanged();
     }
+
+    private void showFailedDialog() {
+        final AlertDialog.Builder builder =
+                new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.fail_title));
+        builder.setMessage(getResources().getString(R.string.fail_content));
+        builder.setPositiveButton(getResources().getString(R.string.position_bt),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
+                        startActivity(intent);
+                    }
+                });
+
+        builder.setNegativeButton(getResources().getString(R.string.navigation_bt),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+//        ImageView imageView = new ImageView(this);
+//        imageView.setImageResource(R.drawable.sun_background);
+//        builder.setView(imageView);
+        builder.create().show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        quitToast();
+    }
+
+    private void quitToast() {
+        if(null == toast.getView().getParent()){
+            toast.show();
+        }else{
+            this.finish();
+        }
+    }
+
 }
 
 //        public class UpdateUIReceiver extends BroadcastReceiver {

@@ -109,7 +109,7 @@ public class SwingDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new AppCompatDialog(getActivity(), getTheme());
         dialog.getWindow().setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT, 800);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         return dialog;
     }
 

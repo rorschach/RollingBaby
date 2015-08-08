@@ -187,8 +187,10 @@ public class SoundDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new AppCompatDialog(getActivity(), getTheme());
+        dialog.setTitle("Sound");
         dialog.getWindow().setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT, 800);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
         return dialog;
     }
 

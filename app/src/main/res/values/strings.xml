@@ -11,13 +11,12 @@
     <string name="success_title">连接成功</string>
     <string name="success_content">成功连接到您宝宝的婴儿床，可以开始使用</string>
     <string name="fail_title">连接失败</string>
-    <string name="fail_content">连接婴儿床失败，请检查网络连接或婴儿床状态</string>
+    <string name="fail_content">未能获取您宝宝的最新状态，请检查网络连接及设备状态</string>
     <string name="read_title">宝宝有动静了</string>
     <string name="read_content">您的宝宝有动静了，请点击查看</string>
-    <string name="position_bt">检查网络设置</string>
-    <string name="navigation_bt">取消</string>
+    <string name="position_bt">立刻检查</string>
+    <string name="navigation_bt">等会再说</string>
     <string name="back_bt">"再按一次退出程序"</string>
-    <string name="show_card">"欢迎使用\n翻滚吧，Baby\n智能婴儿床"</string>
 
     <string name="heating"> 升温中</string>
     <string name="unHeating"> </string>
@@ -26,10 +25,11 @@
     <string name="heating_main"> / 升温中</string>
     <string name="unHeating_main"> </string>
     <string name="cool_down_main"> / 降温中</string>
+
     <string name="music_mode">音乐模式</string>
     <string name="story_mode">故事机模式</string>
     <string name="play">播放中</string>
-    <string name="stop">停止</string>
+
     <string name="open">开启</string>
     <string name="close">关闭</string>
     

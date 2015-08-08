@@ -158,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            showSoundDialog();
             return true;
         }
         return super.onOptionsItemSelected(item);

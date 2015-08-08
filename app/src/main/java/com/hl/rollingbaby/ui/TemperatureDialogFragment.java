@@ -143,13 +143,6 @@ public class TemperatureDialogFragment extends DialogFragment {
             }
             heatingTx.setText(getActivity().getResources().getString(R.string.unHeating));
         }
-
-        if (mSettingTemperature > 34 || mSettingTemperature < 32) {
-            //TODO:toast
-            Toast.makeText(getActivity(),
-                    getActivity().getResources().getString(R.string.temperature_toast),
-                    Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override

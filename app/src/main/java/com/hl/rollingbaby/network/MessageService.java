@@ -125,7 +125,7 @@ public class MessageService extends Service {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 Notification notification = new Notification.Builder(context)
                         .setTicker(TAG)
-                        .setSmallIcon(R.drawable.info)
+                        .setSmallIcon(R.drawable.send_white_32)
                         .setContentTitle(title)
                         .setContentText(content)
                         .setAutoCancel(true)
@@ -137,7 +137,7 @@ public class MessageService extends Service {
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(context)
                                 .setTicker(TAG)
-                                .setSmallIcon(R.drawable.info)
+                                .setSmallIcon(R.drawable.send_white_32)
                                 .setContentTitle(title)
                                 .setContentText(content)
                                 .setAutoCancel(true)

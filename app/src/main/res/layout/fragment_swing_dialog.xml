@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <FrameLayout
+        <RelativeLayout
             android:id="@+id/viewA"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -20,13 +20,21 @@
             android:background="@color/blue">
 
             <ImageView
+                android:src="@drawable/cat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:id="@+id/imageView" />
+
+            <ImageView
                 android:id="@+id/swing_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@color/blue"
-                android:src="@drawable/bell_color_100" />
-        </FrameLayout>
+                android:src="@drawable/ringbell"
+                android:scaleType="centerCrop"
+                android:layout_below="@+id/imageView"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
 
 
         <TextView
@@ -35,7 +43,6 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textSize="25sp"
-            android:textAppearance="?attr/showText"
             android:gravity="center"
             android:textColor="@color/white"
             android:background="@color/yellow" />

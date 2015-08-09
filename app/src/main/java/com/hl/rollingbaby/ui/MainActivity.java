@@ -143,9 +143,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void refreshItemData() {
+
         resetTemperatureItemData();
         resetSoundItemData();
         resetSwingItemData();
+
     }
 
     @Override
@@ -483,7 +485,8 @@ public class MainActivity extends AppCompatActivity implements
         final AlertDialog.Builder builder =
                 new AlertDialog.Builder(this);
         builder.setTitle(getResources().getString(R.string.fail_title));
-        builder.setMessage(getResources().getString(R.string.fail_content));
+//        builder.setMessage(getResources().getString(R.string.fail_content));
+        builder.setView(R.layout.failed_dialog);
         builder.setPositiveButton(getResources().getString(R.string.position_bt),
                 new DialogInterface.OnClickListener() {
                     @Override

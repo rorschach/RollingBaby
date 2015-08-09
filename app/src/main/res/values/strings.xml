@@ -9,11 +9,11 @@
     <string name="title_humidity">湿度</string>
 
     <string name="success_title">连接成功</string>
-    <string name="success_content">成功连接到您宝宝的婴儿床，可以开始使用</string>
+    <string name="success_content">成功连接到宝宝的婴儿床，可以开始使用</string>
     <string name="fail_title">连接失败</string>
-    <string name="fail_content">未能获取您宝宝的最新状态，请检查网络连接及设备状态</string>
+    <string name="fail_content">纸飞机没能送达，无法获取宝宝的最新状态, 请检查网络连接及设备状态</string>
     <string name="read_title">宝宝有动静了</string>
-    <string name="read_content">您的宝宝有动静了，请点击查看</string>
+    <string name="read_content">纸飞机飞回来了，宝宝有动静了，请点击查看</string>
     <string name="position_bt">立刻检查</string>
     <string name="navigation_bt">等会再说</string>
     <string name="back_bt">"再按一次退出程序"</string>
@@ -39,7 +39,7 @@
     <string name="temperature_state">状态 : </string>
     <string name="setting_temperature">设定 : </string>
     <string name="current_temperature">当前 : </string>
-    <string name="temperature_toast">32~34℃是最适合宝宝入睡的温度哦</string>
+    <string name="temperature_toast">32~34℃最适合宝宝入睡哦</string>
 
     <string name="title_activity_main">MainActivity</string>
 

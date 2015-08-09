@@ -68,8 +68,8 @@ public class SwingDialogFragment extends DialogFragment {
 
         actionButton = (FloatingActionButton) view.findViewById(R.id.fab);
 
-        swingIcon.setPivotX(50f);
-        swingIcon.setPivotY(-250f);
+        swingIcon.setPivotX(20f);
+        swingIcon.setPivotY(0f);
 
         animator = ObjectAnimator.ofFloat(swingIcon, "rotation", 45F, -45F);
         animator.setDuration(1500);
@@ -108,8 +108,7 @@ public class SwingDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new AppCompatDialog(getActivity(), getTheme());
-        dialog.getWindow().setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         return dialog;
     }
 

@@ -22,6 +22,17 @@
             android:padding="24dp"
             android:scaleType="centerCrop" />
 
+        <TextView
+            android:padding="8dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:text="@string/temperature_toast"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textAppearance="?attr/showText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
     </FrameLayout>
 
     <LinearLayout

@@ -321,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements
             showFailedDialog();
 
         }
+        Log.d(TAG, mSettingTemperature + mSwingMode + mSoundMode + mPlayState);
 //        refreshItemData();
     }
 
@@ -333,6 +334,8 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
         }
+        Log.d(TAG, mSettingTemperature + mSwingMode + mSoundMode + mPlayState);
+//        Toast.makeText(this, "isChanged : " + isDataChanged, Toast.LENGTH_SHORT).show();
     }
 
     private class ItemAdapter extends RecyclerView.Adapter<ItemViewHolder> {
@@ -402,7 +405,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void setTemperatureState(int settingTemperature, String heatingState) {
+    public void setTemperatureState(int currentTemperature, int settingTemperature, String heatingState) {
+        mCurrentTemperature = currentTemperature;
         mSettingTemperature = settingTemperature;
         mHeatingState = heatingState;
         resetTemperatureItemData();

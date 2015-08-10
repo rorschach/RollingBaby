@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,8 +61,10 @@ public class TemperatureDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mCurrentTemperature = getArguments().getInt(Constants.ARG_CURRENT_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
-            mSettingTemperature = getArguments().getInt(Constants.ARG_SETTING_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
+            mCurrentTemperature = getArguments().getInt(
+                    Constants.ARG_CURRENT_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
+            mSettingTemperature = getArguments().getInt(
+                    Constants.ARG_SETTING_TEMPERATURE, mCurrentTemperature);
             mHeatingState = getArguments().getString(Constants.ARG_HEATING_STATE);
         }
         sSettingTem = mSettingTemperature;
@@ -174,8 +177,9 @@ public class TemperatureDialogFragment extends DialogFragment {
         super.onPause();
         dialog.dismiss();
 //        if (mSettingTemperature != sSettingTem) {
-        mListener.setTemperatureState(mSettingTemperature, mHeatingState);
-//        }
+        mSettingTemperature = seekBar.getProgress() + 25;
+        mListener.setTemperatureState(mCurrentTemperature, mSettingTemperature, mHeatingState);
+        Log.d(TAG, "setting : " + mSettingTemperature);
     }
 
     public void refreshView(
@@ -185,7 +189,7 @@ public class TemperatureDialogFragment extends DialogFragment {
         mHeatingState = heatingState;
         Bundle args = new Bundle();
         mCurrentTemperature = getArguments().getInt(ARG_CURRENT_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
-        mSettingTemperature = getArguments().getInt(ARG_SETTING_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
+        mSettingTemperature = getArguments().getInt(ARG_SETTING_TEMPERATURE, mCurrentTemperature);
         mHeatingState = getArguments().getString(ARG_HEATING_STATE);
         this.setArguments(args);
     }
@@ -194,7 +198,7 @@ public class TemperatureDialogFragment extends DialogFragment {
 
         void showTemperatureDialog();
 
-        void setTemperatureState(int settingTemperature, String heatingState);
+        void setTemperatureState(int mCurrentTemperature, int settingTemperature, String heatingState);
 
     }
 

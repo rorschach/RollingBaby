@@ -42,5 +42,13 @@
     <string name="temperature_toast">32~34℃最适合宝宝入睡哦</string>
 
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_setting">设置</string>
+
+    <string name="IP_ADDRESS_PORT">IP地址及端口号</string>
+    <string name="ip_title">请输入IP地址及端口号</string>
+    <string name="summary_header">当前为 : </string>
+    <string name="summary_default">当前为 : 192.168.23.5:7838</string>
+
+    <string name="hello_world">Hello world!</string>
 
 </resources>

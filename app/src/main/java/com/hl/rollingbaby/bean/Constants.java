@@ -12,6 +12,7 @@ public interface Constants {
     int CONNECT_SUCCESS = 0x400 + 4;
     int CONNECT_FAILED = 0x400 + 8;
 
+    String ADDRESS_PORT = "192.168.23.5:7838";
     /*
      *params to trans intent
      */

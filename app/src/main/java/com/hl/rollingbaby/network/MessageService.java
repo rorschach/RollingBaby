@@ -6,15 +6,19 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.hl.rollingbaby.R;
+import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.ui.MainActivity;
+import com.hl.rollingbaby.ui.SettingActivity;
 
 public class MessageService extends Service {
 
@@ -29,8 +33,8 @@ public class MessageService extends Service {
 //    public static String SERVER_HOST = "192.168.23.5";
 //    public static int SERVER_PORT = 7838;
 
-    public static String SERVER_HOST = "192.168.97.86";
-    public static int SERVER_PORT = 8888;
+    public static String SERVER_HOST;
+    public static int SERVER_PORT;
 
     private MessageManager messageManager;
     private MessageBinder messageBinder = new MessageBinder();
@@ -66,18 +70,18 @@ public class MessageService extends Service {
         messageManager.setConnectState(false);
     }
 
-//    public void getData() {
-//        try {
-//            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-//            String ipPref = pref.getString(SettingsActivity.KEY_IP, "192.168.97.86:8888");
-//            String ip[] = ipPref.split(":");
-//            SERVER_HOST = ip[0];
-//            SERVER_PORT = Integer.valueOf(ip[1]);
-////            Log.d(TAG, SERVER_HOST + ":" + SERVER_PORT);
-//        } catch (NumberFormatException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public void getData() {
+        try {
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String ipPref = pref.getString(SettingActivity.IP_ADDRESS_PORT, Constants.ADDRESS_PORT);
+            String ip[] = ipPref.split(":");
+            SERVER_HOST = ip[0];
+            SERVER_PORT = Integer.valueOf(ip[1]);
+            Log.d(TAG, SERVER_HOST + ":" + SERVER_PORT);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
 
     public class MessageBinder extends Binder {
 
@@ -86,7 +90,7 @@ public class MessageService extends Service {
         }
 
         public void startConnect(Handler handler) {
-//            getData();
+            getData();
             messageManager = new MessageManager(handler, SERVER_HOST, SERVER_PORT);
             messageManager.setConnectState(true);
             messageManager.start();

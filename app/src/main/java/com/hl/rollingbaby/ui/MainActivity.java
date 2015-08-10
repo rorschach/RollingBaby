@@ -102,8 +102,11 @@ public class MainActivity extends AppCompatActivity implements
     private void initView() {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        toolbar.setTitle(R.string.app_name);
+
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+//        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mFlyLayout = (FlyRefreshLayout) findViewById(R.id.fly_layout);
 
@@ -160,6 +163,8 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent i = new Intent(this, SettingActivity.class);
+            startActivity(i);
             return true;
         }
         return super.onOptionsItemSelected(item);

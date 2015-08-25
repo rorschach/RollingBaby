@@ -17,7 +17,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -67,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements
     private int mPlayState;
     private String mSwingMode;
 
-    private long mExitTime = 0;
+    private int playStateFlag = 1;
 
     private boolean isInActivity = false;
     private boolean isDataChanged = false;
@@ -91,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        initDataSet();
         setContentView(R.layout.activity_main);
         getMessageFromServer("t.c.33;sw.c;so.m.1");
         initView();
@@ -106,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements
         toolbar.setTitle(R.string.app_name);
 
         setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mFlyLayout = (FlyRefreshLayout) findViewById(R.id.fly_layout);
 
@@ -275,6 +273,8 @@ public class MainActivity extends AppCompatActivity implements
             mSoundMode = soundList[1];
             mPlayState = Integer.valueOf(soundList[2]);
 
+            playStateFlag = mPlayState;
+
             if (mSettingTemperature == 0) {
                 mSettingTemperature = mCurrentTemperature;
             }
@@ -317,25 +317,26 @@ public class MainActivity extends AppCompatActivity implements
         if (messageBinder.getConnectState()) {
             sendCommand();
         } else {
-            //TODO:connect failed, show to user
             showFailedDialog();
-
         }
-        Log.d(TAG, mSettingTemperature + mSwingMode + mSoundMode + mPlayState);
-//        refreshItemData();
     }
 
     public void sendCommand() {
         if (isDataChanged) {
-            messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                    + mSettingTemperature + ";"
-                    + Constants.SWING_TAG + mSwingMode + ";"
-                    + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
+            if (mPlayState != playStateFlag) {
+                messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                        + mSettingTemperature + ";"
+                        + Constants.SWING_TAG + mSwingMode + ";"
+                        + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
+            } else {
+                messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                        + mSettingTemperature + ";"
+                        + Constants.SWING_TAG + mSwingMode + ";"
+                        + Constants.SOUND_TAG + mSoundMode + Constants.SOUND_NOTHING + ";\n");
+            }
         } else {
             messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
         }
-        Log.d(TAG, mSettingTemperature + mSwingMode + mSoundMode + mPlayState);
-//        Toast.makeText(this, "isChanged : " + isDataChanged, Toast.LENGTH_SHORT).show();
     }
 
     private class ItemAdapter extends RecyclerView.Adapter<ItemViewHolder> {
@@ -494,7 +495,6 @@ public class MainActivity extends AppCompatActivity implements
         final AlertDialog.Builder builder =
                 new AlertDialog.Builder(this);
         builder.setTitle(getResources().getString(R.string.fail_title));
-//        builder.setMessage(getResources().getString(R.string.fail_content));
         builder.setView(R.layout.failed_dialog);
         builder.setPositiveButton(getResources().getString(R.string.position_bt),
                 new DialogInterface.OnClickListener() {
@@ -511,9 +511,6 @@ public class MainActivity extends AppCompatActivity implements
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 });
-//        ImageView imageView = new ImageView(this);
-//        imageView.setImageResource(R.drawable.sun_background);
-//        builder.setView(imageView);
         builder.create().show();
     }
 
@@ -523,9 +520,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void quitToast() {
-        if(null == toast.getView().getParent()){
+        if (null == toast.getView().getParent()) {
             toast.show();
-        }else{
+        } else {
             this.finish();
         }
     }

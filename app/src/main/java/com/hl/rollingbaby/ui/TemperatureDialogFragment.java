@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
@@ -31,8 +30,6 @@ public class TemperatureDialogFragment extends DialogFragment {
     private int mCurrentTemperature;
     private int mSettingTemperature;
     private String mHeatingState;
-
-    private static int sSettingTem;
 
     private OnTemperatureInteractionListener mListener;
 
@@ -51,6 +48,7 @@ public class TemperatureDialogFragment extends DialogFragment {
         args.putInt(Constants.ARG_SETTING_TEMPERATURE, settingTemperature);
         args.putString(Constants.ARG_HEATING_STATE, heatingState);
         fragment.setArguments(args);
+        Log.d(TAG, "current:" + currentTemperature);
         return fragment;
     }
 
@@ -67,7 +65,7 @@ public class TemperatureDialogFragment extends DialogFragment {
                     Constants.ARG_SETTING_TEMPERATURE, mCurrentTemperature);
             mHeatingState = getArguments().getString(Constants.ARG_HEATING_STATE);
         }
-        sSettingTem = mSettingTemperature;
+        Log.d(TAG, "current::" + mCurrentTemperature);
     }
 
     @Override
@@ -114,7 +112,6 @@ public class TemperatureDialogFragment extends DialogFragment {
 
     private void resetView() {
         if (mSettingTemperature > mCurrentTemperature) {
-            //TODO:change heatingState
             mHeatingState = Constants.HEATING_OPEN;
             icon.setBackgroundResource(R.drawable.sun_background);
             settingTx.setTextColor(
@@ -125,7 +122,6 @@ public class TemperatureDialogFragment extends DialogFragment {
             }
             heatingTx.setText(getActivity().getResources().getString(R.string.heating));
         } else if (mSettingTemperature < mCurrentTemperature) {
-            //TODO:change heatingState
             mHeatingState = Constants.COOL_DOWN;
             icon.setBackgroundResource(R.drawable.moon_background);
             settingTx.setTextColor(
@@ -175,11 +171,9 @@ public class TemperatureDialogFragment extends DialogFragment {
     @Override
     public void onPause() {
         super.onPause();
-        dialog.dismiss();
-//        if (mSettingTemperature != sSettingTem) {
         mSettingTemperature = seekBar.getProgress() + 25;
         mListener.setTemperatureState(mCurrentTemperature, mSettingTemperature, mHeatingState);
-        Log.d(TAG, "setting : " + mSettingTemperature);
+        dialog.dismiss();
     }
 
     public void refreshView(

@@ -85,8 +85,6 @@ public class SoundDialogFragment extends DialogFragment {
         modeSwitch = (Switch) view.findViewById(R.id.mode_switch);
         test = (TextView) view.findViewById(R.id.test);
 
-//        test.setText("Mode : " + mSoundMode);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#3498db"), PorterDuff.Mode.SRC_IN);
             seekBar.getThumb().setColorFilter(Color.parseColor("#2980b9"), PorterDuff.Mode.SRC_IN);
@@ -209,7 +207,6 @@ public class SoundDialogFragment extends DialogFragment {
     public void onPause() {
         super.onPause();
         dialog.dismiss();
-//        mListener.setSoundStatus(mSoundMode, mPlayState);
     }
 
     @Override

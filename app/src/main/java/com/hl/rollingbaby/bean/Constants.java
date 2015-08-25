@@ -30,7 +30,7 @@ public interface Constants {
     String PLAY_STATE = "PLAY_STATE";
     String CURRENT_SWING_MODE = "SWING_MODE";
 
-    int DEFAULT_TEMPERATURE = 30;
+    int DEFAULT_TEMPERATURE = 33;
 
     /*
      *constants for translate to server
@@ -52,6 +52,7 @@ public interface Constants {
     int SOUND_STOP = 1;
     int SOUND_NEXT = 2;
     int SOUND_LAST = 3;
+    int SOUND_NOTHING = 4;
 
     String SWING_TAG = "sw";
     String SWING_SLEEP = "s";

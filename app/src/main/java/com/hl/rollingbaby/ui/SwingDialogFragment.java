@@ -132,11 +132,11 @@ public class SwingDialogFragment extends DialogFragment {
     @Override
     public void onPause() {
         super.onPause();
-        dialog.dismiss();
         animator.cancel();
         if (!sSwingTemp.equals(mSwingMode)) {
             mListener.setSwingState(mSwingMode);
         }
+        dialog.dismiss();
     }
 
     public void refreshView(String swingMode) {

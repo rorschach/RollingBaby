@@ -33,10 +33,13 @@ import com.hl.rollingbaby.bean.MessageTarget;
 import com.hl.rollingbaby.network.MessageService;
 import com.race604.flyrefresh.FlyRefreshLayout;
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.views.SampleItemAnimator;
+import com.hl.rollingbaby.views.FlyItemAnimator;
 
 import java.util.ArrayList;
 
+/**
+ * 用户主界面
+ */
 public class MainActivity extends AppCompatActivity implements
         MessageTarget, Handler.Callback, ServiceConnection,
         FlyRefreshLayout.OnPullRefreshListener,
@@ -91,18 +94,20 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getMessageFromServer("t.c.33;sw.c;so.m.1");
+        processMessageFromServer("t.c.33;sw.c;so.m.1");
         initView();
         toast = Toast.makeText(this, getResources().getString(R.string.back_bt), Toast.LENGTH_SHORT);
 
     }
 
+    /**
+     * 初始化视图及3个状态界面数据
+     */
     private void initView() {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        toolbar.setTitle(R.string.app_name);
-
+//        toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -118,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements
 
         mListView.setAdapter(mAdapter);
 
-        mListView.setItemAnimator(new SampleItemAnimator());
+        mListView.setItemAnimator(new FlyItemAnimator());
 
         soundDialog = SoundDialogFragment.newInstance(mSoundMode, mPlayState);
         temperatureDialog = TemperatureDialogFragment.newInstance(
@@ -128,6 +133,9 @@ public class MainActivity extends AppCompatActivity implements
         initItemData();
     }
 
+    /**
+     * 初始化主界面列表数据
+     */
     private void initItemData() {
         mDataSet.clear();
         mDataSet.add(new ItemData(R.drawable.thermometer_blue_48,
@@ -143,12 +151,14 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * 刷新列表数据
+     */
     private void refreshItemData() {
 
         resetTemperatureItemData();
         resetSoundItemData();
         resetSwingItemData();
-
     }
 
     @Override
@@ -168,15 +178,18 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * 设置标志位
+     */
     @Override
     protected void onPause() {
         super.onPause();
         isInActivity = false;
-//        LocalBroadcastManager broadcastManager =
-//                LocalBroadcastManager.getInstance(this);
-//        broadcastManager.unregisterReceiver(receiver);
     }
 
+    /**
+     * 绑定后台服务
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -185,16 +198,11 @@ public class MainActivity extends AppCompatActivity implements
         isInActivity = true;
 
         Log.d(TAG, "onResume" + mSoundMode + ":" + mPlayState);
-//        LocalBroadcastManager broadcastManager =
-//                LocalBroadcastManager.getInstance(this);
-//        IntentFilter intentFilter = new IntentFilter();
-//        intentFilter.addAction(StatusService.ACTION_PROCESS_TEMPERATURE);
-//        intentFilter.addAction(StatusService.ACTION_PROCESS_SWING);
-//        intentFilter.addAction(StatusService.ACTION_PROCESS_SOUND);
-//        receiver = new UpdateUIReceiver();
-//        broadcastManager.registerReceiver(receiver, intentFilter);
     }
 
+    /**
+     * 断开与后台服务的连接
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -203,6 +211,11 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * 绑定后台服务时的操作
+     * @param name 组件名
+     * @param service 绑定的服务
+     */
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         messageBinder = (MessageService.MessageBinder) service;
@@ -214,6 +227,11 @@ public class MainActivity extends AppCompatActivity implements
     public void onServiceDisconnected(ComponentName name) {
     }
 
+    /**
+     * 处理系统收到的消息后在此处更新视图
+     * @param msg message对象
+     * @return
+     */
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
@@ -234,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements
                             getResources().getString(R.string.fail_title),
                             getResources().getString(R.string.fail_content));
                 } else {
-                    //TODO:connect failed, show to user
                     showFailedDialog();
                 }
                 break;
@@ -243,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements
                 byte[] readBuf = (byte[]) msg.obj;
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
-                getMessageFromServer(readMessage);
+                processMessageFromServer(readMessage);
                 if (!isInActivity) {
                     messageBinder.buildNotification(
                             MessageService.NOTIFICATION_READ_MESSAGE,
@@ -257,7 +274,11 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
-    public void getMessageFromServer(String readMessage) {
+    /**
+     *  处理接收到的消息
+     * @param readMessage 收到的消息
+     */
+    public void processMessageFromServer(String readMessage) {
         try {
             String state[] = readMessage.split(";");
             String A = state[0];//like T.O.25,get the '25'
@@ -286,6 +307,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * 刷新时的操作
+     * @param view
+     */
     @Override
     public void onRefresh(FlyRefreshLayout view) {
         View child = mListView.getChildAt(0);
@@ -321,6 +346,9 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * 发送消息给服务器
+     */
     public void sendCommand() {
         if (isDataChanged) {
             if (mPlayState != playStateFlag) {
@@ -339,6 +367,9 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * 列表数据适配器
+     */
     private class ItemAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
         private LayoutInflater mInflater;
@@ -367,6 +398,9 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * viewholder数据缓存
+     */
     private class ItemViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
@@ -382,6 +416,10 @@ public class MainActivity extends AppCompatActivity implements
             itemView.setOnClickListener(this);
         }
 
+        /**
+         * 点击列表不同项进入相应界面
+         * @param v
+         */
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
@@ -402,9 +440,15 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void showTemperatureDialog() {
         temperatureDialog.show(getFragmentManager(), "temperatureDialog");
-        temperatureDialog.refreshView(mCurrentTemperature, mSettingTemperature, mHeatingState);
+        temperatureDialog.refreshData(mCurrentTemperature, mSettingTemperature, mHeatingState);
     }
 
+    /**
+     * 设置温度状态
+     * @param currentTemperature 当前温度
+     * @param settingTemperature 设定温度
+     * @param heatingState 加热状态
+     */
     @Override
     public void setTemperatureState(int currentTemperature, int settingTemperature, String heatingState) {
         mCurrentTemperature = currentTemperature;
@@ -414,6 +458,9 @@ public class MainActivity extends AppCompatActivity implements
         isDataChanged = true;
     }
 
+    /**
+     * 刷新温度数据项内容
+     */
     private void resetTemperatureItemData() {
 
         if (mHeatingState.equals(Constants.HEATING_OPEN)) {
@@ -437,9 +484,14 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void showSoundDialog() {
         soundDialog.show(getFragmentManager(), "soundDialog");
-        soundDialog.refreshView(mSoundMode, mPlayState);
+        soundDialog.refreshData(mSoundMode, mPlayState);
     }
 
+    /**
+     * 设置声音状态
+     * @param soundMode 声音状态
+     * @param playState 播放状态
+     */
     @Override
     public void setSoundStatus(String soundMode, int playState) {
         mSoundMode = soundMode;
@@ -448,6 +500,9 @@ public class MainActivity extends AppCompatActivity implements
         isDataChanged = true;
     }
 
+    /**
+     * 刷新声音数据项内容
+     */
     private void resetSoundItemData() {
 
         if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
@@ -464,16 +519,19 @@ public class MainActivity extends AppCompatActivity implements
             mDataSet.get(1).subTitle = soundTemp + " / " + playTemp;
         }
 
-
         mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void showSwingDialog() {
         swingDialog.show(getFragmentManager(), "swingDialog");
-        swingDialog.refreshView(mSwingMode);
+        swingDialog.refreshData(mSwingMode);
     }
 
+    /**
+     * 设置摇摆状态
+     * @param swingMode
+     */
     @Override
     public void setSwingState(String swingMode) {
         mSwingMode = swingMode;
@@ -481,6 +539,9 @@ public class MainActivity extends AppCompatActivity implements
         isDataChanged = true;
     }
 
+    /**
+     * 刷新摇摆状态
+     */
     private void resetSwingItemData() {
         if (mSwingMode.equals(Constants.SWING_SLEEP)) {
             swingTemp = getResources().getString(R.string.open);
@@ -491,6 +552,9 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * 连接失败后显示的对话框
+     */
     private void showFailedDialog() {
         final AlertDialog.Builder builder =
                 new AlertDialog.Builder(this);
@@ -514,6 +578,9 @@ public class MainActivity extends AppCompatActivity implements
         builder.create().show();
     }
 
+    /**
+     * 双击退出提示
+     */
     @Override
     public void onBackPressed() {
         quitToast();
@@ -526,66 +593,7 @@ public class MainActivity extends AppCompatActivity implements
             this.finish();
         }
     }
-
 }
-
-//        public class UpdateUIReceiver extends BroadcastReceiver {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            String action = intent.getAction();
-//            Log.d("UpdateUIReceiver", "onReceive");
-//            if (StatusService.ACTION_PROCESS_TEMPERATURE.equals(action)) {
-//                currentTemperature =
-//                        intent.getIntExtra(StatusService.EXTRA_TEMPERATURE_VALUE,
-//                                Constants.DEFAULT_TEMPERATURE);
-//                Log.d(TAG, "onReceive temperature" + currentTemperature);
-////                mHeatingState =
-////                        intent.getStringExtra(StatusService.EXTRA_HEATING_STATE);
-//                Log.d(TAG, "onReceive temperature" + currentTemperature + ":" + mHeatingState);
-//                setCard(currentTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
-//            }else if (StatusService.ACTION_PROCESS_SWING.equals(action)) {
-//
-//                mSwingMode =
-//                        intent.getStringExtra(StatusService.EXTRA_SWING_MODE);
-//                Log.d(TAG, "onReceive swing" + mSwingMode);
-//                setCard(currentTemperature, mHeatingState, mSoundMode, mPlayState, mSwingMode);
-//            }else if (StatusService.ACTION_PROCESS_SOUND.equals(action)) {
-//                mSoundMode =
-//                        intent.getStringExtra(StatusService.EXTRA_SOUND_MODE);
-//                mPlayState =
-//                        intent.getIntExtra(StatusService.EXTRA_PLAY_STATE,
-//                                Constants.SOUND_STOP);
-//                Log.d(TAG, "onReceive sound" + mPlayState + ":" + mSoundMode);
-//            }
-//        }
-//    }
-
-
-/*
-    private void setDialog() {
-        AlertDialog.Builder builder =
-                new AlertDialog.Builder(this);
-        builder.setTitle(getResources().getString(R.string.fail_title));
-        builder.setMessage( getResources().getString(R.string.fail_content));
-        builder.setPositiveButton(getResources().getString(R.string.position_bt),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
-                        startActivity(intent);
-                    }
-                });
-
-        builder.setNegativeButton(getResources().getString(R.string.navigation_bt),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-        builder.create().show();
-        Log.d(TAG, "setDialog");
-    }
-*/
 
 
 

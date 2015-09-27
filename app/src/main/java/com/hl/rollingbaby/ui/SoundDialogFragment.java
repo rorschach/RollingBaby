@@ -22,7 +22,9 @@ import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
 import com.hl.rollingbaby.views.WaveView;
 
-
+/**
+ * 声音状态界面
+ */
 public class SoundDialogFragment extends DialogFragment {
 
     private static final String TAG = "SoundDialogFragment";
@@ -33,6 +35,7 @@ public class SoundDialogFragment extends DialogFragment {
     private static String sSoundTemp;
     private static int sPlayTemp;
 
+    //持有的Activity实例
     private OnSoundInteractionListener mListener;
 
     private AppCompatDialog dialog;
@@ -41,6 +44,12 @@ public class SoundDialogFragment extends DialogFragment {
     private Switch modeSwitch;
     private TextView test;
 
+    /**
+     * 获取SoundDialogFragment的实例
+     * @param soundMode 声音模式
+     * @param playState 播放状态
+     * @return fragment实例
+     */
     public static SoundDialogFragment newInstance(String soundMode, int playState) {
         SoundDialogFragment fragment = new SoundDialogFragment();
         Bundle args = new Bundle();
@@ -73,6 +82,10 @@ public class SoundDialogFragment extends DialogFragment {
         return v;
     }
 
+    /**
+     * 初始化各控件
+     * @param view 对应的布局视图
+     */
     private void initView(View view) {
 
         Log.d(TAG, "initView : " + mSoundMode + ":" + mPlayState);
@@ -160,9 +173,12 @@ public class SoundDialogFragment extends DialogFragment {
         });
     }
 
+    /**
+     * 根据用户操作更新视图
+     */
     private void resetView() {
 
-        if (mPlayState == Constants.SOUND_PAUSE_PLAY) {//is playing or pause
+        if (mPlayState == Constants.SOUND_PAUSE_PLAY) {
             waveView.setPlayStation(true);
             playBt.setImageResource(R.drawable.pause_bt_50);
         } else {
@@ -192,6 +208,9 @@ public class SoundDialogFragment extends DialogFragment {
         return dialog;
     }
 
+    /**
+     * @param activity 需要持有的Activity实例
+     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -209,26 +228,37 @@ public class SoundDialogFragment extends DialogFragment {
         dialog.dismiss();
     }
 
+    /**
+     *释放持有的对Activity的引用
+     */
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
 
-    public void refreshView(String soundMode, int playState) {
+    /**
+     * 刷新数据
+     * @param soundMode 声音模式
+     * @param playState 播放状态
+     */
+    public void refreshData(String soundMode, int playState) {
         mSoundMode = soundMode;
         mPlayState = playState;
         Bundle args = new Bundle();
         args.putString(Constants.ARG_SOUND_MODE, soundMode);
         args.putInt(Constants.ARG_PLAY_STATE, playState);
         this.setArguments(args);
-        Log.d(TAG, "refreshView : " + mSoundMode + ":" + mPlayState);
+        Log.d(TAG, "refreshData : " + mSoundMode + ":" + mPlayState);
     }
 
+    //对外部公开的接口
     public interface OnSoundInteractionListener {
 
+        //进入声音状态界面
         void showSoundDialog();
 
+        //更新数据
         void setSoundStatus(String soundMode, int playState);
     }
 

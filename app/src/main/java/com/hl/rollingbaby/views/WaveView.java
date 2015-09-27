@@ -12,6 +12,9 @@ import android.widget.LinearLayout;
 
 import com.hl.rollingbaby.R;
 
+/**
+ * 自定义布局，绘制音乐背景的波浪效果
+ */
 public class WaveView extends LinearLayout {
 
     private static final String TAG = "WaveView";
@@ -42,6 +45,7 @@ public class WaveView extends LinearLayout {
 
     private final int DEFAULT_PROGRESS = 61;
 
+    //构造方法，初始化各项参数
     public WaveView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOrientation(VERTICAL);
@@ -56,19 +60,19 @@ public class WaveView extends LinearLayout {
         mWaveHz = attributes.getInt(R.styleable.WaveView_wave_hz, MIDDLE);
         attributes.recycle();
 
+        //绘制波浪
         mWave = new Wave(context, null);
         mWave.initializeWaveSize(mWaveMultiple, mWaveHeight, mWaveHz);
         mWave.setAboveWaveColor(mAboveWaveColor);
         mWave.setBlowWaveColor(mBlowWaveColor);
         mWave.setOnWaveColor(mOnWaveColor);
         mWave.initializePainters();
-//        mWave.setDrawStation(isPlaying);
 
+        //绘制正方形
         mSolid = new Solid(context, null);
         mSolid.setAboveWavePaint(mWave.getAboveWavePaint());
         mSolid.setBlowWavePaint(mWave.getBlowWavePaint());
         mSolid.setOnWavePaint(mWave.getOnWavePaint());
-//        mWave.setDrawStation(isPlaying);
 
         addView(mWave);
         addView(mSolid);
@@ -76,6 +80,10 @@ public class WaveView extends LinearLayout {
 
     }
 
+    /**
+     * 设置播放状态
+     * @param isPlaying playstation of music
+     */
     public void setPlayStation(boolean isPlaying) {
         this.isPlaying = isPlaying;
         mWave.setDrawStation(isPlaying);
@@ -86,6 +94,10 @@ public class WaveView extends LinearLayout {
 
     }
 
+    /**
+     * @param progress 进度条的进度
+     * 根据进度的百分比将波浪上移相同百分比的高度
+     */
     public void setProgress(int progress) {
         this.mProgress = progress > 100 ? 100 : progress;
         computeWaveToTop();
@@ -99,6 +111,9 @@ public class WaveView extends LinearLayout {
         }
     }
 
+    /**
+     * 移动波浪的纵坐标
+     */
     private void computeWaveToTop() {
         mWaveToTop = (int) (getHeight() * (1f - mProgress / 100f));
         ViewGroup.LayoutParams params = mWave.getLayoutParams();
@@ -124,6 +139,9 @@ public class WaveView extends LinearLayout {
         setProgress(ss.progress);
     }
 
+    /**
+     * 保存状态的类
+     */
     private static class SavedState extends BaseSavedState {
         int progress;
 

@@ -8,6 +8,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+/**
+ *将波浪的纵坐标增加一段高度，即在3道波浪下绘制一个正方形
+ */
 class Solid extends View {
 
     private static final String TAG = "Solid";
@@ -48,6 +51,10 @@ class Solid extends View {
         requestLayout();
     }
 
+    /**
+     * 绘制3条波浪下的正方形以其提升高度
+     * @param canvas
+     */
     @Override
     public void draw(Canvas canvas) {
         if (isDrawing) {
@@ -61,12 +68,6 @@ class Solid extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-//        if (isDrawing) {
-//            canvas.drawRect(getLeft(), 0, getRight(), getBottom(), blowWavePaint);
-//            canvas.drawRect(getLeft(), 0, getRight(), getBottom(), aboveWavePaint);
-//            canvas.drawRect(getLeft(), 0, getRight(), getBottom(), onWavePaint);
-//        }
-//        Log.d(TAG, "solid is on Draw");
     }
 
 

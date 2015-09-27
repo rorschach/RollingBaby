@@ -13,14 +13,15 @@ import java.net.Socket;
 
 /**
  * Created by test on 15-5-28.
+ * 负责管理与服务器之间接收和发送消息的线程
  */
 public class MessageManager extends Thread {
-    private boolean isConnecting;
+    private boolean isConnecting;       //判断是否连接的标志位
     private static final String TAG = "MessageManager";
     private Handler handler;
-    private String mAddress;
-    private int mPort;
-    private static final int TIMEOUT = 5000;
+    private String mAddress;    //ip地址
+    private int mPort;          //端口号
+    private static final int TIMEOUT = 5000;    //超时时间
 
     private InputStream iStream;
     private OutputStream oStream;
@@ -32,6 +33,10 @@ public class MessageManager extends Thread {
         this.mPort = port;
     }
 
+    /**
+     * @return state of connection
+     * 获取连接状态
+     */
     public boolean getConnectState() {
         if (oStream != null && iStream != null) {
             return isConnecting;
@@ -42,6 +47,7 @@ public class MessageManager extends Thread {
 
 /**
  *must do this before start connection
+ * 设置连接标志位，必须在开始连接前实现
  */
     public void setConnectState(boolean connectState) {
         isConnecting = connectState;
@@ -70,6 +76,7 @@ public class MessageManager extends Thread {
                     isConnecting = false;
                 } finally {
                     try {
+                        //关闭资源
                         socket.close();
                         handler.obtainMessage(Constants.CONNECT_FAILED, this)
                                 .sendToTarget();
@@ -96,6 +103,11 @@ public class MessageManager extends Thread {
         }
     }
 
+    /**
+     *
+     * @param buffer
+     * 读取服务器发送的消息
+     */
     private void read(byte[] buffer) {
         int bytes;
         while (true) {
@@ -108,6 +120,7 @@ public class MessageManager extends Thread {
                     readMessage = new String(buffer, "UTF-8");
                 }
                 // Send the obtained bytes to the UI Activity
+                //收到消息后将其传递给MainActivity的handleMessage方法
                 handler.obtainMessage(Constants.MESSAGE_READ,
                         bytes, -1, buffer).sendToTarget();
                 Log.d(TAG, "handler is obtain readMessage...");
@@ -120,6 +133,10 @@ public class MessageManager extends Thread {
         }
     }
 
+    /**
+     * @param buffer
+     * 发送字节数组类型的消息给服务器
+     */
     public void write(byte[] buffer) {
         try {
             oStream.write(buffer);

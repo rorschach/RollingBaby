@@ -18,6 +18,9 @@ import android.widget.TextView;
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
 
+/**
+ * 摇摆状态界面
+ */
 public class SwingDialogFragment extends DialogFragment {
 
     private static final String TAG = "SwingDialogFragment";
@@ -27,8 +30,9 @@ public class SwingDialogFragment extends DialogFragment {
     private String mSwingMode;
     private static String sSwingTemp;
     private boolean isSwingMode = false;
-    ObjectAnimator animator;
+    private ObjectAnimator animator;
 
+    //持有的Activity实例
     private OnSwingInteractionListener mListener;
 
     private AppCompatDialog dialog;
@@ -37,6 +41,10 @@ public class SwingDialogFragment extends DialogFragment {
     private ImageView swingIcon;
     private FloatingActionButton actionButton;
 
+    /**
+     * @param swingMode 摇摆状态
+     * @return fragment实例
+     */
     public static SwingDialogFragment newInstance(String swingMode) {
         SwingDialogFragment fragment = new SwingDialogFragment();
         Bundle args = new Bundle();
@@ -54,7 +62,7 @@ public class SwingDialogFragment extends DialogFragment {
         if (getArguments() != null) {
             mSwingMode = getArguments().getString(ARG_SWING_MODE);
         }
-
+        //临时变量，用于存储摇摆模式
         sSwingTemp = mSwingMode;
     }
 
@@ -62,6 +70,16 @@ public class SwingDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_swing_dialog, container, false);
+        initView(view);
+
+        return view;
+    }
+
+    /**
+     * 初始化各控件
+     * @param view 对应的布局视图
+     */
+    private void initView(View view) {
         swingTx = (TextView) view.findViewById(R.id.swing_tx);
 
         swingIcon = (ImageView) view.findViewById(R.id.swing_icon);
@@ -77,7 +95,6 @@ public class SwingDialogFragment extends DialogFragment {
         animator.setRepeatMode(ObjectAnimator.REVERSE);
         animator.setInterpolator(new LinearInterpolator());
 
-
         resetSwingAnimation();
 
         actionButton.setOnClickListener(new View.OnClickListener() {
@@ -87,10 +104,11 @@ public class SwingDialogFragment extends DialogFragment {
                 resetSwingAnimation();
             }
         });
-
-        return view;
     }
 
+    /**
+     * 开启/关闭摇摆动画
+     */
     private void resetSwingAnimation() {
         if (!isSwingMode) {
             animator.cancel();
@@ -112,6 +130,9 @@ public class SwingDialogFragment extends DialogFragment {
         return dialog;
     }
 
+    /**
+     * @param activity 需要持有的Activity实例
+     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -123,6 +144,9 @@ public class SwingDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     *释放持有的对Activity的引用
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -139,17 +163,24 @@ public class SwingDialogFragment extends DialogFragment {
         dialog.dismiss();
     }
 
-    public void refreshView(String swingMode) {
+    /**
+     *刷新数据
+     * @param swingMode 摇摆模式
+     */
+    public void refreshData(String swingMode) {
         mSwingMode = swingMode;
         Bundle args = new Bundle();
         args.putString(Constants.ARG_SWING_MODE, swingMode);
         this.setArguments(args);
     }
 
+    //对外部公开的接口
     public interface OnSwingInteractionListener {
 
+        //进入摇摆状态界面
         void showSwingDialog();
 
+        //更新数据
         void setSwingState(String swingMode);
 
     }

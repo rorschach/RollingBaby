@@ -13,8 +13,10 @@ import com.hl.rollingbaby.R;
 
 import jp.wasabeef.recyclerview.animators.BaseItemAnimator;
 
-
-public class SampleItemAnimator extends BaseItemAnimator {
+/**
+ * 播放下拉刷新后的动画
+ */
+public class FlyItemAnimator extends BaseItemAnimator {
 
     @Override
     protected void preAnimateAddImpl(RecyclerView.ViewHolder holder) {

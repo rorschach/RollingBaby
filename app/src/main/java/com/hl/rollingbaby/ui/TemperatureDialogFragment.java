@@ -19,6 +19,9 @@ import android.widget.TextView;
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.bean.Constants;
 
+/**
+ * 温度状态界面
+ */
 public class TemperatureDialogFragment extends DialogFragment {
 
     private static final String TAG = "TemperatureDialogFragment";
@@ -31,6 +34,7 @@ public class TemperatureDialogFragment extends DialogFragment {
     private int mSettingTemperature;
     private String mHeatingState;
 
+    //持有的Activity实例
     private OnTemperatureInteractionListener mListener;
 
     private AppCompatDialog dialog;
@@ -40,6 +44,13 @@ public class TemperatureDialogFragment extends DialogFragment {
     private SeekBar seekBar;
     private TextView heatingTx;
 
+    /**
+     * 获取TemperatureDialogFragment的实例
+     * @param currentTemperature 当前温度
+     * @param settingTemperature 设定温度
+     * @param heatingState 加热状态
+     * @return fragment实例
+     */
     public static TemperatureDialogFragment newInstance(
             int currentTemperature, int settingTemperature, String heatingState) {
         TemperatureDialogFragment fragment = new TemperatureDialogFragment();
@@ -48,7 +59,6 @@ public class TemperatureDialogFragment extends DialogFragment {
         args.putInt(Constants.ARG_SETTING_TEMPERATURE, settingTemperature);
         args.putString(Constants.ARG_HEATING_STATE, heatingState);
         fragment.setArguments(args);
-        Log.d(TAG, "current:" + currentTemperature);
         return fragment;
     }
 
@@ -65,7 +75,6 @@ public class TemperatureDialogFragment extends DialogFragment {
                     Constants.ARG_SETTING_TEMPERATURE, mCurrentTemperature);
             mHeatingState = getArguments().getString(Constants.ARG_HEATING_STATE);
         }
-        Log.d(TAG, "current::" + mCurrentTemperature);
     }
 
     @Override
@@ -73,6 +82,16 @@ public class TemperatureDialogFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_temperature_dialog, container, false);
 
+        initView(view);
+
+        return view;
+    }
+
+    /**
+     * 初始化各控件
+     * @param view 对应的布局视图
+     */
+    private void initView(View view) {
         currentTx = (TextView) view.findViewById(R.id.current_temperature);
         settingTx = (TextView) view.findViewById(R.id.setting_temperature);
         icon = (ImageView) view.findViewById(R.id.heating_icon);
@@ -106,10 +125,9 @@ public class TemperatureDialogFragment extends DialogFragment {
         seekBar.setProgress(mSettingTemperature - 25);
 
         resetView();
-
-        return view;
     }
 
+    //根据用户操作更新视图
     private void resetView() {
         if (mSettingTemperature > mCurrentTemperature) {
             mHeatingState = Constants.HEATING_OPEN;
@@ -151,6 +169,9 @@ public class TemperatureDialogFragment extends DialogFragment {
         return dialog;
     }
 
+    /**
+     * @param activity 需要持有的Activity实例
+     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -162,6 +183,9 @@ public class TemperatureDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     *释放持有的对Activity的引用
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -176,7 +200,13 @@ public class TemperatureDialogFragment extends DialogFragment {
         dialog.dismiss();
     }
 
-    public void refreshView(
+    /**
+     * 刷新数据
+     * @param currentTemperature 当前温度
+     * @param settingTemperature 设定温度
+     * @param heatingState 加热状态
+     */
+    public void refreshData(
             int currentTemperature, int settingTemperature, String heatingState) {
         mCurrentTemperature = currentTemperature;
         mSettingTemperature = settingTemperature;
@@ -188,10 +218,13 @@ public class TemperatureDialogFragment extends DialogFragment {
         this.setArguments(args);
     }
 
+    //对外部公开的接口
     public interface OnTemperatureInteractionListener {
 
+        //进入声音状态界面
         void showTemperatureDialog();
 
+        //更新数据
         void setTemperatureState(int mCurrentTemperature, int settingTemperature, String heatingState);
 
     }

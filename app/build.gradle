@@ -29,3 +29,5 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:1.2.0@aar'
     compile 'com.android.support:support-v4:22.2.0'
 }
+
+//compile 'com.race604.flyrefresh:library:2.0.0'

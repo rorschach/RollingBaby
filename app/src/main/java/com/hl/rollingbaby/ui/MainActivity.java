@@ -27,9 +27,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hl.rollingbaby.bean.Constants;
-import com.hl.rollingbaby.bean.ItemData;
-import com.hl.rollingbaby.bean.MessageTarget;
+import com.hl.rollingbaby.interfaces.Constants;
+import com.hl.rollingbaby.entity.ItemData;
+import com.hl.rollingbaby.interfaces.MessageProcesser;
+import com.hl.rollingbaby.interfaces.MessageTarget;
 import com.hl.rollingbaby.network.MessageService;
 import com.race604.flyrefresh.FlyRefreshLayout;
 import com.hl.rollingbaby.R;
@@ -41,7 +42,8 @@ import java.util.ArrayList;
  * 用户主界面
  */
 public class MainActivity extends AppCompatActivity implements
-        MessageTarget, Handler.Callback, ServiceConnection,
+        Handler.Callback, ServiceConnection,
+        MessageTarget, MessageProcesser,
         FlyRefreshLayout.OnPullRefreshListener,
         SoundDialogFragment.OnSoundInteractionListener,
         TemperatureDialogFragment.OnTemperatureInteractionListener,
@@ -62,12 +64,12 @@ public class MainActivity extends AppCompatActivity implements
     private TemperatureDialogFragment temperatureDialog;
     private SwingDialogFragment swingDialog;
 
-    private int mCurrentTemperature;
-    private int mSettingTemperature;
-    private String mHeatingState;
-    private String mSoundMode;
-    private int mPlayState;
-    private String mSwingMode;
+    private int mCurrentTemperature = 33;
+    private int mSettingTemperature = 33;
+    private String mHeatingState = "c";
+    private String mSoundMode = "m";
+    private int mPlayState = 1;
+    private String mSwingMode = "c";
 
     private int playStateFlag = 1;
 
@@ -76,14 +78,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private Handler handler = new Handler(this);
 
-    String temperatureTemp = "";
-    String heatingTemp = "";
-    String soundTemp = "";
-    String playTemp = "";
-    String swingTemp = "";
+    private String temperatureTemp = "";
+    private String heatingTemp = "";
+    private String soundTemp = "";
+    private String playTemp = "";
+    private String swingTemp = "";
 
     private Toast toast;
-
 
     @Override
     public Handler getHandler() {
@@ -94,35 +95,31 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        processMessageFromServer("t.c.33;sw.c;so.m.1");
+//        parseMessage("t.c.33;sw.c;so.m.1");
+        parseMessage("sw.s;");
         initView();
         toast = Toast.makeText(this, getResources().getString(R.string.back_bt), Toast.LENGTH_SHORT);
-
     }
 
     /**
      * 初始化视图及3个状态界面数据
      */
     private void initView() {
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
-//        toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
 
         mFlyLayout = (FlyRefreshLayout) findViewById(R.id.fly_layout);
-
         mFlyLayout.setOnPullRefreshListener(this);
 
         mListView = (RecyclerView) findViewById(R.id.list);
-
         mLayoutManager = new LinearLayoutManager(this);
         mListView.setLayoutManager(mLayoutManager);
+
         mAdapter = new ItemAdapter(this);
-
         mListView.setAdapter(mAdapter);
-
         mListView.setItemAnimator(new FlyItemAnimator());
 
         soundDialog = SoundDialogFragment.newInstance(mSoundMode, mPlayState);
@@ -148,14 +145,13 @@ public class MainActivity extends AppCompatActivity implements
                 getResources().getString(R.string.title_swing),
                 swingTemp));
         refreshItemData();
-        mAdapter.notifyDataSetChanged();
+//        mAdapter.notifyDataSetChanged();
     }
 
     /**
      * 刷新列表数据
      */
     private void refreshItemData() {
-
         resetTemperatureItemData();
         resetSoundItemData();
         resetSwingItemData();
@@ -196,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, MessageService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
         isInActivity = true;
-
         Log.d(TAG, "onResume" + mSoundMode + ":" + mPlayState);
     }
 
@@ -213,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * 绑定后台服务时的操作
-     * @param name 组件名
+     * @param name    组件名
      * @param service 绑定的服务
      */
     @Override
@@ -244,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements
                             getResources().getString(R.string.success_content));
                 }
                 break;
-
             case Constants.CONNECT_FAILED:
                 if (!isInActivity) {
                     messageBinder.buildNotification(
@@ -255,12 +249,11 @@ public class MainActivity extends AppCompatActivity implements
                     showFailedDialog();
                 }
                 break;
-
             case Constants.MESSAGE_READ:
                 byte[] readBuf = (byte[]) msg.obj;
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
-                processMessageFromServer(readMessage);
+                parseMessage(readMessage);
                 if (!isInActivity) {
                     messageBinder.buildNotification(
                             MessageService.NOTIFICATION_READ_MESSAGE,
@@ -268,29 +261,76 @@ public class MainActivity extends AppCompatActivity implements
                             getResources().getString(R.string.read_content));
                 }
                 break;
-
             case Constants.MESSAGE_SEND:
+                break;
         }
         return true;
     }
 
     /**
-     *  处理接收到的消息
+     * 处理接收到的消息
+     *
      * @param readMessage 收到的消息
      */
-    public void processMessageFromServer(String readMessage) {
+    @Override
+    public void parseMessage(final String readMessage) {
         try {
-            String state[] = readMessage.split(";");
+            String[] state = readMessage.split(";");
+            Log.d(TAG, "..." + state.length);
+            if (state.length == 3) {
+                parseMultipleMessage(state);
+            } else if (state.length == 1) {
+                parseSingleMessage(state);
+            }
+
+            if (mSettingTemperature == 0) {
+                mSettingTemperature = mCurrentTemperature;
+            }
+
+            refreshItemData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void parseSingleMessage(String[] state) {
+        String singleMessage = state[0];
+        String[] messageArray = singleMessage.split("\\.");
+        String tag = messageArray[0];
+        Log.d(TAG, tag);
+
+        switch (tag) {
+            case Constants.SOUND_TAG:
+                mSoundMode = messageArray[1];
+                mPlayState = Integer.valueOf(messageArray[2]);
+                break;
+            case Constants.SWING_TAG:
+                mSwingMode = messageArray[1];
+                break;
+            case Constants.TEMPERATURE_TAG:
+                mHeatingState = messageArray[1];
+                mCurrentTemperature = Integer.valueOf(messageArray[2]);
+                break;
+            case Constants.HUMIDITY_TAG:
+                //TODO
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void parseMultipleMessage(String[] state) {
+        try {
             String A = state[0];//like T.O.25,get the '25'
-            String temperatureList[] = A.split("\\.");
+            String[] temperatureList = A.split("\\.");
             mHeatingState = temperatureList[1];
             mCurrentTemperature = Integer.valueOf(temperatureList[2]);
 
             String C = state[1];//like SW.S, get the 'S'
-            String swingList[] = C.split("\\.");
+            String[] swingList = C.split("\\.");
             mSwingMode = swingList[1];
             String B = state[2];//like SO.M.1,get the 'M' and '1'
-            String soundList[] = B.split("\\.");
+            String[] soundList = B.split("\\.");
             mSoundMode = soundList[1];
             mPlayState = Integer.valueOf(soundList[2]);
 
@@ -299,16 +339,75 @@ public class MainActivity extends AppCompatActivity implements
             if (mSettingTemperature == 0) {
                 mSettingTemperature = mCurrentTemperature;
             }
-
             refreshItemData();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
+     * 发送消息给服务器
+     */
+    @Override
+    public void sendMultipleMessage() {
+        if (isDataChanged) {
+            if (mPlayState != playStateFlag) {
+                messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                        + mSettingTemperature + ";"
+                        + Constants.SWING_TAG + mSwingMode + ";"
+                        + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
+            } else {
+                messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                        + mSettingTemperature + ";"
+                        + Constants.SWING_TAG + mSwingMode + ";"
+                        + Constants.SOUND_TAG + mSoundMode + Constants.SOUND_NOTHING + ";\n");
+            }
+            isDataChanged = false;
+        } else {
+            messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
+        }
+    }
+
+    @Override
+    public void sendSingleMessage(int tag) {
+        if (isDataChanged) {
+            switch (tag) {
+                case 1:
+                    messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                            + mSettingTemperature + ";"
+                            + Constants.COMMAND_REFRESH + ";\n");
+                    break;
+                case 2:
+                    //TODO
+                    break;
+                case 3:
+                    if (mPlayState != playStateFlag) {
+                        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                                + Constants.SOUND_TAG + mSoundMode + mPlayState
+                                + Constants.COMMAND_REFRESH + ";\n");
+                    } else {
+                        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                                + Constants.SOUND_TAG + mSoundMode + Constants.SOUND_NOTHING
+                                + Constants.COMMAND_REFRESH + ";\n");
+                    }
+                    break;
+                case 4:
+                    messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
+                            + Constants.SWING_TAG + mSwingMode + ";"
+                            + Constants.COMMAND_REFRESH + ";\n");
+                    break;
+                default:
+                    break;
+            }
+            isDataChanged = false;
+        } else {
+            messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
+        }
+    }
+
+    /**
      * 刷新时的操作
+     *
      * @param view
      */
     @Override
@@ -340,30 +439,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onRefreshAnimationEnd(FlyRefreshLayout view) {
         if (messageBinder.getConnectState()) {
-            sendCommand();
+            sendMultipleMessage();
         } else {
             showFailedDialog();
-        }
-    }
-
-    /**
-     * 发送消息给服务器
-     */
-    public void sendCommand() {
-        if (isDataChanged) {
-            if (mPlayState != playStateFlag) {
-                messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                        + mSettingTemperature + ";"
-                        + Constants.SWING_TAG + mSwingMode + ";"
-                        + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
-            } else {
-                messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                        + mSettingTemperature + ";"
-                        + Constants.SWING_TAG + mSwingMode + ";"
-                        + Constants.SOUND_TAG + mSoundMode + Constants.SOUND_NOTHING + ";\n");
-            }
-        } else {
-            messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
         }
     }
 
@@ -399,10 +477,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * viewholder数据缓存
+     * viewHolder数据缓存
      */
-    private class ItemViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+    private class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView icon;
         TextView title;
@@ -418,6 +495,7 @@ public class MainActivity extends AppCompatActivity implements
 
         /**
          * 点击列表不同项进入相应界面
+         *
          * @param v
          */
         @Override
@@ -445,17 +523,21 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * 设置温度状态
+     *
      * @param currentTemperature 当前温度
      * @param settingTemperature 设定温度
-     * @param heatingState 加热状态
+     * @param heatingState       加热状态
      */
     @Override
-    public void setTemperatureState(int currentTemperature, int settingTemperature, String heatingState) {
+    public void updateTemperatureState(int currentTemperature, int settingTemperature, String heatingState) {
+        isDataChanged = true;
         mCurrentTemperature = currentTemperature;
         mSettingTemperature = settingTemperature;
         mHeatingState = heatingState;
+
         resetTemperatureItemData();
-        isDataChanged = true;
+        sendSingleMessage(1);
+        Log.d(TAG, "updateTemperatureStatus");
     }
 
     /**
@@ -463,12 +545,16 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void resetTemperatureItemData() {
 
-        if (mHeatingState.equals(Constants.HEATING_OPEN)) {
-            heatingTemp = getResources().getString(R.string.heating_main);
-        } else if (mHeatingState.equals(Constants.COOL_DOWN)) {
-            heatingTemp = getResources().getString(R.string.cool_down_main);
-        } else {
-            heatingTemp = getResources().getString(R.string.unHeating);
+        switch (mHeatingState) {
+            case Constants.HEATING_OPEN:
+                heatingTemp = getResources().getString(R.string.heating_main);
+                break;
+            case Constants.COOL_DOWN:
+                heatingTemp = getResources().getString(R.string.cool_down_main);
+                break;
+            default:
+                heatingTemp = getResources().getString(R.string.unHeating);
+                break;
         }
 
         if (mCurrentTemperature != mSettingTemperature) {
@@ -489,22 +575,25 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * 设置声音状态
+     *
      * @param soundMode 声音状态
      * @param playState 播放状态
      */
     @Override
-    public void setSoundStatus(String soundMode, int playState) {
+    public void updateSoundStatus(String soundMode, int playState) {
+        isDataChanged = true;
         mSoundMode = soundMode;
         mPlayState = playState;
+
         resetSoundItemData();
-        isDataChanged = true;
+        sendSingleMessage(3);
+        Log.d(TAG, "updateSoundStatus");
     }
 
     /**
      * 刷新声音数据项内容
      */
     private void resetSoundItemData() {
-
         if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
             soundTemp = getResources().getString(R.string.music_mode);
         } else if (mSoundMode.equals(Constants.SOUND_STORY)) {
@@ -518,31 +607,38 @@ public class MainActivity extends AppCompatActivity implements
             playTemp = getResources().getString(R.string.play);
             mDataSet.get(1).subTitle = soundTemp + " / " + playTemp;
         }
-
         mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void showSwingDialog() {
+        Log.d(TAG, "showSwingDialog" + mSwingMode);
         swingDialog.show(getFragmentManager(), "swingDialog");
         swingDialog.refreshData(mSwingMode);
+        Log.d(TAG, "showSwingDialog" + mSwingMode);
     }
 
     /**
      * 设置摇摆状态
+     *
      * @param swingMode
      */
     @Override
-    public void setSwingState(String swingMode) {
-        mSwingMode = swingMode;
-        resetSwingItemData();
+    public void updateSwingStatus(String swingMode) {
+        Log.d(TAG, "updateSwingStatus : " + mSwingMode);
         isDataChanged = true;
+        mSwingMode = swingMode;
+
+        resetSwingItemData();
+        sendSingleMessage(4);
+        Log.d(TAG, "updateSwingStatus : " + mSwingMode);
     }
 
     /**
      * 刷新摇摆状态
      */
     private void resetSwingItemData() {
+        Log.d(TAG, "resetSwingItemData : " + mSwingMode);
         if (mSwingMode.equals(Constants.SWING_SLEEP)) {
             swingTemp = getResources().getString(R.string.open);
         } else if (mSwingMode.equals(Constants.SWING_CLOSE)) {
@@ -550,6 +646,7 @@ public class MainActivity extends AppCompatActivity implements
         }
         mDataSet.get(2).subTitle = swingTemp;
         mAdapter.notifyDataSetChanged();
+        Log.d(TAG, "resetSwingItemData : " + mSwingMode);
     }
 
     /**

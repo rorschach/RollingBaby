@@ -19,7 +19,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.bean.Constants;
+import com.hl.rollingbaby.interfaces.Constants;
 import com.hl.rollingbaby.views.WaveView;
 
 /**
@@ -130,9 +130,9 @@ public class SoundDialogFragment extends DialogFragment {
                 }
                 Log.d(TAG, "Play state after click: " + mPlayState);
                 resetView();
-                if (!sSoundTemp.equals(mSoundMode) || (sPlayTemp != mPlayState)) {
-                    mListener.setSoundStatus(mSoundMode, mPlayState);
-                }
+                mListener.updateSoundStatus(mSoundMode, mPlayState);
+//                if (!sSoundTemp.equals(mSoundMode) || (sPlayTemp != mPlayState)) {
+//                }
             }
         });
 
@@ -140,9 +140,9 @@ public class SoundDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 mPlayState = Constants.SOUND_NEXT;
-                if (!sSoundTemp.equals(mSoundMode) || (sPlayTemp != mPlayState)) {
-                    mListener.setSoundStatus(mSoundMode, mPlayState);
-                }
+                mListener.updateSoundStatus(mSoundMode, mPlayState);
+//                if (!sSoundTemp.equals(mSoundMode) || (sPlayTemp != mPlayState)) {
+//                }
             }
         });
 
@@ -150,9 +150,9 @@ public class SoundDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 mPlayState = Constants.SOUND_LAST;
-                if (!sSoundTemp.equals(mSoundMode) || (sPlayTemp != mPlayState)) {
-                    mListener.setSoundStatus(mSoundMode, mPlayState);
-                }
+                mListener.updateSoundStatus(mSoundMode, mPlayState);
+//                if (!sSoundTemp.equals(mSoundMode) || (sPlayTemp != mPlayState)) {
+//                }
             }
         });
 
@@ -167,7 +167,7 @@ public class SoundDialogFragment extends DialogFragment {
                     mSoundMode = Constants.SOUND_STORY;
                     temp = getActivity().getResources().getString(R.string.story_mode);
                 }
-                mListener.setSoundStatus(mSoundMode, mPlayState);
+                mListener.updateSoundStatus(mSoundMode, mPlayState);
                 test.setText(temp);
             }
         });
@@ -259,7 +259,7 @@ public class SoundDialogFragment extends DialogFragment {
         void showSoundDialog();
 
         //更新数据
-        void setSoundStatus(String soundMode, int playState);
+        void updateSoundStatus(String soundMode, int playState);
     }
 
 }

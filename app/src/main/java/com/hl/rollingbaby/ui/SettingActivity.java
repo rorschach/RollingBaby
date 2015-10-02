@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatCheckedTextView;
@@ -22,7 +20,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.bean.Constants;
+import com.hl.rollingbaby.interfaces.Constants;
 
 public class SettingActivity extends PreferenceActivity implements
         SharedPreferences.OnSharedPreferenceChangeListener {

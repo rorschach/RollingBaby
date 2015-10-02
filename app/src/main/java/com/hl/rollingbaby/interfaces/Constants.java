@@ -1,4 +1,4 @@
-package com.hl.rollingbaby.bean;
+package com.hl.rollingbaby.interfaces;
 
 /**
  * Created by test on 15-6-11.
@@ -42,9 +42,12 @@ public interface Constants {
     String COMMAND_REFRESH = COMMAND_TAG + 0;   //刷新请求
     String COMMAND_EXECUTE = COMMAND_TAG + 1;   //执行命令
 
+    String TEMPERATURE_TAG = "t";
     String HEATING_CLOSE = "c";     //关闭升温
     String HEATING_OPEN = "o";      //开启升温
     String COOL_DOWN = "cd";        //降温
+
+    String HUMIDITY_TAG = "h";      //湿度标志
 
     String SOUND_TAG = "so";        //声音标志位
     String SOUND_MUSIC = "m";       //音乐模式

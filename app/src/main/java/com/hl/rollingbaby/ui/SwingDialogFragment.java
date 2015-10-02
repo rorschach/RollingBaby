@@ -16,7 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.bean.Constants;
+import com.hl.rollingbaby.interfaces.Constants;
 
 /**
  * 摇摆状态界面
@@ -27,8 +27,7 @@ public class SwingDialogFragment extends DialogFragment {
 
     private static final String ARG_SWING_MODE = "SWING_MODE";
 
-    private String mSwingMode;
-    private static String sSwingTemp;
+    private String mSwingMode = "s";
     private boolean isSwingMode = false;
     private ObjectAnimator animator;
 
@@ -62,8 +61,6 @@ public class SwingDialogFragment extends DialogFragment {
         if (getArguments() != null) {
             mSwingMode = getArguments().getString(ARG_SWING_MODE);
         }
-        //临时变量，用于存储摇摆模式
-        sSwingTemp = mSwingMode;
     }
 
     @Override
@@ -89,7 +86,7 @@ public class SwingDialogFragment extends DialogFragment {
         swingIcon.setPivotX(20f);
         swingIcon.setPivotY(0f);
 
-        animator = ObjectAnimator.ofFloat(swingIcon, "rotation", 45F, -45F);
+        animator = ObjectAnimator.ofFloat(swingIcon, "rotation", 40F, -40F);
         animator.setDuration(1500);
         animator.setRepeatCount(ObjectAnimator.INFINITE);
         animator.setRepeatMode(ObjectAnimator.REVERSE);
@@ -102,8 +99,11 @@ public class SwingDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 isSwingMode = !isSwingMode;
                 resetSwingAnimation();
+                mListener.updateSwingStatus(mSwingMode);
             }
         });
+
+        Log.d(TAG, "onCreate : " + mSwingMode);
     }
 
     /**
@@ -121,6 +121,7 @@ public class SwingDialogFragment extends DialogFragment {
             actionButton.setImageResource(R.drawable.pause_bt_64);
             swingTx.setText(getActivity().getResources().getString(R.string.swing_open_tx));
         }
+
     }
 
     @Override
@@ -157,9 +158,6 @@ public class SwingDialogFragment extends DialogFragment {
     public void onPause() {
         super.onPause();
         animator.cancel();
-        if (!sSwingTemp.equals(mSwingMode)) {
-            mListener.setSwingState(mSwingMode);
-        }
         dialog.dismiss();
     }
 
@@ -168,10 +166,12 @@ public class SwingDialogFragment extends DialogFragment {
      * @param swingMode 摇摆模式
      */
     public void refreshData(String swingMode) {
+        Log.d(TAG, "refreshData : " + mSwingMode);
         mSwingMode = swingMode;
         Bundle args = new Bundle();
         args.putString(Constants.ARG_SWING_MODE, swingMode);
         this.setArguments(args);
+        Log.d(TAG, "refreshData : " + mSwingMode);
     }
 
     //对外部公开的接口
@@ -181,7 +181,7 @@ public class SwingDialogFragment extends DialogFragment {
         void showSwingDialog();
 
         //更新数据
-        void setSwingState(String swingMode);
+        void updateSwingStatus(String swingMode);
 
     }
 

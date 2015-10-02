@@ -3,7 +3,7 @@ package com.hl.rollingbaby.network;
 import android.os.Handler;
 import android.util.Log;
 
-import com.hl.rollingbaby.bean.Constants;
+import com.hl.rollingbaby.interfaces.Constants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,7 +68,7 @@ public class MessageManager extends Thread {
                     //                   int bytes;
                     handler.obtainMessage(Constants.MESSAGE_SEND, this)
                             .sendToTarget();
-                    Log.d(TAG, "handler is obtain sendMessage...");
+                    Log.d(TAG, "handler is obtain sendMultipleMessage...");
 
                     read(buffer);
                 } catch (IOException e) {

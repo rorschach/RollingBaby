@@ -16,7 +16,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.bean.Constants;
+import com.hl.rollingbaby.interfaces.Constants;
 import com.hl.rollingbaby.ui.MainActivity;
 import com.hl.rollingbaby.ui.SettingActivity;
 

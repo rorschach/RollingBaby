@@ -1,4 +1,4 @@
-package com.hl.rollingbaby.bean;
+package com.hl.rollingbaby.entity;
 
 
 /**

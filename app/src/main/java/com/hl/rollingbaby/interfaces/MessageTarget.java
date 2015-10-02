@@ -1,4 +1,4 @@
-package com.hl.rollingbaby.bean;
+package com.hl.rollingbaby.interfaces;
 
 import android.os.Handler;
 

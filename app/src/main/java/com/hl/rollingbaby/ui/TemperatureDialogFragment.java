@@ -8,7 +8,6 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.hl.rollingbaby.R;
-import com.hl.rollingbaby.bean.Constants;
+import com.hl.rollingbaby.interfaces.Constants;
 
 /**
  * 温度状态界面
@@ -196,7 +195,7 @@ public class TemperatureDialogFragment extends DialogFragment {
     public void onPause() {
         super.onPause();
         mSettingTemperature = seekBar.getProgress() + 25;
-        mListener.setTemperatureState(mCurrentTemperature, mSettingTemperature, mHeatingState);
+        mListener.updateTemperatureState(mCurrentTemperature, mSettingTemperature, mHeatingState);
         dialog.dismiss();
     }
 
@@ -225,7 +224,7 @@ public class TemperatureDialogFragment extends DialogFragment {
         void showTemperatureDialog();
 
         //更新数据
-        void setTemperatureState(int mCurrentTemperature, int settingTemperature, String heatingState);
+        void updateTemperatureState(int mCurrentTemperature, int settingTemperature, String heatingState);
 
     }
 

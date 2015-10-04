@@ -25,10 +25,6 @@ public class TemperatureDialogFragment extends DialogFragment {
 
     private static final String TAG = "TemperatureDialogFragment";
 
-    private static final String ARG_CURRENT_TEMPERATURE = "CURRENT_TEMPERATURE";
-    private static final String ARG_SETTING_TEMPERATURE = "SETTING_TEMPERATURE";
-    private static final String ARG_HEATING_STATE = "HEATING_STATE";
-
     private int mCurrentTemperature;
     private int mSettingTemperature;
     private String mHeatingState;
@@ -129,7 +125,7 @@ public class TemperatureDialogFragment extends DialogFragment {
     //根据用户操作更新视图
     private void resetView() {
         if (mSettingTemperature > mCurrentTemperature) {
-            mHeatingState = Constants.HEATING_OPEN;
+            mHeatingState = Constants.TEMPERATURE_UP;
             icon.setBackgroundResource(R.drawable.sun_background);
             settingTx.setTextColor(
                     getActivity().getResources().getColor(R.color.red));
@@ -139,7 +135,7 @@ public class TemperatureDialogFragment extends DialogFragment {
             }
             heatingTx.setText(getActivity().getResources().getString(R.string.heating));
         } else if (mSettingTemperature < mCurrentTemperature) {
-            mHeatingState = Constants.COOL_DOWN;
+            mHeatingState = Constants.TEMPERATURE_DOWN;
             icon.setBackgroundResource(R.drawable.moon_background);
             settingTx.setTextColor(
                     getActivity().getResources().getColor(R.color.blue));
@@ -211,9 +207,9 @@ public class TemperatureDialogFragment extends DialogFragment {
         mSettingTemperature = settingTemperature;
         mHeatingState = heatingState;
         Bundle args = new Bundle();
-        mCurrentTemperature = getArguments().getInt(ARG_CURRENT_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
-        mSettingTemperature = getArguments().getInt(ARG_SETTING_TEMPERATURE, mCurrentTemperature);
-        mHeatingState = getArguments().getString(ARG_HEATING_STATE);
+        mCurrentTemperature = getArguments().getInt(Constants.ARG_CURRENT_TEMPERATURE, Constants.DEFAULT_TEMPERATURE);
+        mSettingTemperature = getArguments().getInt(Constants.ARG_SETTING_TEMPERATURE, mCurrentTemperature);
+        mHeatingState = getArguments().getString(Constants.ARG_HEATING_STATE);
         this.setArguments(args);
     }
 
@@ -226,6 +222,7 @@ public class TemperatureDialogFragment extends DialogFragment {
         //更新数据
         void updateTemperatureState(int mCurrentTemperature, int settingTemperature, String heatingState);
 
+        void refreshTemperatureItemData();
     }
 
 }

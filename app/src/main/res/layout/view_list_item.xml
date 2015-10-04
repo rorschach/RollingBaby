@@ -40,10 +40,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginStart="18dp"
         android:textColor="@android:color/darker_gray"
         android:gravity="start|center_vertical"
-        android:textSize="30sp" />
+        android:textSize="28sp" />
 
 </LinearLayout>

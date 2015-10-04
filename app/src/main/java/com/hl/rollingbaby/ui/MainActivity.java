@@ -45,8 +45,9 @@ public class MainActivity extends AppCompatActivity implements
         Handler.Callback, ServiceConnection,
         MessageTarget, MessageProcesser,
         FlyRefreshLayout.OnPullRefreshListener,
-        SoundDialogFragment.OnSoundInteractionListener,
         TemperatureDialogFragment.OnTemperatureInteractionListener,
+        HumidityDialogFragment.OnHumidityInteractionListener,
+        SoundDialogFragment.OnSoundInteractionListener,
         SwingDialogFragment.OnSwingInteractionListener {
 
     private static final String TAG = "MainActivity";
@@ -60,12 +61,14 @@ public class MainActivity extends AppCompatActivity implements
     private ArrayList<ItemData> mDataSet = new ArrayList<>();
     private LinearLayoutManager mLayoutManager;
 
-    private SoundDialogFragment soundDialog;
     private TemperatureDialogFragment temperatureDialog;
+    private HumidityDialogFragment humidityDialog;
+    private SoundDialogFragment soundDialog;
     private SwingDialogFragment swingDialog;
 
     private int mCurrentTemperature = 33;
     private int mSettingTemperature = 33;
+    private int mHumidity = 60;
     private String mHeatingState = "c";
     private String mSoundMode = "m";
     private int mPlayState = 1;
@@ -78,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private Handler handler = new Handler(this);
 
+    private String humidityTemp = "";
     private String temperatureTemp = "";
     private String heatingTemp = "";
     private String soundTemp = "";
@@ -122,9 +126,10 @@ public class MainActivity extends AppCompatActivity implements
         mListView.setAdapter(mAdapter);
         mListView.setItemAnimator(new FlyItemAnimator());
 
-        soundDialog = SoundDialogFragment.newInstance(mSoundMode, mPlayState);
         temperatureDialog = TemperatureDialogFragment.newInstance(
                 mCurrentTemperature, mSettingTemperature, mHeatingState);
+        humidityDialog = HumidityDialogFragment.newInstance(mHumidity);
+        soundDialog = SoundDialogFragment.newInstance(mSoundMode, mPlayState);
         swingDialog = SwingDialogFragment.newInstance(mSwingMode);
 
         initItemData();
@@ -138,6 +143,9 @@ public class MainActivity extends AppCompatActivity implements
         mDataSet.add(new ItemData(R.drawable.thermometer_blue_48,
                 getResources().getString(R.string.title_temperature),
                 temperatureTemp + heatingTemp));
+        mDataSet.add(new ItemData(R.drawable.humidity_blue_48,
+                getResources().getString(R.string.title_humidity),
+                humidityTemp));
         mDataSet.add(new ItemData(R.drawable.music_blue_48,
                 getResources().getString(R.string.title_sound),
                 soundTemp + " / " + playTemp));
@@ -151,10 +159,11 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * 刷新列表数据
      */
-    private void refreshItemData() {
-        resetTemperatureItemData();
-        resetSoundItemData();
-        resetSwingItemData();
+    public void refreshItemData() {
+        refreshTemperatureItemData();
+        refreshHumidityItemData();
+        refreshSoundItemData();
+        refreshSwingItemData();
     }
 
     @Override
@@ -208,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * 绑定后台服务时的操作
+     *
      * @param name    组件名
      * @param service 绑定的服务
      */
@@ -224,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * 处理系统收到的消息后在此处更新视图
+     *
      * @param msg message对象
      * @return
      */
@@ -269,7 +280,6 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * 处理接收到的消息
-     *
      * @param readMessage 收到的消息
      */
     @Override
@@ -297,22 +307,22 @@ public class MainActivity extends AppCompatActivity implements
         String singleMessage = state[0];
         String[] messageArray = singleMessage.split("\\.");
         String tag = messageArray[0];
-        Log.d(TAG, tag);
 
         switch (tag) {
-            case Constants.SOUND_TAG:
+            case Constants.MUSIC_TAG:
+            case Constants.STORY_TAG:
                 mSoundMode = messageArray[1];
                 mPlayState = Integer.valueOf(messageArray[2]);
                 break;
             case Constants.SWING_TAG:
                 mSwingMode = messageArray[1];
                 break;
+            case Constants.HUMIDITY_TAG:
+                mHumidity = Integer.valueOf(messageArray[1]);
+                break;
             case Constants.TEMPERATURE_TAG:
                 mHeatingState = messageArray[1];
                 mCurrentTemperature = Integer.valueOf(messageArray[2]);
-                break;
-            case Constants.HUMIDITY_TAG:
-                //TODO
                 break;
             default:
                 break;
@@ -350,58 +360,37 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void sendMultipleMessage() {
-        if (isDataChanged) {
-            if (mPlayState != playStateFlag) {
-                messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                        + mSettingTemperature + ";"
-                        + Constants.SWING_TAG + mSwingMode + ";"
-                        + Constants.SOUND_TAG + mSoundMode + mPlayState + ";\n");
-            } else {
-                messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                        + mSettingTemperature + ";"
-                        + Constants.SWING_TAG + mSwingMode + ";"
-                        + Constants.SOUND_TAG + mSoundMode + Constants.SOUND_NOTHING + ";\n");
-            }
-            isDataChanged = false;
-        } else {
-            messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
-        }
+        messageBinder.sendMessage(mSoundMode + mPlayState + ";\n");
+        messageBinder.sendMessage(Constants.SWING_TAG + mSwingMode + ";\n");
+        messageBinder.sendMessage(Constants.HUMIDITY_TAG + mHumidity + ";\n");
+        messageBinder.sendMessage(Constants.TEMPERATURE_TAG + mSettingTemperature + ";\n");
+        messageBinder.sendMessage(Constants.REFRESH_TAG + ";\n");
     }
 
     @Override
-    public void sendSingleMessage(int tag) {
+    public void sendSingleMessage(String tag) {
         if (isDataChanged) {
             switch (tag) {
-                case 1:
-                    messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                            + mSettingTemperature + ";"
-                            + Constants.COMMAND_REFRESH + ";\n");
+                case Constants.MUSIC_TAG:
+                case Constants.STORY_TAG:
+                    messageBinder.sendMessage(mSoundMode + mPlayState + ";\n");
                     break;
-                case 2:
-                    //TODO
+                case Constants.SWING_TAG:
+                    messageBinder.sendMessage(Constants.SWING_TAG + mSwingMode + ";\n");
                     break;
-                case 3:
-                    if (mPlayState != playStateFlag) {
-                        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                                + Constants.SOUND_TAG + mSoundMode + mPlayState
-                                + Constants.COMMAND_REFRESH + ";\n");
-                    } else {
-                        messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                                + Constants.SOUND_TAG + mSoundMode + Constants.SOUND_NOTHING
-                                + Constants.COMMAND_REFRESH + ";\n");
-                    }
+                case Constants.HUMIDITY_TAG:
+                    messageBinder.sendMessage(Constants.HUMIDITY_TAG + mHumidity + ";\n");
                     break;
-                case 4:
-                    messageBinder.sendMessage(Constants.COMMAND_EXECUTE + ";"
-                            + Constants.SWING_TAG + mSwingMode + ";"
-                            + Constants.COMMAND_REFRESH + ";\n");
+                case Constants.TEMPERATURE_TAG:
+                    messageBinder.sendMessage(Constants.TEMPERATURE_TAG + mSettingTemperature + ";\n");
                     break;
                 default:
                     break;
             }
+            messageBinder.sendMessage(Constants.REFRESH_TAG + ";\n");
             isDataChanged = false;
         } else {
-            messageBinder.sendMessage(Constants.COMMAND_REFRESH + ";\n");
+            messageBinder.sendMessage(Constants.REFRESH_TAG + ";\n");
         }
     }
 
@@ -506,11 +495,15 @@ public class MainActivity extends AppCompatActivity implements
                     showTemperatureDialog();
                     break;
                 case 1:
-                    showSoundDialog();
+                    showHumidityDialog();
                     break;
                 case 2:
+                    showSoundDialog();
+                    break;
+                case 3:
                     showSwingDialog();
                     break;
+
             }
         }
     }
@@ -535,21 +528,21 @@ public class MainActivity extends AppCompatActivity implements
         mSettingTemperature = settingTemperature;
         mHeatingState = heatingState;
 
-        resetTemperatureItemData();
-        sendSingleMessage(1);
+        refreshTemperatureItemData();
+        sendSingleMessage(Constants.TEMPERATURE_TAG);
         Log.d(TAG, "updateTemperatureStatus");
     }
 
     /**
      * 刷新温度数据项内容
      */
-    private void resetTemperatureItemData() {
-
+    @Override
+    public void refreshTemperatureItemData() {
         switch (mHeatingState) {
-            case Constants.HEATING_OPEN:
+            case Constants.TEMPERATURE_UP:
                 heatingTemp = getResources().getString(R.string.heating_main);
                 break;
-            case Constants.COOL_DOWN:
+            case Constants.TEMPERATURE_DOWN:
                 heatingTemp = getResources().getString(R.string.cool_down_main);
                 break;
             default:
@@ -564,6 +557,19 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         mDataSet.get(0).subTitle = temperatureTemp + heatingTemp;
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showHumidityDialog() {
+        humidityDialog.show(getFragmentManager(), "humidityDialog");
+        humidityDialog.refreshData(mHumidity);
+    }
+
+    @Override
+    public void refreshHumidityItemData() {
+        humidityTemp = mHumidity + "%";
+        mDataSet.get(1).subTitle = humidityTemp;
         mAdapter.notifyDataSetChanged();
     }
 
@@ -585,27 +591,28 @@ public class MainActivity extends AppCompatActivity implements
         mSoundMode = soundMode;
         mPlayState = playState;
 
-        resetSoundItemData();
-        sendSingleMessage(3);
+        refreshSoundItemData();
+        sendSingleMessage(soundMode);
         Log.d(TAG, "updateSoundStatus");
     }
 
     /**
      * 刷新声音数据项内容
      */
-    private void resetSoundItemData() {
-        if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
+    @Override
+    public void refreshSoundItemData() {
+        if (mSoundMode.equals(Constants.MUSIC_TAG)) {
             soundTemp = getResources().getString(R.string.music_mode);
-        } else if (mSoundMode.equals(Constants.SOUND_STORY)) {
+        } else if (mSoundMode.equals(Constants.STORY_TAG)) {
             soundTemp = getResources().getString(R.string.story_mode);
         }
 
         if (mPlayState == Constants.SOUND_STOP) {
             playTemp = getResources().getString(R.string.close);
-            mDataSet.get(1).subTitle = playTemp;
+            mDataSet.get(2).subTitle = playTemp;
         } else {
             playTemp = getResources().getString(R.string.play);
-            mDataSet.get(1).subTitle = soundTemp + " / " + playTemp;
+            mDataSet.get(2).subTitle = soundTemp + " / " + playTemp;
         }
         mAdapter.notifyDataSetChanged();
     }
@@ -629,24 +636,25 @@ public class MainActivity extends AppCompatActivity implements
         isDataChanged = true;
         mSwingMode = swingMode;
 
-        resetSwingItemData();
-        sendSingleMessage(4);
+        refreshSwingItemData();
+        sendSingleMessage(swingMode);
         Log.d(TAG, "updateSwingStatus : " + mSwingMode);
     }
 
     /**
      * 刷新摇摆状态
      */
-    private void resetSwingItemData() {
-        Log.d(TAG, "resetSwingItemData : " + mSwingMode);
-        if (mSwingMode.equals(Constants.SWING_SLEEP)) {
+    @Override
+    public void refreshSwingItemData() {
+        Log.d(TAG, "refreshSwingItemData : " + mSwingMode);
+        if (mSwingMode.equals(Constants.SWING_OPEN)) {
             swingTemp = getResources().getString(R.string.open);
         } else if (mSwingMode.equals(Constants.SWING_CLOSE)) {
             swingTemp = getResources().getString(R.string.close);
         }
-        mDataSet.get(2).subTitle = swingTemp;
+        mDataSet.get(3).subTitle = swingTemp;
         mAdapter.notifyDataSetChanged();
-        Log.d(TAG, "resetSwingItemData : " + mSwingMode);
+        Log.d(TAG, "refreshSwingItemData : " + mSwingMode);
     }
 
     /**

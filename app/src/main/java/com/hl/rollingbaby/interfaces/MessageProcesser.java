@@ -7,7 +7,7 @@ public interface MessageProcesser {
 
     public void sendMultipleMessage();
 
-    public void sendSingleMessage(int tag);
+    public void sendSingleMessage(String tag);
 
     public void parseMessage(String readMessage);
 }

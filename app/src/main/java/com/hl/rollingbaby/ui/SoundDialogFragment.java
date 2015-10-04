@@ -123,9 +123,9 @@ public class SoundDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 mPlayState = Math.abs(mPlayState - 1);
-                if (mPlayState == 0) {
+                if (mPlayState == Constants.SOUND_RECEIVE_PAUSE || mPlayState == Constants.SOUND_STOP ) {
                     waveView.setPlayStation(true);
-                } else {
+                } else if(mPlayState == Constants.SOUND_PLAY ){
                     waveView.setPlayStation(false);
                 }
                 Log.d(TAG, "Play state after click: " + mPlayState);
@@ -149,7 +149,7 @@ public class SoundDialogFragment extends DialogFragment {
         rewindBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPlayState = Constants.SOUND_LAST;
+                mPlayState = Constants.SOUND_PREVIOUS;
                 mListener.updateSoundStatus(mSoundMode, mPlayState);
 //                if (!sSoundTemp.equals(mSoundMode) || (sPlayTemp != mPlayState)) {
 //                }
@@ -161,10 +161,10 @@ public class SoundDialogFragment extends DialogFragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 String temp;
                 if (isChecked) {
-                    mSoundMode = Constants.SOUND_MUSIC;
+                    mSoundMode = Constants.MUSIC_TAG;
                     temp = getActivity().getResources().getString(R.string.music_mode);
                 } else {
-                    mSoundMode = Constants.SOUND_STORY;
+                    mSoundMode = Constants.STORY_TAG;
                     temp = getActivity().getResources().getString(R.string.story_mode);
                 }
                 mListener.updateSoundStatus(mSoundMode, mPlayState);
@@ -178,7 +178,7 @@ public class SoundDialogFragment extends DialogFragment {
      */
     private void resetView() {
 
-        if (mPlayState == Constants.SOUND_PAUSE_PLAY) {
+        if (mPlayState == Constants.SOUND_PLAY) {
             waveView.setPlayStation(true);
             playBt.setImageResource(R.drawable.pause_bt_50);
         } else {
@@ -187,7 +187,7 @@ public class SoundDialogFragment extends DialogFragment {
         }
 
         String temp;
-        if (mSoundMode.equals(Constants.SOUND_MUSIC)) {
+        if (mSoundMode.equals(Constants.MUSIC_TAG)) {
             modeSwitch.setChecked(true);
             temp = getActivity().getResources().getString(R.string.music_mode);
         } else {
@@ -246,8 +246,8 @@ public class SoundDialogFragment extends DialogFragment {
         mSoundMode = soundMode;
         mPlayState = playState;
         Bundle args = new Bundle();
-        args.putString(Constants.ARG_SOUND_MODE, soundMode);
-        args.putInt(Constants.ARG_PLAY_STATE, playState);
+        args.putString(Constants.ARG_SOUND_MODE, mSoundMode);
+        args.putInt(Constants.ARG_PLAY_STATE, mPlayState);
         this.setArguments(args);
         Log.d(TAG, "refreshData : " + mSoundMode + ":" + mPlayState);
     }
@@ -260,6 +260,8 @@ public class SoundDialogFragment extends DialogFragment {
 
         //更新数据
         void updateSoundStatus(String soundMode, int playState);
+
+        void refreshSoundItemData();
     }
 
 }

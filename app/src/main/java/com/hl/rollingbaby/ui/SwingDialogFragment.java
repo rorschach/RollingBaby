@@ -117,7 +117,7 @@ public class SwingDialogFragment extends DialogFragment {
             swingTx.setText(getActivity().getResources().getString(R.string.swing_close_tx));
         } else {
             animator.start();
-            mSwingMode = Constants.SWING_SLEEP;
+            mSwingMode = Constants.SWING_OPEN;
             actionButton.setImageResource(R.drawable.pause_bt_64);
             swingTx.setText(getActivity().getResources().getString(R.string.swing_open_tx));
         }
@@ -182,6 +182,8 @@ public class SwingDialogFragment extends DialogFragment {
 
         //更新数据
         void updateSwingStatus(String swingMode);
+
+        void refreshSwingItemData();
 
     }
 

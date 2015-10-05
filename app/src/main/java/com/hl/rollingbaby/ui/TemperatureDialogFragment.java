@@ -1,13 +1,10 @@
 package com.hl.rollingbaby.ui;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +22,7 @@ import butterknife.ButterKnife;
 /**
  * 温度状态界面
  */
-public class TemperatureDialogFragment extends DialogFragment {
+public class TemperatureDialogFragment extends BaseDialogFragment {
 
     private static final String TAG = "TemperatureDialogFragment";
     @Bind(R.id.icon)
@@ -43,10 +40,11 @@ public class TemperatureDialogFragment extends DialogFragment {
     private int mSettingTemperature;
     private String mHeatingState;
 
+    private int textColor;
+    private String seekColor;
+
     //持有的Activity实例
     private OnTemperatureInteractionListener mListener;
-
-    private AppCompatDialog dialog;
 
     /**
      * 获取TemperatureDialogFragment的实例
@@ -93,7 +91,8 @@ public class TemperatureDialogFragment extends DialogFragment {
     /**
      * 初始化各控件
      */
-    private void initView() {
+    @Override
+    protected void initView() {
         current.setText(mCurrentTemperature + "");
         setting.setText(mSettingTemperature + "");
 
@@ -122,44 +121,34 @@ public class TemperatureDialogFragment extends DialogFragment {
     //根据用户操作更新视图
     private void resetView() {
         if (mSettingTemperature > mCurrentTemperature) {
+
             mHeatingState = Constants.TEMPERATURE_UP;
             icon.setBackgroundResource(R.drawable.sun_background);
-            setting.setTextColor(
-                    getActivity().getResources().getColor(R.color.red));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ffdb4437"), PorterDuff.Mode.SRC_IN);
-                seekBar.getThumb().setColorFilter(Color.parseColor("#ffdb4437"), PorterDuff.Mode.SRC_IN);
-            }
-            state.setText(getActivity().getResources().getString(R.string.heating));
+            textColor = R.color.red;
+            seekColor = "#ffdb4437";
+            state.setText(getActivity().getResources().getString(R.string.temperature_up));
         } else if (mSettingTemperature < mCurrentTemperature) {
+
             mHeatingState = Constants.TEMPERATURE_DOWN;
             icon.setBackgroundResource(R.drawable.moon_background);
-            setting.setTextColor(
-                    getActivity().getResources().getColor(R.color.blue));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ff4285f4"), PorterDuff.Mode.SRC_IN);
-                seekBar.getThumb().setColorFilter(Color.parseColor("#ff4285f4"), PorterDuff.Mode.SRC_IN);
-            }
-            state.setText(getActivity().getResources().getString(R.string.cool_down));
+            textColor = R.color.blue;
+            seekColor = "#ff4285f4";
+            state.setText(getActivity().getResources().getString(R.string.temperature_down));
         } else {
+
             icon.setBackgroundResource(R.drawable.sun_background);
             mHeatingState = Constants.HEATING_CLOSE;
-            setting.setTextColor(
-                    getActivity().getResources().getColor(R.color.green));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ff0f9d58"), PorterDuff.Mode.SRC_IN);
-                seekBar.getThumb().setColorFilter(Color.parseColor("#ff0f9d58"), PorterDuff.Mode.SRC_IN);
-            }
-            state.setText(getActivity().getResources().getString(R.string.unHeating));
+            textColor = R.color.green;
+            seekColor = "#ff0f9d58";
+            state.setText(getActivity().getResources().getString(R.string.temperature_close));
         }
-    }
 
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        dialog = new AppCompatDialog(getActivity(), getTheme());
-        int height = Utils.dpToPx(Utils.getScreenHeight(getActivity()) / 3);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height);
-        return dialog;
+        setting.setTextColor(getActivity().getResources().getColor(textColor));
+        state.setTextColor(getActivity().getResources().getColor(textColor));
+        if (Utils.isAndroid4P1()) {
+            seekBar.getProgressDrawable().setColorFilter(Color.parseColor(seekColor), PorterDuff.Mode.SRC_IN);
+            seekBar.getThumb().setColorFilter(Color.parseColor(seekColor), PorterDuff.Mode.SRC_IN);
+        }
     }
 
     /**
@@ -190,12 +179,10 @@ public class TemperatureDialogFragment extends DialogFragment {
         super.onPause();
         mSettingTemperature = seekBar.getProgress() + 25;
         mListener.updateTemperatureState(mCurrentTemperature, mSettingTemperature, mHeatingState);
-        dialog.dismiss();
     }
 
     /**
      * 刷新数据
-     *
      * @param currentTemperature 当前温度
      * @param settingTemperature 设定温度
      * @param heatingState       加热状态
@@ -210,12 +197,6 @@ public class TemperatureDialogFragment extends DialogFragment {
         mSettingTemperature = getArguments().getInt(Constants.ARG_SETTING_TEMPERATURE, mCurrentTemperature);
         mHeatingState = getArguments().getString(Constants.ARG_HEATING_STATE);
         this.setArguments(args);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
     }
 
     //对外部公开的接口

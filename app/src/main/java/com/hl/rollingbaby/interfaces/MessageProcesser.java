@@ -5,7 +5,7 @@ package com.hl.rollingbaby.interfaces;
  */
 public interface MessageProcesser {
 
-    public void sendMultipleMessage();
+    public void sendRefreshRequest();
 
     public void sendSingleMessage(String tag);
 

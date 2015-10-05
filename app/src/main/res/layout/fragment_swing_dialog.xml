@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fff3f3f3"
+    android:id="@+id/swing_root"
     tools:context="com.hl.rollingbaby.ui.SwingDialogFragment">
 
 

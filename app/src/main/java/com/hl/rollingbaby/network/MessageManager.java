@@ -70,7 +70,7 @@ public class MessageManager extends Thread {
                     //                   int bytes;
                     handler.obtainMessage(Constants.MESSAGE_SEND, this)
                             .sendToTarget();
-                    Log.d(TAG, "handler is obtain sendMultipleMessage...");
+                    Log.d(TAG, "handler is obtain sendRefreshRequest...");
 
                     read(buffer);
                 } catch (IOException e) {

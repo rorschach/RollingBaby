@@ -1,17 +1,17 @@
 package com.hl.rollingbaby.ui;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -30,9 +30,10 @@ import butterknife.ButterKnife;
 /**
  * 声音状态界面
  */
-public class SoundDialogFragment extends DialogFragment {
+public class SoundDialogFragment extends BaseDialogFragment {
 
     private static final String TAG = "SoundDialogFragment";
+
     @Bind(R.id.wave_view)
     WaveView waveView;
     @Bind(R.id.test)
@@ -51,17 +52,11 @@ public class SoundDialogFragment extends DialogFragment {
     private String mSoundMode;
     private int mPlayState;
 
-    private static String sSoundTemp;
-    private static int sPlayTemp;
-
     //持有的Activity实例
     private OnSoundInteractionListener mListener;
 
-    private AppCompatDialog dialog;
-
     /**
      * 获取SoundDialogFragment的实例
-     *
      * @param soundMode 声音模式
      * @param playState 播放状态
      * @return fragment实例
@@ -85,8 +80,6 @@ public class SoundDialogFragment extends DialogFragment {
             mSoundMode = getArguments().getString(Constants.ARG_SOUND_MODE);
             mPlayState = getArguments().getInt(Constants.ARG_PLAY_STATE, Constants.SOUND_STOP);
         }
-        sSoundTemp = mSoundMode;
-        sPlayTemp = mPlayState;
         Log.d(TAG, "onCreate : " + mSoundMode + ":" + mPlayState);
     }
 
@@ -95,14 +88,26 @@ public class SoundDialogFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_sound_dialog, container, false);
         ButterKnife.bind(this, v);
-        initView();
+        initView(v);
         return v;
     }
 
     /**
      * 初始化各控件
      */
-    private void initView() {
+    @Override
+    protected void initView(final View view) {
+
+        if (Utils.isAndroid4P1()) {
+            view.getViewTreeObserver().addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
+                @Override
+                @TargetApi(16)
+                public void onDraw() {
+                    view.getViewTreeObserver().removeOnDrawListener(this);
+                }
+            });
+        }
+
         if (Utils.isAndroid4P1()) {
             seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#3498db"), PorterDuff.Mode.SRC_IN);
             seekBar.getThumb().setColorFilter(Color.parseColor("#2980b9"), PorterDuff.Mode.SRC_IN);
@@ -208,7 +213,7 @@ public class SoundDialogFragment extends DialogFragment {
         dialog = new AppCompatDialog(getActivity(), getTheme());
         int height = Utils.dpToPx(Utils.getScreenHeight(getActivity()) / 3);
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height);
-
+        dialog.getWindow().setWindowAnimations(R.style.DialogAnimation);
         return dialog;
     }
 
@@ -229,7 +234,6 @@ public class SoundDialogFragment extends DialogFragment {
     @Override
     public void onPause() {
         super.onPause();
-        dialog.dismiss();
     }
 
     /**
@@ -255,12 +259,6 @@ public class SoundDialogFragment extends DialogFragment {
         args.putInt(Constants.ARG_PLAY_STATE, mPlayState);
         this.setArguments(args);
         Log.d(TAG, "refreshData : " + mSoundMode + ":" + mPlayState);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
     }
 
     //对外部公开的接口

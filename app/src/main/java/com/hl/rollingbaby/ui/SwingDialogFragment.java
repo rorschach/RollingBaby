@@ -5,12 +5,15 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatDialog;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -26,11 +29,10 @@ import butterknife.ButterKnife;
 /**
  * 摇摆状态界面
  */
-public class SwingDialogFragment extends DialogFragment {
+public class SwingDialogFragment extends BaseDialogFragment {
 
     private static final String TAG = "SwingDialogFragment";
 
-    private static final String ARG_SWING_MODE = "SWING_MODE";
     @Bind(R.id.swing_icon)
     ImageView swingIcon;
     @Bind(R.id.swing_tx)
@@ -44,7 +46,6 @@ public class SwingDialogFragment extends DialogFragment {
 
     //持有的Activity实例
     private OnSwingInteractionListener mListener;
-    private AppCompatDialog dialog;
 
     /**
      * @param swingMode 摇摆状态
@@ -53,7 +54,7 @@ public class SwingDialogFragment extends DialogFragment {
     public static SwingDialogFragment newInstance(String swingMode) {
         SwingDialogFragment fragment = new SwingDialogFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_SWING_MODE, swingMode);
+        args.putString(Constants.ARG_SWING_MODE, swingMode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,7 +66,7 @@ public class SwingDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mSwingMode = getArguments().getString(ARG_SWING_MODE);
+            mSwingMode = getArguments().getString(Constants.ARG_SWING_MODE);
         }
     }
 
@@ -81,7 +82,8 @@ public class SwingDialogFragment extends DialogFragment {
     /**
      * 初始化各控件
      */
-    private void initView() {
+    @Override
+    protected void initView() {
         swingIcon.setPivotX(20f);
         swingIcon.setPivotY(0f);
 
@@ -119,15 +121,6 @@ public class SwingDialogFragment extends DialogFragment {
             fab.setImageResource(R.drawable.pause_bt_64);
             swingTx.setText(getActivity().getResources().getString(R.string.swing_open_tx));
         }
-
-    }
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        dialog = new AppCompatDialog(getActivity(), getTheme());
-        int height = Utils.dpToPx(Utils.getScreenHeight(getActivity()) / 3);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height);
-        return dialog;
     }
 
     /**
@@ -157,7 +150,6 @@ public class SwingDialogFragment extends DialogFragment {
     public void onPause() {
         super.onPause();
         animator.cancel();
-        dialog.dismiss();
     }
 
     /**
@@ -172,12 +164,6 @@ public class SwingDialogFragment extends DialogFragment {
         args.putString(Constants.ARG_SWING_MODE, swingMode);
         this.setArguments(args);
         Log.d(TAG, "refreshData : " + mSwingMode);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
     }
 
     //对外部公开的接口

@@ -17,8 +17,6 @@ import com.hl.rollingbaby.R;
  */
 public class WaveView extends LinearLayout {
 
-    private static final String TAG = "WaveView";
-
     private boolean isPlaying = false;
 
     protected static final int LARGE = 1;
@@ -90,8 +88,6 @@ public class WaveView extends LinearLayout {
         mSolid.setDrawStation(isPlaying);
         invalidate();
         requestLayout();
-        Log.d(TAG, "waveView isPlaying : " + isPlaying );
-
     }
 
     /**

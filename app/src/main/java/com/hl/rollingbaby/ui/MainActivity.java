@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,16 +28,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hl.rollingbaby.interfaces.Constants;
+import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.entity.ItemData;
+import com.hl.rollingbaby.interfaces.Constants;
 import com.hl.rollingbaby.interfaces.MessageProcesser;
 import com.hl.rollingbaby.interfaces.MessageTarget;
 import com.hl.rollingbaby.network.MessageService;
-import com.race604.flyrefresh.FlyRefreshLayout;
-import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.views.FlyItemAnimator;
+import com.race604.flyrefresh.FlyRefreshLayout;
 
 import java.util.ArrayList;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 /**
  * 用户主界面
@@ -52,11 +56,16 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = "MainActivity";
 
+    @Bind(R.id.list)
+    RecyclerView list;
+    @Bind(R.id.fly_layout)
+    FlyRefreshLayout flyLayout;
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
     private MessageService.MessageBinder messageBinder;
     private MessageService messageService;
 
-    private FlyRefreshLayout mFlyLayout;
-    private RecyclerView mListView;
     private ItemAdapter mAdapter;
     private ArrayList<ItemData> mDataSet = new ArrayList<>();
     private LinearLayoutManager mLayoutManager;
@@ -99,40 +108,35 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        parseMessage("t.c.33;sw.c;so.m.1");
-        parseMessage("sw.s;");
+        ButterKnife.bind(this);
         initView();
-        toast = Toast.makeText(this, getResources().getString(R.string.back_bt), Toast.LENGTH_SHORT);
+
     }
 
     /**
      * 初始化视图及3个状态界面数据
      */
     private void initView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
-        mFlyLayout = (FlyRefreshLayout) findViewById(R.id.fly_layout);
-        mFlyLayout.setOnPullRefreshListener(this);
-
-        mListView = (RecyclerView) findViewById(R.id.list);
+        flyLayout.setOnPullRefreshListener(this);
         mLayoutManager = new LinearLayoutManager(this);
-        mListView.setLayoutManager(mLayoutManager);
-
+        list.setLayoutManager(mLayoutManager);
+        list.setItemAnimator(new FlyItemAnimator());
         mAdapter = new ItemAdapter(this);
-        mListView.setAdapter(mAdapter);
-        mListView.setItemAnimator(new FlyItemAnimator());
+        list.setAdapter(mAdapter);
 
         temperatureDialog = TemperatureDialogFragment.newInstance(
                 mCurrentTemperature, mSettingTemperature, mHeatingState);
         humidityDialog = HumidityDialogFragment.newInstance(mHumidity);
         soundDialog = SoundDialogFragment.newInstance(mSoundMode, mPlayState);
         swingDialog = SwingDialogFragment.newInstance(mSwingMode);
-
         initItemData();
+
+        toast = Toast.makeText(this, getResources().getString(R.string.back_bt), Toast.LENGTH_SHORT);
     }
 
     /**
@@ -153,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements
                 getResources().getString(R.string.title_swing),
                 swingTemp));
         refreshItemData();
-//        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -280,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * 处理接收到的消息
+     *
      * @param readMessage 收到的消息
      */
     @Override
@@ -373,35 +377,38 @@ public class MainActivity extends AppCompatActivity implements
             switch (tag) {
                 case Constants.MUSIC_TAG:
                 case Constants.STORY_TAG:
-                    messageBinder.sendMessage(mSoundMode + mPlayState + ";\n");
+                    messageBinder.sendMessage(mSoundMode + mPlayState + Constants.REFRESH_TAG + ";\n");
                     break;
                 case Constants.SWING_TAG:
-                    messageBinder.sendMessage(Constants.SWING_TAG + mSwingMode + ";\n");
+                    messageBinder.sendMessage(Constants.SWING_TAG + mSwingMode + Constants.REFRESH_TAG + ";\n");
                     break;
                 case Constants.HUMIDITY_TAG:
-                    messageBinder.sendMessage(Constants.HUMIDITY_TAG + mHumidity + ";\n");
+                    messageBinder.sendMessage(Constants.HUMIDITY_TAG + mHumidity + Constants.REFRESH_TAG + ";\n");
                     break;
                 case Constants.TEMPERATURE_TAG:
-                    messageBinder.sendMessage(Constants.TEMPERATURE_TAG + mSettingTemperature + ";\n");
+                    messageBinder.sendMessage(Constants.TEMPERATURE_TAG + mSettingTemperature + Constants.REFRESH_TAG + ";\n");
                     break;
                 default:
                     break;
             }
-            messageBinder.sendMessage(Constants.REFRESH_TAG + ";\n");
+//            messageBinder.sendMessage(Constants.REFRESH_TAG + ";\n");
             isDataChanged = false;
         } else {
-            messageBinder.sendMessage(Constants.REFRESH_TAG + ";\n");
+            messageBinder.sendMessage(mSoundMode + mPlayState + Constants.REFRESH_TAG + ";\n");
+            messageBinder.sendMessage(Constants.SWING_TAG + mSwingMode + Constants.REFRESH_TAG + ";\n");
+            messageBinder.sendMessage(Constants.HUMIDITY_TAG + mHumidity + Constants.REFRESH_TAG + ";\n");
+            messageBinder.sendMessage(Constants.TEMPERATURE_TAG + mSettingTemperature + Constants.REFRESH_TAG + ";\n");
+//            messageBinder.sendMessage(Constants.REFRESH_TAG + ";\n");
         }
     }
 
     /**
      * 刷新时的操作
-     *
      * @param view
      */
     @Override
     public void onRefresh(FlyRefreshLayout view) {
-        View child = mListView.getChildAt(0);
+        View child = list.getChildAt(0);
         if (child != null) {
             bounceAnimateView(child.findViewById(R.id.icon));
         }
@@ -409,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mFlyLayout.onRefreshFinish();
+                flyLayout.onRefreshFinish();
             }
         }, 2000);
     }
@@ -484,7 +491,6 @@ public class MainActivity extends AppCompatActivity implements
 
         /**
          * 点击列表不同项进入相应界面
-         *
          * @param v
          */
         @Override
@@ -503,7 +509,6 @@ public class MainActivity extends AppCompatActivity implements
                 case 3:
                     showSwingDialog();
                     break;
-
             }
         }
     }
@@ -516,7 +521,6 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * 设置温度状态
-     *
      * @param currentTemperature 当前温度
      * @param settingTemperature 设定温度
      * @param heatingState       加热状态
@@ -581,7 +585,6 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * 设置声音状态
-     *
      * @param soundMode 声音状态
      * @param playState 播放状态
      */
@@ -669,7 +672,7 @@ public class MainActivity extends AppCompatActivity implements
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
+                        Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
                         startActivity(intent);
                     }
                 });

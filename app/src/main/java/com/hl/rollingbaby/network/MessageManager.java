@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import timber.log.Timber;
+
 /**
  * Created by test on 15-5-28.
  * 负责管理与服务器之间接收和发送消息的线程
@@ -80,7 +82,8 @@ public class MessageManager extends Thread {
                         socket.close();
                         handler.obtainMessage(Constants.CONNECT_FAILED, this)
                                 .sendToTarget();
-                        Log.d(TAG, "socket is closed");
+//                        Log.d(TAG, "socket is closed");
+                        Timber.d("socket is closed");
                     } catch (IOException e) {
                         e.printStackTrace();
                         isConnecting = false;
@@ -123,10 +126,12 @@ public class MessageManager extends Thread {
                 //收到消息后将其传递给MainActivity的handleMessage方法
                 handler.obtainMessage(Constants.MESSAGE_READ,
                         bytes, -1, buffer).sendToTarget();
-                Log.d(TAG, "handler is obtain readMessage...");
+//                Log.d(TAG, "handler is obtain readMessage...");
+                Timber.d( "handler is obtain readMessage...");
             } catch (IOException e) {
                 isConnecting = false;
-                Log.e(TAG, "socket is disconnected", e);
+//                Log.e(TAG, "socket is disconnected", e);
+                Timber.e("socket is disconnected", e);
                 handler.obtainMessage(Constants.CONNECT_FAILED, this)
                         .sendToTarget();
             }
@@ -141,10 +146,12 @@ public class MessageManager extends Thread {
         try {
             oStream.write(buffer);
             String sendMessage = new String(buffer, "UTF-8");
-            Log.d(TAG, "Send : " + sendMessage);
+//            Log.d(TAG, "Send : " + sendMessage);
+            Timber.d(sendMessage);
         } catch (IOException e) {
             isConnecting = false;
-            Log.e(TAG, "Exception during write", e);
+//            Log.e(TAG, "Exception during write", e);
+            Timber.e("Exception during write", e);
         }
     }
 

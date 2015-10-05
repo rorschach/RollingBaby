@@ -15,7 +15,10 @@ import com.hl.rollingbaby.interfaces.Constants;
 
 /**
  */
-public class HumidityDialogFragment extends DialogFragment {
+public class
+
+
+        HumidityDialogFragment extends DialogFragment {
 
     private static final String TAG = "HumidityDialogFragment";
 

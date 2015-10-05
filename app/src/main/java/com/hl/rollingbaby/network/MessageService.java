@@ -16,6 +16,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.hl.rollingbaby.R;
+import com.hl.rollingbaby.Utils;
 import com.hl.rollingbaby.interfaces.Constants;
 import com.hl.rollingbaby.ui.MainActivity;
 import com.hl.rollingbaby.ui.SettingActivity;
@@ -123,7 +124,7 @@ public class MessageService extends Service {
             NotificationManager manager =
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if (Utils.isAndroid4P1()) {
                 Notification notification = new Notification.Builder(context)
                         .setTicker(TAG)
                         .setSmallIcon(R.drawable.send_white_32)
@@ -134,7 +135,7 @@ public class MessageService extends Service {
                         .setDefaults(Notification.DEFAULT_ALL)
                         .build();
                 manager.notify(requestCode, notification);
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            } else if (Utils.isAndroid4()) {
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(context)
                                 .setTicker(TAG)

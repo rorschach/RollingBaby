@@ -16,7 +16,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.hl.rollingbaby.R;
+import com.hl.rollingbaby.Utils;
 import com.hl.rollingbaby.interfaces.Constants;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 /**
  * 温度状态界面
@@ -24,6 +28,16 @@ import com.hl.rollingbaby.interfaces.Constants;
 public class TemperatureDialogFragment extends DialogFragment {
 
     private static final String TAG = "TemperatureDialogFragment";
+    @Bind(R.id.icon)
+    ImageView icon;
+    @Bind(R.id.state)
+    TextView state;
+    @Bind(R.id.setting)
+    TextView setting;
+    @Bind(R.id.current)
+    TextView current;
+    @Bind(R.id.seekBar)
+    SeekBar seekBar;
 
     private int mCurrentTemperature;
     private int mSettingTemperature;
@@ -33,17 +47,12 @@ public class TemperatureDialogFragment extends DialogFragment {
     private OnTemperatureInteractionListener mListener;
 
     private AppCompatDialog dialog;
-    private TextView currentTx;
-    private TextView settingTx;
-    private ImageView icon;
-    private SeekBar seekBar;
-    private TextView heatingTx;
 
     /**
      * 获取TemperatureDialogFragment的实例
      * @param currentTemperature 当前温度
      * @param settingTemperature 设定温度
-     * @param heatingState 加热状态
+     * @param heatingState       加热状态
      * @return fragment实例
      */
     public static TemperatureDialogFragment newInstance(
@@ -76,25 +85,17 @@ public class TemperatureDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_temperature_dialog, container, false);
-
-        initView(view);
-
+        ButterKnife.bind(this, view);
+        initView();
         return view;
     }
 
     /**
      * 初始化各控件
-     * @param view 对应的布局视图
      */
-    private void initView(View view) {
-        currentTx = (TextView) view.findViewById(R.id.current_temperature);
-        settingTx = (TextView) view.findViewById(R.id.setting_temperature);
-        icon = (ImageView) view.findViewById(R.id.heating_icon);
-        heatingTx = (TextView) view.findViewById(R.id.heating_state);
-        seekBar = (SeekBar) view.findViewById(R.id.temperature_seekBar);
-
-        currentTx.setText(mCurrentTemperature + "");
-        settingTx.setText(mSettingTemperature + "");
+    private void initView() {
+        current.setText(mCurrentTemperature + "");
+        setting.setText(mSettingTemperature + "");
 
         seekBar.setProgress(mSettingTemperature);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -102,23 +103,19 @@ public class TemperatureDialogFragment extends DialogFragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 progress += 25;
                 mSettingTemperature = progress;
-                settingTx.setText("" + progress);
+                setting.setText("" + progress);
                 resetView();
             }
-
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
 
         seekBar.setProgress(mSettingTemperature - 25);
-
         resetView();
     }
 
@@ -127,40 +124,41 @@ public class TemperatureDialogFragment extends DialogFragment {
         if (mSettingTemperature > mCurrentTemperature) {
             mHeatingState = Constants.TEMPERATURE_UP;
             icon.setBackgroundResource(R.drawable.sun_background);
-            settingTx.setTextColor(
+            setting.setTextColor(
                     getActivity().getResources().getColor(R.color.red));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ffdb4437"), PorterDuff.Mode.SRC_IN);
                 seekBar.getThumb().setColorFilter(Color.parseColor("#ffdb4437"), PorterDuff.Mode.SRC_IN);
             }
-            heatingTx.setText(getActivity().getResources().getString(R.string.heating));
+            state.setText(getActivity().getResources().getString(R.string.heating));
         } else if (mSettingTemperature < mCurrentTemperature) {
             mHeatingState = Constants.TEMPERATURE_DOWN;
             icon.setBackgroundResource(R.drawable.moon_background);
-            settingTx.setTextColor(
+            setting.setTextColor(
                     getActivity().getResources().getColor(R.color.blue));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ff4285f4"), PorterDuff.Mode.SRC_IN);
                 seekBar.getThumb().setColorFilter(Color.parseColor("#ff4285f4"), PorterDuff.Mode.SRC_IN);
             }
-            heatingTx.setText(getActivity().getResources().getString(R.string.cool_down));
+            state.setText(getActivity().getResources().getString(R.string.cool_down));
         } else {
             icon.setBackgroundResource(R.drawable.sun_background);
             mHeatingState = Constants.HEATING_CLOSE;
-            settingTx.setTextColor(
+            setting.setTextColor(
                     getActivity().getResources().getColor(R.color.green));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#ff0f9d58"), PorterDuff.Mode.SRC_IN);
                 seekBar.getThumb().setColorFilter(Color.parseColor("#ff0f9d58"), PorterDuff.Mode.SRC_IN);
             }
-            heatingTx.setText(getActivity().getResources().getString(R.string.unHeating));
+            state.setText(getActivity().getResources().getString(R.string.unHeating));
         }
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new AppCompatDialog(getActivity(), getTheme());
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        int height = Utils.dpToPx(Utils.getScreenHeight(getActivity()) / 3);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height);
         return dialog;
     }
 
@@ -179,7 +177,7 @@ public class TemperatureDialogFragment extends DialogFragment {
     }
 
     /**
-     *释放持有的对Activity的引用
+     * 释放持有的对Activity的引用
      */
     @Override
     public void onDetach() {
@@ -197,9 +195,10 @@ public class TemperatureDialogFragment extends DialogFragment {
 
     /**
      * 刷新数据
+     *
      * @param currentTemperature 当前温度
      * @param settingTemperature 设定温度
-     * @param heatingState 加热状态
+     * @param heatingState       加热状态
      */
     public void refreshData(
             int currentTemperature, int settingTemperature, String heatingState) {
@@ -211,6 +210,12 @@ public class TemperatureDialogFragment extends DialogFragment {
         mSettingTemperature = getArguments().getInt(Constants.ARG_SETTING_TEMPERATURE, mCurrentTemperature);
         mHeatingState = getArguments().getString(Constants.ARG_HEATING_STATE);
         this.setArguments(args);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     //对外部公开的接口

@@ -14,13 +14,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.hl.rollingbaby.R;
+import com.hl.rollingbaby.Utils;
 import com.hl.rollingbaby.interfaces.Constants;
 import com.hl.rollingbaby.views.WaveView;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 /**
  * 声音状态界面
@@ -28,6 +33,20 @@ import com.hl.rollingbaby.views.WaveView;
 public class SoundDialogFragment extends DialogFragment {
 
     private static final String TAG = "SoundDialogFragment";
+    @Bind(R.id.wave_view)
+    WaveView waveView;
+    @Bind(R.id.test)
+    TextView test;
+    @Bind(R.id.rewind)
+    ImageButton rewind;
+    @Bind(R.id.play)
+    ImageButton play;
+    @Bind(R.id.forward)
+    ImageButton forward;
+    @Bind(R.id.seek_bar)
+    SeekBar seekBar;
+    @Bind(R.id.mode_switch)
+    Switch modeSwitch;
 
     private String mSoundMode;
     private int mPlayState;
@@ -39,13 +58,10 @@ public class SoundDialogFragment extends DialogFragment {
     private OnSoundInteractionListener mListener;
 
     private AppCompatDialog dialog;
-    private WaveView waveView;
-    private ImageButton playBt;
-    private Switch modeSwitch;
-    private TextView test;
 
     /**
      * 获取SoundDialogFragment的实例
+     *
      * @param soundMode 声音模式
      * @param playState 播放状态
      * @return fragment实例
@@ -78,27 +94,16 @@ public class SoundDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_sound_dialog, container, false);
-        initView(v);
+        ButterKnife.bind(this, v);
+        initView();
         return v;
     }
 
     /**
      * 初始化各控件
-     * @param view 对应的布局视图
      */
-    private void initView(View view) {
-
-        Log.d(TAG, "initView : " + mSoundMode + ":" + mPlayState);
-
-        waveView = (WaveView) view.findViewById(R.id.wave_view);
-        SeekBar seekBar = (SeekBar) view.findViewById(R.id.seek_bar);
-        playBt = (ImageButton) view.findViewById(R.id.play);
-        ImageButton rewindBt = (ImageButton) view.findViewById(R.id.rewind);
-        ImageButton forwardBt = (ImageButton) view.findViewById(R.id.forward);
-        modeSwitch = (Switch) view.findViewById(R.id.mode_switch);
-        test = (TextView) view.findViewById(R.id.test);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+    private void initView() {
+        if (Utils.isAndroid4P1()) {
             seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#3498db"), PorterDuff.Mode.SRC_IN);
             seekBar.getThumb().setColorFilter(Color.parseColor("#2980b9"), PorterDuff.Mode.SRC_IN);
         }
@@ -119,13 +124,13 @@ public class SoundDialogFragment extends DialogFragment {
 
         resetView();
 
-        playBt.setOnClickListener(new View.OnClickListener() {
+        play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPlayState = Math.abs(mPlayState - 1);
-                if (mPlayState == Constants.SOUND_RECEIVE_PAUSE || mPlayState == Constants.SOUND_STOP ) {
+                if (mPlayState == Constants.SOUND_RECEIVE_PAUSE || mPlayState == Constants.SOUND_STOP) {
                     waveView.setPlayStation(true);
-                } else if(mPlayState == Constants.SOUND_PLAY ){
+                } else if (mPlayState == Constants.SOUND_PLAY) {
                     waveView.setPlayStation(false);
                 }
                 Log.d(TAG, "Play state after click: " + mPlayState);
@@ -136,7 +141,7 @@ public class SoundDialogFragment extends DialogFragment {
             }
         });
 
-        forwardBt.setOnClickListener(new View.OnClickListener() {
+        forward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPlayState = Constants.SOUND_NEXT;
@@ -146,7 +151,7 @@ public class SoundDialogFragment extends DialogFragment {
             }
         });
 
-        rewindBt.setOnClickListener(new View.OnClickListener() {
+        rewind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPlayState = Constants.SOUND_PREVIOUS;
@@ -180,10 +185,10 @@ public class SoundDialogFragment extends DialogFragment {
 
         if (mPlayState == Constants.SOUND_PLAY) {
             waveView.setPlayStation(true);
-            playBt.setImageResource(R.drawable.pause_bt_50);
+            play.setImageResource(R.drawable.pause_bt_50);
         } else {
             waveView.setPlayStation(false);
-            playBt.setImageResource(R.drawable.play_bt_50);
+            play.setImageResource(R.drawable.play_bt_50);
         }
 
         String temp;
@@ -201,9 +206,8 @@ public class SoundDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new AppCompatDialog(getActivity(), getTheme());
-        dialog.setTitle("Sound");
-        dialog.getWindow().setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        int height = Utils.dpToPx(Utils.getScreenHeight(getActivity()) / 3);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height);
 
         return dialog;
     }
@@ -229,7 +233,7 @@ public class SoundDialogFragment extends DialogFragment {
     }
 
     /**
-     *释放持有的对Activity的引用
+     * 释放持有的对Activity的引用
      */
     @Override
     public void onDetach() {
@@ -239,6 +243,7 @@ public class SoundDialogFragment extends DialogFragment {
 
     /**
      * 刷新数据
+     *
      * @param soundMode 声音模式
      * @param playState 播放状态
      */
@@ -250,6 +255,12 @@ public class SoundDialogFragment extends DialogFragment {
         args.putInt(Constants.ARG_PLAY_STATE, mPlayState);
         this.setArguments(args);
         Log.d(TAG, "refreshData : " + mSoundMode + ":" + mPlayState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     //对外部公开的接口

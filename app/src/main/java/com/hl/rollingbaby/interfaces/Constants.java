@@ -32,7 +32,7 @@ public interface Constants {
     /*
      * 和服务器通信的消息的字段
      */
-    String REFRESH_TAG = "ref";   //刷新请求
+    String REFRESH_TAG = "re";   //刷新请求
 
     String TEMPERATURE_TAG = "t";
     String HEATING_CLOSE = "c";

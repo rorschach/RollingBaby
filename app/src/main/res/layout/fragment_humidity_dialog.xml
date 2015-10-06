@@ -1,15 +1,29 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
     tools:context="com.hl.rollingbaby.ui.HumidityDialogFragment">
 
     <TextView
-        android:id="@+id/text"
+        android:id="@+id/humidity"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_gravity="center"
-        android:gravity="center"
-        android:textSize="30sp" />
+        android:layout_weight="2"
+        android:padding="8dp"
+        android:text="@string/humidity_state"
+        android:textSize="28sp" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/wetting_state"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="3"
+        android:gravity="center"
+        android:padding="8dp"
+        android:textSize="28sp" />
+
+</LinearLayout>

@@ -2,11 +2,9 @@ package com.hl.rollingbaby.ui;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +12,10 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.Utils;
@@ -57,6 +55,7 @@ public class SoundDialogFragment extends BaseDialogFragment {
 
     /**
      * 获取SoundDialogFragment的实例
+     *
      * @param soundMode 声音模式
      * @param playState 播放状态
      * @return fragment实例
@@ -127,22 +126,19 @@ public class SoundDialogFragment extends BaseDialogFragment {
             }
         });
 
-        resetView();
+        updateView();
 
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPlayState = Math.abs(mPlayState - 1);
+//                mPlayState = Math.abs(mPlayState - 1);
                 if (mPlayState == Constants.SOUND_RECEIVE_PAUSE || mPlayState == Constants.SOUND_STOP) {
-                    waveView.setPlayStation(true);
+                    mPlayState = Constants.SOUND_PLAY;
                 } else if (mPlayState == Constants.SOUND_PLAY) {
-                    waveView.setPlayStation(false);
+                    mPlayState = Constants.SOUND_SEND_PAUSE;
                 }
-                Log.d(TAG, "Play state after click: " + mPlayState);
-                resetView();
+                updateView();
                 mListener.updateSoundStatus(mSoundMode, mPlayState);
-//                if (!sSoundTemp.equals(mSoundMode) || (sPlayTemp != mPlayState)) {
-//                }
             }
         });
 
@@ -150,9 +146,8 @@ public class SoundDialogFragment extends BaseDialogFragment {
             @Override
             public void onClick(View v) {
                 mPlayState = Constants.SOUND_NEXT;
+                Toast.makeText(getActivity(), "Next", Toast.LENGTH_SHORT).show();
                 mListener.updateSoundStatus(mSoundMode, mPlayState);
-//                if (!sSoundTemp.equals(mSoundMode) || (sPlayTemp != mPlayState)) {
-//                }
             }
         });
 
@@ -160,9 +155,8 @@ public class SoundDialogFragment extends BaseDialogFragment {
             @Override
             public void onClick(View v) {
                 mPlayState = Constants.SOUND_PREVIOUS;
+                Toast.makeText(getActivity(), "Last", Toast.LENGTH_SHORT).show();
                 mListener.updateSoundStatus(mSoundMode, mPlayState);
-//                if (!sSoundTemp.equals(mSoundMode) || (sPlayTemp != mPlayState)) {
-//                }
             }
         });
 
@@ -186,12 +180,15 @@ public class SoundDialogFragment extends BaseDialogFragment {
     /**
      * 根据用户操作更新视图
      */
-    private void resetView() {
-
+    private void updateView() {
+        forward.setEnabled(false);
+        rewind.setEnabled(false);
         if (mPlayState == Constants.SOUND_PLAY) {
             waveView.setPlayStation(true);
             play.setImageResource(R.drawable.pause_bt_50);
-        } else {
+            forward.setEnabled(true);
+            rewind.setEnabled(true);
+        } else if (mPlayState == Constants.SOUND_RECEIVE_PAUSE || mPlayState == Constants.SOUND_STOP) {
             waveView.setPlayStation(false);
             play.setImageResource(R.drawable.play_bt_50);
         }
@@ -205,16 +202,7 @@ public class SoundDialogFragment extends BaseDialogFragment {
             temp = getActivity().getResources().getString(R.string.story_mode);
         }
         test.setText(temp);
-        Log.d(TAG, "resetView : " + mSoundMode + ":" + mPlayState);
-    }
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        dialog = new AppCompatDialog(getActivity(), getTheme());
-        int height = Utils.dpToPx(Utils.getScreenHeight(getActivity()) / 3);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height);
-        dialog.getWindow().setWindowAnimations(R.style.DialogAnimation);
-        return dialog;
+        Log.d(TAG, "updateView : " + mSoundMode + ":" + mPlayState);
     }
 
     /**

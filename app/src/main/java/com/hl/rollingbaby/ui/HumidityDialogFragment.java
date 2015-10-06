@@ -2,7 +2,6 @@ package com.hl.rollingbaby.ui;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDialog;
 import android.util.Log;
@@ -15,11 +14,20 @@ import com.hl.rollingbaby.R;
 import com.hl.rollingbaby.Utils;
 import com.hl.rollingbaby.interfaces.Constants;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  */
 public class HumidityDialogFragment extends BaseDialogFragment {
 
+    @Bind(R.id.humidity)
+    TextView humidity;
+    @Bind(R.id.wetting_state)
+    TextView wettingState;
+
     private static final String TAG = "HumidityDialogFragment";
+
     private AppCompatDialog dialog;
     private int mHumidity;
 
@@ -48,21 +56,33 @@ public class HumidityDialogFragment extends BaseDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_humidity_dialog, container, false);
-        TextView textView = (TextView) view.findViewById(R.id.text);
-        textView.setText(mHumidity + "%");
+        ButterKnife.bind(this, view);
+
+        initView(view);
         return view;
     }
 
     @Override
+    protected void initView(View view) {
+        String text = getActivity().getResources().getString(R.string.humidity_state)
+                + mHumidity + "%";
+        humidity.setText(text);
+        if (mHumidity >= 80) {
+            wettingState.setText(getActivity().getResources().getString(R.string.isWetting));
+        }else {
+            wettingState.setText(getActivity().getResources().getString(R.string.notWetting));
+        }
+    }
+
+    @Override
     public void onPause() {
-        dialog.dismiss();
         super.onPause();
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new AppCompatDialog(getActivity(), getTheme());
-        int height = Utils.dpToPx(Utils.getScreenHeight(getActivity()) / 4);
+        int height = Utils.dpToPx(Utils.getScreenHeight(getActivity()) / 5);
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, height);
         dialog.getWindow().setWindowAnimations(R.style.DialogAnimation);
         return dialog;
@@ -91,6 +111,12 @@ public class HumidityDialogFragment extends BaseDialogFragment {
         args.putInt(Constants.ARG_HUMIDITY, mHumidity);
         this.setArguments(args);
         Log.d(TAG, "refreshData : " + mHumidity);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     public interface OnHumidityInteractionListener {

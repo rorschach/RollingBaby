@@ -14,6 +14,7 @@ import android.os.Message;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -55,14 +56,14 @@ public class MainActivity extends AppCompatActivity implements
         SoundDialogFragment.OnSoundInteractionListener,
         SwingDialogFragment.OnSwingInteractionListener {
 
-    private static final String TAG = "MainActivity";
-
     @Bind(R.id.list)
     RecyclerView list;
     @Bind(R.id.fly_layout)
     FlyRefreshLayout flyLayout;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
+
+    private static final String TAG = "MainActivity";
 
     private MessageService.MessageBinder messageBinder;
     private MessageService messageService;
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements
     private HumidityDialogFragment humidityDialog;
     private SoundDialogFragment soundDialog;
     private SwingDialogFragment swingDialog;
+    private ConnectFailedFragment failedFragment;
 
     private int mCurrentTemperature = 33;
     private int mSettingTemperature = 33;
@@ -84,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
     private String mSwingMode = "c";
 
     private boolean isInActivity = false;
-    private boolean isDataChanged = false;
+    public static boolean isDialogShown = false;
 
     private Handler handler = new Handler(this);
 
@@ -134,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements
         humidityDialog = HumidityDialogFragment.newInstance(mHumidity);
         soundDialog = SoundDialogFragment.newInstance(mSoundMode, mPlayState);
         swingDialog = SwingDialogFragment.newInstance(mSwingMode);
+        failedFragment = ConnectFailedFragment.newInstance();
         initItemData();
 
         toast = Toast.makeText(this, getResources().getString(R.string.back_bt), Toast.LENGTH_SHORT);
@@ -204,7 +207,8 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, MessageService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
         isInActivity = true;
-        Log.d(TAG, "onResume" + mSoundMode + ":" + mPlayState);
+        isDialogShown = false;
+        Log.d(TAG, "onResume-" + isDialogShown);
     }
 
     /**
@@ -213,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        sendExitMessage();
         if (messageService != null) {
             unbindService(this);
         }
@@ -220,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * 绑定后台服务时的操作
+     *
      * @param name    组件名
      * @param service 绑定的服务
      */
@@ -243,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
-
             case Constants.CONNECT_SUCCESS:
                 if (!isInActivity) {
                     messageBinder.buildNotification(
@@ -259,7 +264,8 @@ public class MainActivity extends AppCompatActivity implements
                             getResources().getString(R.string.fail_title),
                             getResources().getString(R.string.fail_content));
                 } else {
-                    showFailedDialog();
+                    showConnectedFailedDialog();
+//                    failedFragment.show(getFragmentManager(), "connectFailed");
                 }
                 break;
             case Constants.MESSAGE_READ:
@@ -369,6 +375,18 @@ public class MainActivity extends AppCompatActivity implements
         messageBinder.sendMessage(Constants.REFRESH_TAG + ";\n");
     }
 
+    public void sendExitMessage() {
+        Log.d(TAG, "sendExitMessage");
+        if (mPlayState == Constants.SOUND_PLAY) {
+            messageBinder.sendMessage(mSoundMode + Constants.SOUND_STOP + ";\n");
+        }
+
+        if (mSwingMode.equals(Constants.SWING_OPEN)) {
+            messageBinder.sendMessage(Constants.SWING_TAG + Constants.SWING_CLOSE + ";\n");
+        }
+        messageBinder.sendMessage(Constants.TEMPERATURE_TAG + 0 + ";\n");
+    }
+
     @Override
     public void sendSingleMessage(String tag) {
         switch (tag) {
@@ -388,7 +406,6 @@ public class MainActivity extends AppCompatActivity implements
             default:
                 break;
         }
-        isDataChanged = false;
     }
 
     /**
@@ -424,10 +441,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onRefreshAnimationEnd(FlyRefreshLayout view) {
+        Log.d(TAG, "getConnectState-" + messageBinder.getConnectState());
         if (messageBinder.getConnectState()) {
             sendRefreshRequest();
-        } else {
-            showFailedDialog();
+        }else {
+            showConnectedFailedDialog();
+//            failedFragment.show(getFragmentManager(), "connectFailed");
         }
     }
 
@@ -543,14 +562,11 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void updateTemperatureState(int currentTemperature, int settingTemperature, String heatingState) {
-        isDataChanged = true;
         mCurrentTemperature = currentTemperature;
         mSettingTemperature = settingTemperature;
         mHeatingState = heatingState;
-
         refreshTemperatureItemData();
         sendSingleMessage(Constants.TEMPERATURE_TAG);
-        Log.d(TAG, "updateTemperatureStatus");
     }
 
     /**
@@ -588,7 +604,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void refreshHumidityItemData() {
-        humidityTemp = mHumidity + "%";
+        String tx;
+        if (mHumidity >= 80) {
+            tx = " / " + getResources().getString(R.string.mIsWetting);
+        } else {
+            tx = "";
+        }
+        humidityTemp = mHumidity + "%" + tx;
         mDataSet.get(1).subTitle = humidityTemp;
         mAdapter.notifyDataSetChanged();
     }
@@ -607,13 +629,10 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void updateSoundStatus(String soundMode, int playState) {
-        isDataChanged = true;
         mSoundMode = soundMode;
         mPlayState = playState;
-
         refreshSoundItemData();
         sendSingleMessage(soundMode);
-        Log.d(TAG, "updateSoundStatus");
     }
 
     /**
@@ -627,11 +646,11 @@ public class MainActivity extends AppCompatActivity implements
             soundTemp = getResources().getString(R.string.story_mode);
         }
 
-        if (mPlayState == Constants.SOUND_STOP) {
+        if (mPlayState == Constants.SOUND_STOP || mPlayState == Constants.SOUND_RECEIVE_PAUSE) {
             playTemp = getResources().getString(R.string.close);
             mDataSet.get(2).subTitle = playTemp;
-        } else {
-            playTemp = getResources().getString(R.string.play);
+        } else if(mPlayState == Constants.SOUND_PLAY){
+            playTemp = getResources().getString(R.string.isPlaying);
             mDataSet.get(2).subTitle = soundTemp + " / " + playTemp;
         }
         mAdapter.notifyDataSetChanged();
@@ -639,10 +658,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void showSwingDialog() {
-        Log.d(TAG, "showSwingDialog" + mSwingMode);
         swingDialog.show(getFragmentManager(), "swingDialog");
         swingDialog.refreshData(mSwingMode);
-        Log.d(TAG, "showSwingDialog" + mSwingMode);
     }
 
     /**
@@ -652,13 +669,9 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void updateSwingStatus(String swingMode) {
-        Log.d(TAG, "updateSwingStatus : " + mSwingMode);
-        isDataChanged = true;
         mSwingMode = swingMode;
-
         refreshSwingItemData();
         sendSingleMessage(swingMode);
-        Log.d(TAG, "updateSwingStatus : " + mSwingMode);
     }
 
     /**
@@ -666,7 +679,6 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void refreshSwingItemData() {
-        Log.d(TAG, "refreshSwingItemData : " + mSwingMode);
         if (mSwingMode.equals(Constants.SWING_OPEN)) {
             swingTemp = getResources().getString(R.string.open);
         } else if (mSwingMode.equals(Constants.SWING_CLOSE)) {
@@ -674,33 +686,21 @@ public class MainActivity extends AppCompatActivity implements
         }
         mDataSet.get(3).subTitle = swingTemp;
         mAdapter.notifyDataSetChanged();
-        Log.d(TAG, "refreshSwingItemData : " + mSwingMode);
+    }
+
+    public static void setIsDialogShown(boolean shown) {
+        isDialogShown = shown;
     }
 
     /**
      * 连接失败后显示的对话框
      */
-    private void showFailedDialog() {
-        final AlertDialog.Builder builder =
-                new AlertDialog.Builder(this);
-        builder.setTitle(getResources().getString(R.string.fail_title));
-        builder.setView(R.layout.failed_dialog);
-        builder.setPositiveButton(getResources().getString(R.string.position_bt),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
-                        startActivity(intent);
-                    }
-                });
-
-        builder.setNegativeButton(getResources().getString(R.string.navigation_bt),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-        builder.create().show();
+    private void showConnectedFailedDialog() {
+        Log.d(TAG, "isDialogShown-" + isDialogShown);
+        if (!isDialogShown) {
+            failedFragment.show(getFragmentManager(), "connectFailed");
+        }
+        Log.d(TAG, "isDialogShown-" + isDialogShown);
     }
 
     /**

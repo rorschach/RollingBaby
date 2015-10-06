@@ -40,11 +40,7 @@ public class MessageManager extends Thread {
      * 获取连接状态
      */
     public boolean getConnectState() {
-        if (oStream != null && iStream != null) {
-            return isConnecting;
-        } else {
-            return false;
-        }
+        return oStream != null && iStream != null;
     }
 
 /**
@@ -143,16 +139,21 @@ public class MessageManager extends Thread {
      * 发送字节数组类型的消息给服务器
      */
     public void write(byte[] buffer) {
-        try {
-            oStream.write(buffer);
-            String sendMessage = new String(buffer, "UTF-8");
-//            Log.d(TAG, "Send : " + sendMessage);
-            Timber.d(sendMessage);
-        } catch (IOException e) {
-            isConnecting = false;
-//            Log.e(TAG, "Exception during write", e);
-            Timber.e("Exception during write", e);
-        }
+//        if (getConnectState()) {
+            try {
+                oStream.write(buffer);
+                String sendMessage = new String(buffer, "UTF-8");
+            Log.d(TAG, "Send : " + sendMessage);
+                Timber.d(sendMessage);
+            } catch (IOException e) {
+                isConnecting = false;
+            Log.e(TAG, "Exception during write", e);
+                Timber.e("Exception during write", e);
+            }
+//        }else {
+//            handler.obtainMessage(Constants.CONNECT_FAILED, this)
+//                    .sendToTarget();
+//        }
     }
 
 

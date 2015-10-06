@@ -35,7 +35,7 @@ public interface Constants {
     String REFRESH_TAG = "ref";   //刷新请求
 
     String TEMPERATURE_TAG = "t";
-    String HEATING_CLOSE = "c";
+    String TEMPERATURE_CLOSE = "c";
     String TEMPERATURE_UP = "u";            //升温
     String TEMPERATURE_DOWN = "d";          //降温
     //t.u.40;

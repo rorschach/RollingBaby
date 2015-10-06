@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -24,7 +23,6 @@ import com.hl.rollingbaby.ui.SettingActivity;
 public class MessageService extends Service {
 
     private static final String TAG = "MessageService";
-    public static final String CONVERSATION_ID = "conversation_id";
 
     public static final int NOTIFICATION_CONNECT_FAILED = 0;
     public static final int NOTIFICATION_CONNECT_SUCCESS = 1;

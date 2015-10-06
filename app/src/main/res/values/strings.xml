@@ -16,19 +16,22 @@
     <string name="read_content">纸飞机飞回来了，宝宝有动静了，请点击查看</string>
     <string name="position_bt">立刻检查</string>
     <string name="navigation_bt">等会再说</string>
-    <string name="back_bt">"再按一次退出程序"</string>
+    <string name="back_bt">再按一次退出程序</string>
 
     <string name="temperature_up"> 升温中</string>
     <string name="temperature_close"> </string>
     <string name="temperature_down"> 降温中</string>
 
-    <string name="heating_main"> / 升温中</string>
-    <string name="unHeating_main"> </string>
-    <string name="cool_down_main"> / 降温中</string>
+    <string name="humidity_state">当前湿度值为：</string>
+    <string name="isWetting">宝宝尿床啦，请快快换尿布吧</string>
+    <string name="notWetting">您的宝宝睡的很安稳，没有尿床</string>
+
+    <string name="mIsWetting">宝宝尿床啦</string>
+    <string name="mNotWetting">宝宝未尿床</string>
 
     <string name="music_mode">音乐模式</string>
     <string name="story_mode">故事机模式</string>
-    <string name="play">播放中</string>
+    <string name="isPlaying">播放中</string>
 
     <string name="open">开启</string>
     <string name="close">关闭</string>
@@ -48,8 +51,6 @@
     <string name="ip_title">请输入IP地址及端口号</string>
     <string name="summary_header">当前为 : </string>
     <string name="summary_default">当前为 : 192.168.23.5:7838</string>
-
-    <string name="hello_world">Hello world!</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

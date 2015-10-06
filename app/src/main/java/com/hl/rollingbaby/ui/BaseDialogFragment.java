@@ -35,18 +35,9 @@ public class BaseDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        dialog.dismiss();
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
 
-    public AppCompatDialog getMyDialog() {
-        return dialog;
-    }
 }

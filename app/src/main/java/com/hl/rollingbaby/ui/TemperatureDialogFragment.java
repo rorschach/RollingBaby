@@ -3,7 +3,6 @@ package com.hl.rollingbaby.ui;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -93,8 +92,9 @@ public class TemperatureDialogFragment extends BaseDialogFragment {
      */
     @Override
     protected void initView() {
-        current.setText(mCurrentTemperature + "");
-        setting.setText(mSettingTemperature + "");
+        String tx = mCurrentTemperature + "";
+        current.setText(tx);
+        setting.setText(tx);
 
         seekBar.setProgress(mSettingTemperature);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -137,7 +137,7 @@ public class TemperatureDialogFragment extends BaseDialogFragment {
         } else {
 
             icon.setBackgroundResource(R.drawable.sun_background);
-            mHeatingState = Constants.HEATING_CLOSE;
+            mHeatingState = Constants.TEMPERATURE_CLOSE;
             textColor = R.color.green;
             seekColor = "#ff0f9d58";
             state.setText(getActivity().getResources().getString(R.string.temperature_close));

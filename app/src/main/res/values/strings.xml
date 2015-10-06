@@ -23,10 +23,10 @@
     <string name="temperature_down"> 降温中</string>
 
     <string name="humidity_state">当前湿度值为：</string>
-    <string name="isWetting">宝宝尿床啦，请快快换尿布吧</string>
+    <string name="isWetting">十万火急，宝宝尿床啦，请快快换尿布吧！</string>
     <string name="notWetting">您的宝宝睡的很安稳，没有尿床</string>
 
-    <string name="mIsWetting">宝宝尿床啦</string>
+    <string name="mIsWetting">宝宝尿床啦！</string>
     <string name="mNotWetting">宝宝未尿床</string>
 
     <string name="music_mode">音乐模式</string>

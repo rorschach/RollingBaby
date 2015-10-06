@@ -28,6 +28,7 @@ public interface Constants {
     String ARG_SWING_MODE = "SWING_MODE";
 
     int DEFAULT_TEMPERATURE = 33;           //默认温度
+    int DEFAULT_HUMIDITY = 50;
 
     /*
      * 和服务器通信的消息的字段

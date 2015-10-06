@@ -73,17 +73,18 @@ public class MainActivity extends AppCompatActivity implements
     private SwingDialogFragment swingDialog;
     private ConnectFailedFragment failedFragment;
 
-    private int mCurrentTemperature = 33;
-    private int mSettingTemperature = 33;
-    private int mHumidity = 60;
-    private String mHeatingState = "n";
-    private String mSoundMode = "m";
-    private int mPlayState = 1;
-    private String mSwingMode = "c";
+    private int mCurrentTemperature = Constants.DEFAULT_TEMPERATURE;
+    private int mSettingTemperature = mCurrentTemperature;
+    private int mHumidity = Constants.DEFAULT_HUMIDITY;
+    private String mHeatingState = Constants.HEATING_NONE;
+    private String mSoundMode = Constants.MUSIC_TAG;
+    private int mPlayState = Constants.SOUND_STOP;
+    private String mSwingMode = Constants.SWING_CLOSE;
 
     private boolean isInActivity = false;
     public static boolean isDialogShown = false;
     private boolean isChangeTemperature = false;
+    private boolean isWetting = false;
 
     private Handler handler = new Handler(this);
 
@@ -205,7 +206,6 @@ public class MainActivity extends AppCompatActivity implements
         bindService(intent, this, BIND_AUTO_CREATE);
         isInActivity = true;
         isDialogShown = false;
-        Log.d(TAG, "onResume-" + isDialogShown);
     }
 
     /**
@@ -262,7 +262,6 @@ public class MainActivity extends AppCompatActivity implements
                             getResources().getString(R.string.fail_content));
                 } else {
                     showConnectedFailedDialog();
-//                    failedFragment.show(getFragmentManager(), "connectFailed");
                 }
                 break;
             case Constants.MESSAGE_READ:
@@ -270,6 +269,12 @@ public class MainActivity extends AppCompatActivity implements
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
                 parseMessage(readMessage);
+                if (isWetting) {
+                    messageBinder.buildNotification(
+                            MessageService.NOTIFICATION_READ_MESSAGE,
+                            getResources().getString(R.string.mIsWetting),
+                            getResources().getString(R.string.isWetting));
+                }
                 if (!isInActivity) {
                     messageBinder.buildNotification(
                             MessageService.NOTIFICATION_READ_MESSAGE,
@@ -346,6 +351,9 @@ public class MainActivity extends AppCompatActivity implements
             String HUMIDITY = state[2];//like SW.S, get the 'S'
             String[] humidityList = HUMIDITY.split("\\.");
             mHumidity = Integer.valueOf(humidityList[1]);
+            if (mHumidity >= 80) {
+                isWetting = true;
+            }
 
             String TEMPERATURE = state[3];//like T.O.25,get the '25'
             String[] temperatureList = TEMPERATURE.split("\\.");

@@ -122,14 +122,14 @@ public class TemperatureDialogFragment extends BaseDialogFragment {
     private void resetView() {
         if (mSettingTemperature > mCurrentTemperature) {
 
-            mHeatingState = Constants.TEMPERATURE_UP;
+            mHeatingState = Constants.HEATING_OPEN;
             icon.setBackgroundResource(R.drawable.sun_background);
             textColor = R.color.red;
             seekColor = "#ffdb4437";
             state.setText(getActivity().getResources().getString(R.string.temperature_up));
         } else if (mSettingTemperature < mCurrentTemperature) {
 
-            mHeatingState = Constants.TEMPERATURE_DOWN;
+            mHeatingState = Constants.HEATING_CLOSE;
             icon.setBackgroundResource(R.drawable.moon_background);
             textColor = R.color.blue;
             seekColor = "#ff4285f4";
@@ -137,7 +137,7 @@ public class TemperatureDialogFragment extends BaseDialogFragment {
         } else {
 
             icon.setBackgroundResource(R.drawable.sun_background);
-            mHeatingState = Constants.TEMPERATURE_CLOSE;
+            mHeatingState = Constants.HEATING_NONE;
             textColor = R.color.green;
             seekColor = "#ff0f9d58";
             state.setText(getActivity().getResources().getString(R.string.temperature_close));

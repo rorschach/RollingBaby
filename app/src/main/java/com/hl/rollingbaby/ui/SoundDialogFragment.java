@@ -131,12 +131,12 @@ public class SoundDialogFragment extends BaseDialogFragment {
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mPlayState = Math.abs(mPlayState - 1);
-                if (mPlayState == Constants.SOUND_RECEIVE_PAUSE || mPlayState == Constants.SOUND_STOP) {
-                    mPlayState = Constants.SOUND_PLAY;
-                } else if (mPlayState == Constants.SOUND_PLAY) {
-                    mPlayState = Constants.SOUND_SEND_PAUSE;
-                }
+                mPlayState = Math.abs(mPlayState - 1);
+//                if (mPlayState == Constants.SOUND_RECEIVE_PAUSE || mPlayState == Constants.SOUND_STOP) {
+//                    mPlayState = Constants.SOUND_PLAY;
+//                } else if (mPlayState == Constants.SOUND_PLAY) {
+//                    mPlayState = Constants.SOUND_SEND_PAUSE;
+//                }
                 updateView();
                 mListener.updateSoundStatus(mSoundMode, mPlayState);
             }
@@ -181,8 +181,6 @@ public class SoundDialogFragment extends BaseDialogFragment {
      * 根据用户操作更新视图
      */
     private void updateView() {
-        forward.setEnabled(false);
-        rewind.setEnabled(false);
         if (mPlayState == Constants.SOUND_PLAY) {
             waveView.setPlayStation(true);
             play.setImageResource(R.drawable.pause_bt_50);
@@ -191,6 +189,8 @@ public class SoundDialogFragment extends BaseDialogFragment {
         } else if (mPlayState == Constants.SOUND_RECEIVE_PAUSE || mPlayState == Constants.SOUND_STOP) {
             waveView.setPlayStation(false);
             play.setImageResource(R.drawable.play_bt_50);
+            forward.setEnabled(false);
+            rewind.setEnabled(false);
         }
 
         String temp;

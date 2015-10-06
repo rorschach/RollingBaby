@@ -4,17 +4,13 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.provider.Settings;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -80,13 +76,14 @@ public class MainActivity extends AppCompatActivity implements
     private int mCurrentTemperature = 33;
     private int mSettingTemperature = 33;
     private int mHumidity = 60;
-    private String mHeatingState = "c";
+    private String mHeatingState = "n";
     private String mSoundMode = "m";
     private int mPlayState = 1;
     private String mSwingMode = "c";
 
     private boolean isInActivity = false;
     public static boolean isDialogShown = false;
+    private boolean isChangeTemperature = false;
 
     private Handler handler = new Handler(this);
 
@@ -296,14 +293,10 @@ public class MainActivity extends AppCompatActivity implements
         try {
             String[] state = readMessage.split(";");
             Log.d(TAG, "..." + state.length);
-            if (state.length == 3) {
+            if (state.length == 4) {
                 parseMultipleMessage(state);
             } else if (state.length == 1) {
                 parseSingleMessage(state);
-            }
-
-            if (mSettingTemperature == 0) {
-                mSettingTemperature = mCurrentTemperature;
             }
 
             refreshItemData();
@@ -340,10 +333,11 @@ public class MainActivity extends AppCompatActivity implements
 
     private void parseMultipleMessage(String[] state) {
         try {
-            String SOUND = state[0];//like SO.M.1,get the 'M' and '1'
+            String SOUND = state[0];//like M.1,get the 'M' and '1'
             String[] soundList = SOUND.split("\\.");
-            mSoundMode = soundList[1];
-            mPlayState = Integer.valueOf(soundList[2]);
+            mSoundMode = soundList[0];
+            mPlayState = Integer.valueOf(soundList[1]);
+
 
             String SWING = state[1];//like SW.S, get the 'S'
             String[] swingList = SWING.split("\\.");
@@ -353,12 +347,13 @@ public class MainActivity extends AppCompatActivity implements
             String[] humidityList = HUMIDITY.split("\\.");
             mHumidity = Integer.valueOf(humidityList[1]);
 
-            String TEMPERATURE = state[4];//like T.O.25,get the '25'
+            String TEMPERATURE = state[3];//like T.O.25,get the '25'
             String[] temperatureList = TEMPERATURE.split("\\.");
             mHeatingState = temperatureList[1];
             mCurrentTemperature = Integer.valueOf(temperatureList[2]);
+            Log.d(TAG, "tem-" + mCurrentTemperature);
 
-            if (mSettingTemperature == 0) {
+            if (!isChangeTemperature) {
                 mSettingTemperature = mCurrentTemperature;
             }
             refreshItemData();
@@ -378,12 +373,23 @@ public class MainActivity extends AppCompatActivity implements
     public void sendExitMessage() {
         Log.d(TAG, "sendExitMessage");
         if (mPlayState == Constants.SOUND_PLAY) {
-            messageBinder.sendMessage(mSoundMode + Constants.SOUND_STOP + ";\n");
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    messageBinder.sendMessage(mSoundMode + Constants.SOUND_STOP + ";\n");
+                }
+            }, 100);
         }
 
         if (mSwingMode.equals(Constants.SWING_OPEN)) {
-            messageBinder.sendMessage(Constants.SWING_TAG + Constants.SWING_CLOSE + ";\n");
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    messageBinder.sendMessage(Constants.SWING_TAG + Constants.SWING_CLOSE + ";\n");
+                }
+            }, 100);
         }
+
         messageBinder.sendMessage(Constants.TEMPERATURE_TAG + 0 + ";\n");
     }
 
@@ -575,10 +581,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void refreshTemperatureItemData() {
         switch (mHeatingState) {
-            case Constants.TEMPERATURE_UP:
+            case Constants.HEATING_OPEN:
                 heatingTemp = getResources().getString(R.string.temperature_up);
                 break;
-            case Constants.TEMPERATURE_DOWN:
+            case Constants.HEATING_CLOSE:
                 heatingTemp = getResources().getString(R.string.temperature_down);
                 break;
             default:
@@ -631,6 +637,7 @@ public class MainActivity extends AppCompatActivity implements
     public void updateSoundStatus(String soundMode, int playState) {
         mSoundMode = soundMode;
         mPlayState = playState;
+        isChangeTemperature = true;
         refreshSoundItemData();
         sendSingleMessage(soundMode);
     }
@@ -671,7 +678,7 @@ public class MainActivity extends AppCompatActivity implements
     public void updateSwingStatus(String swingMode) {
         mSwingMode = swingMode;
         refreshSwingItemData();
-        sendSingleMessage(swingMode);
+        sendSingleMessage(Constants.SWING_TAG);
     }
 
     /**
@@ -698,6 +705,18 @@ public class MainActivity extends AppCompatActivity implements
     private void showConnectedFailedDialog() {
         Log.d(TAG, "isDialogShown-" + isDialogShown);
         if (!isDialogShown) {
+            if (soundDialog.isVisible()) {
+                soundDialog.dismiss();
+            }
+            if (swingDialog.isVisible()) {
+                swingDialog.dismiss();
+            }
+            if (humidityDialog.isVisible()) {
+                humidityDialog.dismiss();
+            }
+            if (temperatureDialog.isVisible()) {
+                temperatureDialog.dismiss();
+            }
             failedFragment.show(getFragmentManager(), "connectFailed");
         }
         Log.d(TAG, "isDialogShown-" + isDialogShown);

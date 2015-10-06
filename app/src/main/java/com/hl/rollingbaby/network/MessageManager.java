@@ -25,6 +25,7 @@ public class MessageManager extends Thread {
     private int mPort;          //端口号
     private static final int TIMEOUT = 5000;    //超时时间
 
+    private Socket socket;
     private InputStream iStream;
     private OutputStream oStream;
     public static String readMessage;
@@ -51,9 +52,26 @@ public class MessageManager extends Thread {
         isConnecting = connectState;
     }
 
+    public void closeConnection() {
+        try {
+            if (iStream != null) {
+                socket.shutdownInput();
+                iStream.close();
+            }
+            if (oStream != null) {
+                socket.shutdownOutput();
+                oStream.close();
+            }
+            socket.close();
+            socket = null;
+        }catch (IOException e){
+            Timber.e("Error in exit");
+        }
+    }
+
     @Override
     public void run() {
-        Socket socket = new Socket();
+        socket = new Socket();
         while (isConnecting) {
             try {
                 socket.bind(null);
@@ -139,7 +157,6 @@ public class MessageManager extends Thread {
      * 发送字节数组类型的消息给服务器
      */
     public void write(byte[] buffer) {
-//        if (getConnectState()) {
             try {
                 oStream.write(buffer);
                 String sendMessage = new String(buffer, "UTF-8");
@@ -150,10 +167,6 @@ public class MessageManager extends Thread {
             Log.e(TAG, "Exception during write", e);
                 Timber.e("Exception during write", e);
             }
-//        }else {
-//            handler.obtainMessage(Constants.CONNECT_FAILED, this)
-//                    .sendToTarget();
-//        }
     }
 
 

@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onServiceConnected(ComponentName name, IBinder service) {
         messageBinder = (MessageService.MessageBinder) service;
         messageService = messageBinder.getService();
-        messageBinder.startConnect(((MessageTarget) this).getHandler());
+        messageBinder.startConnect(getHandler());
     }
 
     @Override

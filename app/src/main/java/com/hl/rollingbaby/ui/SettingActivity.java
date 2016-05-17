@@ -92,6 +92,12 @@ public class SettingActivity extends PreferenceActivity implements
         super.onResume();
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
+
+        SharedPreferences sharedPreferences =  getPreferenceScreen().getSharedPreferences();
+        Preference pref = this.findPreference(IP_ADDRESS_PORT);
+        pref.setSummary(getResources().getString(R.string.summary_header)
+                + sharedPreferences.getString(IP_ADDRESS_PORT, Constants.ADDRESS_PORT));
+
         Log.d(TAG, "onResume");
     }
 
